@@ -26,5 +26,18 @@ int	main(int ac, char **av) {
 		printf("waiting for a connection on port %d\n", SERVER_PORT);
 		fflush(stdout);
 		connfd = accept(listenfd, (SA *) NULL, NULL);
+		memset(recvline, 0, MAXLINE);
+		while ((n = read(connfd, recvline, MAXLINE - 1)) > 0) {
+			fprintf(stdout, "\n%s\n\n%s", bin2hex(recvline, n), recvline);
+			if (recvline[n - 1] == '\n')
+				break;
+			memset(recvline, 0, MAXLINE);
+		}
+		if (n < 0)
+			err_n_die("read error.");
+		
+		snprintf((char *)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
+		write(connfd, (char *)buff, strlen((char *)buff));
+		close(connfd);
 	}
 }
