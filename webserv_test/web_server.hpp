@@ -21,6 +21,7 @@
 #define MAXLINE 4096
 #define SA struct sockaddr
 
+//affiche les potentiels erreurs puis meurt
 void	err_n_die(const char *fmt, ...) {
 	int		errno_save;
 	va_list	ap;
@@ -32,25 +33,28 @@ void	err_n_die(const char *fmt, ...) {
 	fprintf(stdout, "\n");
 	fflush(stdout);
 
-	if (errno_save) {
+	if (errno_save != 0) {
 		fprintf(stdout, "(errno = %d) : %s\n", errno_save, strerror(errno_save));
 		fprintf(stdout, "\n");
 		fflush(stdout);
 	}
 	va_end(ap);
-	exit(EXIT_FAILURE);
+	exit(1);
 }
 
-char	*bin2hex(const unsigned char *input, size_t len) {
+//pour debug permet de check s'il y a des char non printables qui posent pb
+//prends une string de bytes et convertie en hex
+char	*bin2hex(const unsigned char *input, size_t len)
+{
 	char	*result;
-	char	*hexits = "0123456789ABCDEF";
+	char	hexits[] = "0123456789ABCDEF";
 
 	if (input == NULL || len <= 0)
 		return (NULL);
 
 	int resultlength = (len * 3) + 1;
 
-	result = malloc(resultlength);
+	result = (char*)malloc(resultlength);
 	bzero(result, resultlength);
 
 	for (int i = 0; i < len; i++) {
@@ -58,8 +62,8 @@ char	*bin2hex(const unsigned char *input, size_t len) {
 		result[(i * 3) + 1] = hexits[input[i] & 0x0F];
 		result[(i * 3) + 2] = ' ';
 	}
-
 	return (result);
+
 }
 
 #endif
