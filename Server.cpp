@@ -1,26 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.hpp                                        :+:      :+:    :+:   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/08 10:30:56 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/08 12:49:12 by bahommer         ###   ########.fr       */
+/*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
+/*   Updated: 2024/01/08 12:56:27 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSING_HPP
-# define PARSING_HPP
+#include "Server.hpp"
+#include "parsing.hpp"
 
-#include <iostream>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <string.h>
-#include <exception>
-#include <unistd.h>
-#include <fstream>
-#include <vector>
+Server::Server(std::vector<std::string> config) {
+	std::cout << "SERVER" << std::endl;
+	for (size_t i = 0; i < config.size(); i++) {
+		std::cout << config[i] << std::endl;
+	}
+	std::cout << "END OF SERVER" << std::endl;
+}
 
-#endif
+Server::~Server(void) {}

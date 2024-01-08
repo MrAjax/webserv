@@ -1,0 +1,36 @@
+# Premier serveur
+server {
+    listen 80;
+    server_name www.monsite1.com;
+
+    root /var/www/monsite1;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Configuration pour les fichiers statiques
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+        expires 30d;
+    }
+}
+
+# Deuxième serveur
+server {
+    listen 80;
+    server_name www.monsite2.com;
+
+    root /var/www/monsite2;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Configuration pour les fichiers statiques
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+        expires 30d;
+    }
+}
+

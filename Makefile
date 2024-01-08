@@ -6,7 +6,7 @@
 #    By: bahommer <bahommer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/09/12 13:52:28 by bahommer          #+#    #+#              #
-#    Updated: 2024/01/08 10:35:20 by bahommer         ###   ########.fr        #
+#    Updated: 2024/01/08 12:40:28 by bahommer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,8 @@ I = ./
 D = dep/
 
 SRC		= $(S)main.cpp \
+			$(S)Server.cpp \
+			$(S)serv_config.cpp
 
 OBJ		= $(SRC:$(S)%=$(O)%.o)
 DEP		= $(SRC:$(S)%=$(D)%.d)
