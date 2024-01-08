@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:30:56 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/08 12:49:12 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/08 13:38:43 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,5 +22,9 @@
 #include <unistd.h>
 #include <fstream>
 #include <vector>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
 
 #endif

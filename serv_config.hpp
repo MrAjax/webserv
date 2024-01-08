@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/08 12:51:44 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/08 13:48:02 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ private:
 	void parse_blocks( void );
 	
 	std::ifstream _ifs;
+	int socketfd;
 	std::vector<Server> _servers;
 		
 };

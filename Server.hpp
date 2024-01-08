@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/08 12:48:04 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/08 13:46:42 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ public:
 
 private:
 	Server( void );
+	
+	struct addrinfo _serv;
 
 };
 
