@@ -2,7 +2,6 @@
 # define HTTPRESPONSE_HPP
 
 #include "http.hpp"
-#include "HttpRequest.hpp"
 
 class HttpResponse {
 	std::string	_version;
@@ -10,8 +9,13 @@ class HttpResponse {
 	std::string	_status_msg;
 	std::string	_header;
 public:
-	HttpResponse();
-	HttpResponse();
+	HttpResponse(HttpRequest &req);
+	HttpResponse(const HttpResponse &rep);
+	HttpResponse	&operator=(const HttpResponse &rep);
+	~HttpResponse();
 };
+
+// Building an storing the HTTP response (status line, header, body...)
+// Setting the appropriate status code
 
 #endif
