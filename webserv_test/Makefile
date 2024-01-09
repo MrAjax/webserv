@@ -7,7 +7,7 @@ client:
 	c++ web_client.cpp -o client
 
 server:
-	c++ web_server.cpp -o server
+	c++ web_server.cpp HttpRequest.cpp -o server
 
 clean:
 	rm -f client
