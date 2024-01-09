@@ -5,9 +5,9 @@
 #include <cstring>
 #include <iostream>
 
-void sendhtml(int connfd)
+void sendhtml(int connfd, std::string ContentType, std::string input)
 {
-	std::ifstream file("index.html");
+	std::ifstream file(input);
 
 	if (file.is_open())
 	{
@@ -19,7 +19,7 @@ void sendhtml(int connfd)
 
 	std::string response;
 	response = "HTTP/1.1 200 OK\r\n";
-	response += "Content-Type: text/html\r\n";
+	response += "Content-Type: " + ContentType + "text/html\r\n";
 	response += "Content-Length: " + std::to_string(htmlcontent.length()) + "\r\n\r\n";
     response += htmlcontent;
 
@@ -55,8 +55,8 @@ int main(int argc, char **argv)
     // en gros accepte la connection et la reset a l infini jusqu'a ce qu on en veuille plus
     for (;;)
 	{
-		struct sockaddr_in	addr;
-		socklen_t			addr_len;
+		// struct sockaddr_in	addr;
+		// socklen_t			addr_len;
 
 		printf("waiting for a connection on port %d\n", SERVER_PORT);
 		fflush(stdout);
@@ -73,7 +73,21 @@ int main(int argc, char **argv)
         // snprintf((char*)buff, sizeof(buff), "HTTP/1.0 200 OK\r\n\r\nHello");
         // write(connfd, (char *)buff, strlen((char *)buff));
 		printf("connfd->[%d]\n", connfd);
-		sendhtml(connfd);
+		sendhtml(connfd, "text/html", "index.html");
+		close(connfd);
+
+		//--------- test loading image ---------
+
+		printf("waiting for a connection on port %d\n", SERVER_PORT);
+		fflush(stdout);
+		
+		connfd = accept(listenfd, (SA *) NULL, NULL);
+		memset(recvline, 0, MAXLINE);
+	
+		Head.parsingHeader(connfd);
+
+		printf("connfd->[%d]\n", connfd);
+		sendhtml(connfd, "image/jpeg", "chien.jpeg");
 		close(connfd);
         
     }

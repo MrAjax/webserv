@@ -16,8 +16,10 @@ void    HttpRequest::parsingHeader(int connfd)
 	{
 		printf("%s\n", recvline);
 
-        if (recvline )
+        // if (recvline )
+        // {
 
+        // }
 
 
 		if (recvline[n - 1] == '\n')
