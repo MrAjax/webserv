@@ -19,7 +19,7 @@ void sendhtml(int connfd, std::string ContentType, std::string input)
 
 	std::string response;
 	response = "HTTP/1.1 200 OK\r\n";
-	response += "Content-Type: " + ContentType + "text/html\r\n";
+	response += "Content-Type: " + ContentType + "\r\n";
 	response += "Content-Length: " + std::to_string(htmlcontent.length()) + "\r\n\r\n";
     response += htmlcontent;
 

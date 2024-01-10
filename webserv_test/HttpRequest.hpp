@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <cstdlib>
+#include <vector>
 
 # define RESET	"\e[0m"
 # define RED	"\e[31m"
@@ -26,11 +27,14 @@ class HttpRequest
         void parsingHeader(int connfd);
 
     private:
-        std::string cmd;
-        std::string protocol;
-        std::string ContentType;
-        std::string ContentLength;
-        std::string Content;
+        std::string _cmd;
+        std::string _protocol;
+        std::string _ContentType;
+        std::string _ContentLength;
+        std::string _Content;
+
+        std::vector< std::pair<int, bool> > _requestList; 
+
         
 };
 

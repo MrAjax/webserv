@@ -18,7 +18,7 @@ void    HttpRequest::parsingHeader(int connfd)
 
         // if (recvline )
         // {
-
+                
         // }
 
 
