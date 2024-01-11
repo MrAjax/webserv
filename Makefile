@@ -2,7 +2,7 @@ CC = c++
 CXXFLAGS = -Iinc -MMD -g3 -Wall -Wextra -Werror -std=c++98
 NAME = webserv
 
-SRC = src/main.cpp
+SRC = main.cpp
 
 OBJ = $(SRC:.cpp=.o)
 DEP = $(SRC:.cpp=.d)
