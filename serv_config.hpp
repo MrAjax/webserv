@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/08 13:48:02 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/11 11:34:01 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ public:
 private:
 	serv_config( void );
 	void parse_blocks( void );
+	void config_webserv(void);
 	
 	std::ifstream _ifs;
 	int socketfd;

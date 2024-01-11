@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 11:13:25 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/08 14:00:53 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/11 11:34:24 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void serv_config::config_webserv(void) {
 
 	socketfd = socket(AF_INET, SOCK_STREAM, 0); 
 	/* check error */
+}	
 
 void serv_config::parse_blocks(void) { // Cut every server block ("server {" to ... "}")
 									// in std::vector<std::string> and create a server class member
@@ -50,6 +51,4 @@ void serv_config::parse_blocks(void) { // Cut every server block ("server {" to 
 		}
 	}
 	_ifs.close();
-}	
-
-
+}
