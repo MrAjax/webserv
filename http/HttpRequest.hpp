@@ -23,7 +23,12 @@ class HttpRequest
         //OPERATOR//
         HttpRequest	&operator=(HttpRequest const &rhs);
 
-        void parsingHeader(int connfd);
+        int parsingHeader();
+
+        std::string getMethod();
+        std::string getPath();
+        std::string getProtocol();
+        std::string getHeader();
 
     private:
         std::string cmd;
