@@ -1,0 +1,7 @@
+**.d
+**.o
+test
+http/main.cpp
+http/Makefile
+file
+**.vscode
