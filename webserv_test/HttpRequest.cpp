@@ -6,6 +6,20 @@ HttpRequest::HttpRequest(void){}
 
 HttpRequest::~HttpRequest(void){}
 
+//-----------Utils----------------
+
+std::string	HttpRequest::findLine(std::string header, std::string &delimiteur, std::size_t & end_pos)
+{
+	std::string	line;
+	end_pos = header.find(delimiteur);
+	if (end_pos == std::string::npos)
+		return (header);
+	line = header.substr(0, end_pos);
+	return (line);
+}
+
+//-----------Header parser----------------
+
 std::string HttpRequest::getHeader(std::string &fullRequest)
 {
 	std::string delimiteur = "\r\n\r\n";
@@ -19,7 +33,6 @@ std::string HttpRequest::getHeader(std::string &fullRequest)
 
 	return (header);
 }
-//-----------Header parser----------------
 
 void	HttpRequest::parsingHeader_method_pathcmd_http(std::string &line)
 {
@@ -27,42 +40,67 @@ void	HttpRequest::parsingHeader_method_pathcmd_http(std::string &line)
 	std::string			output;
 	ss >> output;
 	if (output != "GET" && output != "POST" && output != "DELETE")
-		std::cout << "NO METHODE!!!!!!\n";
+		std::cout << "ERROR NO METHODE!!!!!!\n";
 	else
 		this->_method = output;
 	ss >> output;
-	this->_pathCmd;
+	this->_pathCmd = output;
 	ss >> output;
-	this->_pathCmd;
-	ss >> output;
-	this->_http;
+	this->_http = output;
+	if (ss >> output)
+		std::cout << "ERROR SHOULD BE EMPTY NOW!!!!!!\n";
 }
 
-void        HttpRequest::parsingHeader_host(std::string &line)
+std::string	HttpRequest::parsingHeader_rest(std::string &line, std::string const & keyWord)
 {
 	std::stringstream	ss(line);
+	std::string			token;
 	std::string			output;
-	ss >> output;
-	if (output != "Host:")
-		std::cout << "NO HOST!!!!!!\n";
+
+	ss >> token;
+	if (token != keyWord)
+		std::cout << "ERROR NO " + keyWord + "!!!!!!\n";
 	else
 	{
-		ss >> output;
-		this->_host = output;
+		while (ss >> token)
+		{
+			if (!output.empty())
+				output += " ";
+			output += token;
+		}
 	}
+	return (output);
 }
 
-void    HttpRequest::parsingHeader(std::string &header)
+void    HttpRequest::parseAllAttributes(std::string &header)
 {
 	std::string delimiteur = "\r\n";
-	std::size_t pos = header.find(delimiteur);
-	std::cout << "\n\n[" << header.substr(0, pos) << "]\n[\r\n]\n";
+	std::size_t start_pos = 0;
+	std::size_t end_pos;
+	std::string	line;
+	std::string	tab_key[10] = {"Host:", "User-Agent:", "Accept:", "Accept-Language:", "Accept-Encoding:",
+				"Connection:", "Referer:", "Sec-Fetch-Dest:", "Sec-Fetch-Mode:", "Sec-Fetch-Site:"};
+	std::string *tab_ref[10] = {&_host, &_userAgent, &_accept, &_acceptLanguage, &_acceptEncoding,
+				&_connection, &_referer, &_secFetchDest, &_secFetchMode, &_secFetchSite};
 
-	std::string	line = header.substr(0, pos);
+	line = findLine(header, delimiteur, end_pos);
 	parsingHeader_method_pathcmd_http(line);
+	//std::cout << "\n1[" << line << "]\n"; //print ligne pour voir ce que je parse
+	for (int i = 0 ; i < 10; i++)
+	{
+		start_pos += end_pos + delimiteur.size();
+		line = findLine(header.substr(start_pos), delimiteur, end_pos);
+		*tab_ref[i] = parsingHeader_rest(line, tab_key[i]);
+		//std::cout << "\n" << i << "[" << line << "]\n"; //print ligne pour voir ce que je parse
+	}
+
+	std::cout << "-------List command--------" << std::endl; //print pour voir si toutes les valeurs sont bien parse
+	std::cout << this->_method << std::endl;
+	std::cout << this->_pathCmd << std::endl;
+	std::cout << this->_http << std::endl;
+	for (int i = 0; i < 10; i++)
+		std::cout << *tab_ref[i] << std::endl;
 }
-
-
 
 void    HttpRequest::parsingHeader(int connfd)
 {
@@ -71,7 +109,6 @@ void    HttpRequest::parsingHeader(int connfd)
 
 	std::string fullRequest;
 	int n;
-
 	while ((n = read(connfd, recvline, MAXLINE - 1)) > 0)
 	{
 		printf("%s\n", recvline);
@@ -81,11 +118,9 @@ void    HttpRequest::parsingHeader(int connfd)
 		memset(recvline, 0, MAXLINE);
 	}
 	if (n < 0)
-		printf("read error\n");
+		printf("read ERROR\n");
 
-	getHeader(fullRequest);
-
-
-
+	std::string 	header = getHeader(fullRequest);
+	parseAllAttributes(header);
 }
 

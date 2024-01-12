@@ -26,22 +26,16 @@ class HttpRequest
         HttpRequest	&operator=(HttpRequest const &rhs);
 
         void        parsingHeader(int connfd);
+        void        parseAllAttributes(std::string & header);
+
         std::string getHeader(std::string &fullRequest);
 
         //---------Header parser--------------
         void        parsingHeader(std::string &header);
         void        parsingHeader_method_pathcmd_http(std::string &line);
-        void        parsingHeader_host(std::string &line);
-        void        parsingHeader_userAgent(std::string &line);
-        void        parsingHeader_accept(std::string &line);
-        void        parsingHeader_acceptLanguage(std::string &line);
-        void        parsingHeader_acceptEncoding(std::string &line);
-        void        parsingHeader_connection(std::string &line);
-        void        parsingHeader_referer(std::string &line);
-        void        parsingHeader_secFetchDest(std::string &line);
-        void        parsingHeader_secFetchMode(std::string &line);
-        void        parsingHeader_secFetchSite(std::string &line);
-        //---------
+        std::string parsingHeader_rest(std::string &line, std::string const & keyWord);
+        //---------Utils---------------------
+        std::string findLine(std::string header, std::string &delimiteur, std::size_t & end_pos);
 
     private:
         std::string _method;
