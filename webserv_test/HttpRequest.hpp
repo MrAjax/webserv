@@ -6,6 +6,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <vector>
+#include <sstream>
 
 # define RESET	"\e[0m"
 # define RED	"\e[31m"
@@ -24,14 +25,28 @@ class HttpRequest
         //OPERATOR//
         HttpRequest	&operator=(HttpRequest const &rhs);
 
-        void parsingHeader(int connfd);
+        void        parsingHeader(int connfd);
+        std::string getHeader(std::string &fullRequest);
+        void        parsingHeader(std::string &header);
+
+        void        parsingHeader(std::string &header);
+        void        parsingHeader_method_pathcmd_http(std::string &line);
 
     private:
-        std::string _cmd;
-        std::string _protocol;
-        std::string _ContentType;
-        std::string _ContentLength;
-        std::string _Content;
+        std::string _method;
+        std::string _pathCmd;
+        std::string _http;
+        std::string _host;
+        std::string _userAgent;
+        std::string _accept;
+        std::string _acceptLanguage;
+        std::string _acceptEncoding;
+        std::string _connection;
+        std::string _referer;
+        std::string _secFetchDest;
+        std::string _secFetchMode;
+        std::string _secFetchSite;
+
 
         std::vector< std::pair<int, bool> > _requestList; 
 
