@@ -19,6 +19,7 @@ std::string HttpRequest::getHeader(std::string &fullRequest)
 
 	return (header);
 }
+//-----------Header parser----------------
 
 void	HttpRequest::parsingHeader_method_pathcmd_http(std::string &line)
 {
@@ -35,6 +36,20 @@ void	HttpRequest::parsingHeader_method_pathcmd_http(std::string &line)
 	this->_pathCmd;
 	ss >> output;
 	this->_http;
+}
+
+void        HttpRequest::parsingHeader_host(std::string &line)
+{
+	std::stringstream	ss(line);
+	std::string			output;
+	ss >> output;
+	if (output != "Host:")
+		std::cout << "NO HOST!!!!!!\n";
+	else
+	{
+		ss >> output;
+		this->_host = output;
+	}
 }
 
 void    HttpRequest::parsingHeader(std::string &header)
