@@ -138,3 +138,4 @@ void    HttpRequest::parsingHeader(int connfd)
 	std::string 	header = getHeader(fullRequest);
 	parseAllAttributes(header);
 }
+

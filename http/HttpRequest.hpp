@@ -1,5 +1,5 @@
-#ifndef SPAN_HPP
-# define SPAN_HPP
+#ifndef HTTPREQUEST_HPP
+# define HTTPREQUEST_HPP
 
 #include <iostream>
 #include <unistd.h>
@@ -22,30 +22,37 @@ class HttpRequest
         HttpRequest(void);
         HttpRequest(HttpRequest const &copy);
         ~HttpRequest(void);
-        //OPERATOR//
+        //------------OPERATOR------------------//
         HttpRequest	&operator=(HttpRequest const &rhs);
 
         void        parsingHeader(int connfd);
-        std::string getHeader(std::string &fullRequest);
+        void        parseAllAttributes(std::string & header);
+
+        //---------Guetteurs-----------------
+        std::string getMethod();
+        std::string getPath();
+        std::string getHttp();
+        std::string getHost();
+        std::string getUserAgent();
+        std::string getAccept();
+        std::string getAcceptLanguage();
+        std::string getConnection();
+        std::string getReferer();
+        std::string getSecFetchDest();
+        std::string getSecFetchMode();
+        std::string getSecFetchSite();
 
         //---------Header parser--------------
+        std::string getHeader(std::string &fullRequest);
         void        parsingHeader(std::string &header);
-        void        parsingHeader_method_pathcmd_http(std::string &line);
-        void        parsingHeader_host(std::string &line);
-        void        parsingHeader_userAgent(std::string &line);
-        void        parsingHeader_accept(std::string &line);
-        void        parsingHeader_acceptLanguage(std::string &line);
-        void        parsingHeader_acceptEncoding(std::string &line);
-        void        parsingHeader_connection(std::string &line);
-        void        parsingHeader_referer(std::string &line);
-        void        parsingHeader_secFetchDest(std::string &line);
-        void        parsingHeader_secFetchMode(std::string &line);
-        void        parsingHeader_secFetchSite(std::string &line);
-        //---------
+        void        parsingHeader_method_path_http(std::string &line);
+        std::string parsingHeader_rest(std::string &line, std::string const & keyWord);
+        //---------Utils---------------------
+        std::string findLine(std::string header, std::string &delimiteur, std::size_t & end_pos);
 
     private:
         std::string _method;
-        std::string _pathCmd;
+        std::string _path;
         std::string _http;
         std::string _host;
         std::string _userAgent;
@@ -57,10 +64,6 @@ class HttpRequest
         std::string _secFetchDest;
         std::string _secFetchMode;
         std::string _secFetchSite;
-
-
-        std::vector< std::pair<int, bool> > _requestList; 
-
         
 };
 
