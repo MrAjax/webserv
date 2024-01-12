@@ -5,11 +5,13 @@
 #include "HttpRequest.hpp"
 
 class HttpResponse {
-	std::string					_protocol;
-	std::string					_status_code;
-	std::string					_status_msg;
-	std::string					_header;
-	std::string					_response;
+	std::string	_method;
+	std::string	_path;
+	std::string	_protocol;
+	std::string	_status_code;
+	std::string	_status_msg;
+	std::string	_header;
+	std::string	_response;
 public:
 	HttpResponse(HttpRequest &req);
 

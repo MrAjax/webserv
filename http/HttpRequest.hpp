@@ -42,6 +42,18 @@ class HttpRequest
         void        parsingHeader_secFetchMode(std::string &line);
         void        parsingHeader_secFetchSite(std::string &line);
         //---------
+        std::string getMethod() {
+            return _method;
+        }
+        std::string getPath() {
+            return _pathCmd;
+        }
+        std::string getProtocol() {
+            return _http;
+        }
+        std::string getHeader() {
+            return "";
+        }
 
     private:
         std::string _method;

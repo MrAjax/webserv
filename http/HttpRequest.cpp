@@ -6,7 +6,7 @@ HttpRequest::HttpRequest(void){}
 
 HttpRequest::~HttpRequest(void){}
 
-int    HttpRequest::parsingHeader(int connfd)
+void    HttpRequest::parsingHeader(int connfd)
 {
     u_int8_t recvline[MAXLINE + 1];
     memset(recvline, 0, MAXLINE);
@@ -50,22 +50,5 @@ int    HttpRequest::parsingHeader(int connfd)
         data = fullRequest.substr(pos + delimiteur.size());
         std::cout << "\nDATA\n[" + data + "]\n";
     }
-    return (0);
-}
-
-std::string HttpRequest::getMethod() {
-    return cmd;
-}
-
-std::string HttpRequest::getPath() {
-    return "";
-}
-    
-std::string HttpRequest::getProtocol() {
-    return protocol;
-}
-
-std::string HttpRequest::getHeader() {
-    return "";
 }
 

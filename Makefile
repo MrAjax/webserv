@@ -13,6 +13,8 @@ YELLOW=\033[0;93m
 RED=\033[0;38;5;167m
 END=\033[0m
 
+valgrind = valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes --trace-children=yes ./$(NAME)
+
 $(NAME) : $(OBJ)
 	@$(CC) $(CXXFLAGS) $(OBJ) -o $(NAME)
 	@echo "$(RED) Exec ready $(END)"
@@ -31,5 +33,8 @@ fclean : clean
 
 re : fclean all
 
-.PHONY: all clean fclean re
+leaks : all
+	@ $(valgrind)
+
+.PHONY: all clean fclean re leaks
 .SILENT:

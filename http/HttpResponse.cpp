@@ -1,15 +1,26 @@
 #include "HttpResponse.hpp"
 
 HttpResponse::HttpResponse(HttpRequest &req) {
-	// On presuppose au depart que le header est valide
-	_protocol = req.getProtocol();
-	_header = req.getHeader();
+	// On presuppose ici que le header est valide
+	// Recuperer ces infos de la classe Request
+	(void)req;
+	_method = "GET";
+	_path = "/";
+	_protocol = "HTTP/1.1";
+	_header = "Host";
 	_response = _protocol + " " + _status_code + _status_msg + "\n" + _header;
 
-	std::cout << "\n*********************************************\n*********************************************\n" << _response << "\n*********************************************\n";
-	if (getResponse())
-		throw std::runtime_error("ERROR: *****\n");
+	std::cout << "\n\nResponse:\n" << _response << "\n\n";
+/* 	if (getResponse())
+		throw std::runtime_error("ERROR: *****\n"); */
 }
+
+//STEP by STEP
+//
+// Verifier le path, existence du fichier et droits dessus
+// Identifier le type de methode
+// 
+// Generer 
 
 HttpResponse::~HttpResponse() {}
 
@@ -47,5 +58,4 @@ void HttpResponse::sendhtml(int connfd, std::string ContentType, std::string inp
 	else{
 		std::cerr << "Error HTML" << std::endl;
 	}
-
 }
