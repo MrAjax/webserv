@@ -65,7 +65,7 @@ char	*bin2hex(const unsigned char *input, size_t len)
 		result[(i * 3) + 2] = ' ';
 	}
 	return (result);
-
 }
+
 
 #endif
