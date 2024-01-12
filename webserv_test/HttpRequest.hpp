@@ -47,6 +47,7 @@ class HttpRequest
         void        parsingHeader(std::string &header);
         void        parsingHeader_method_path_http(std::string &line);
         std::string parsingHeader_rest(std::string &line, std::string const & keyWord);
+        
         //---------Utils---------------------
         std::string findLine(std::string header, std::string &delimiteur, std::size_t & end_pos);
 

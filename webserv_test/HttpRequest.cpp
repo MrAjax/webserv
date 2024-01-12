@@ -109,6 +109,12 @@ void    HttpRequest::parseAllAttributes(std::string &header)
 		//std::cout << "\n" << i << "[" << line << "]\n"; //print ligne pour voir ce que je parse
 	}
 
+
+	while (start_pos < header.size())
+	{
+		
+	}
+
 	std::cout << "-------List command--------" << std::endl; //print pour voir si toutes les valeurs sont bien parse
 	std::cout << this->_method << std::endl;
 	std::cout << this->_path << std::endl;
