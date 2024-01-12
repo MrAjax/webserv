@@ -69,3 +69,4 @@ char	*bin2hex(const unsigned char *input, size_t len)
 
 
 #endif
+
