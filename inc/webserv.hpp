@@ -11,7 +11,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/eventfd.h>
-//#include <sys/event.h>
+#include <poll.h>
 #include <sys/time.h>
 #include <signal.h>
 #include <dirent.h>
@@ -20,10 +20,19 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <sys/wait.h>
-
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <sys/ioctl.h>
+#include <stdarg.h>
+//C++
+#include <sstream>
+#include <cstring>
 #include <iostream>
 #include <string>
 #include <map>
 #include <vector>
+#include <fstream>
 
 #endif
