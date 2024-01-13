@@ -126,14 +126,14 @@ void    HttpRequest::parsingHeader(int connfd)
 	int n;
 	while ((n = read(connfd, recvline, MAXLINE - 1)) > 0)
 	{
-		printf("%s\n", recvline);
+		std::cout << recvline << std::endl;
 		fullRequest += reinterpret_cast< char * >(recvline);
 		if (recvline[n - 1] == '\n')
 			break;
 		memset(recvline, 0, MAXLINE);
 	}
 	if (n < 0)
-		printf("read ERROR\n");
+		std::cout << "read ERROR" << std::endl;
 
 	std::string 	header = getHeader(fullRequest);
 	parseAllAttributes(header);
