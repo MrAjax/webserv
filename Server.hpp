@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/15 14:53:46 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/15 15:49:16 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,13 @@
 
 #include "parsing.hpp"
 
-# define PARAM 3
 class serv_config;
 class Server {
 
 typedef void (*FuncPtr)(std::string const&);
 
 public:
-	Server(std::vector<std::string> config, serv_config const& webserv);
+	Server(std::vector<std::string> config, serv_config const& webserv, int i);
 	~Server( void );
 	
 private:
@@ -37,6 +36,7 @@ private:
 	void configServer(void);
 
 	serv_config const& _webserv;
+	int	_i; // number of Server 0 is the first etc...
 	struct addrinfo* _res;
 	struct sockaddr_in _server_addr;
 	std::string _node; // = ip or localhost

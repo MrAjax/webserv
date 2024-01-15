@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/15 14:57:00 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/15 16:05:23 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@
 #include "parsing.hpp"
 #include "serv_config.hpp"
 
-Server::Server(std::vector<std::string> config, serv_config const& webserv) : _webserv(webserv) 
+Server::Server(std::vector<std::string> config, serv_config const& webserv, int i)
+	: _webserv(webserv), _i(i) 
 {
 	memset(&_server_addr, 0, sizeof(_server_addr));
 
@@ -75,9 +76,18 @@ void Server::configServer(void) {
 	if (ret != 0) {
 		std::cerr << "getaddrinfo error: " << gai_strerror(ret) << std::endl;
 	}
-	std::cout << "Fd = " << _webserv.getSocketfd() << std::endl;
-//	int ret = bind(
-			
+	std::cout << _webserv.getSocketfd() << " " << (struct sockaddr *)&_server_addr.sa_data << std::endl;
+	/*loop to bind*/
+	if (ret != 0) {
+		std::cerr << "bind error: " << strerror(errno) << std::endl;
+	}	
+
+	if (_i == 0) { // listen is set only once 
+		ret = listen(_webserv.getSocketfd(), MAX_CO);
+		if (ret != 0) {
+			std::cerr << "listen error: " << strerror(errno) << std::endl;
+		}
+	}	
 }	
 
 void Server::p_listen(std::string const& line) {

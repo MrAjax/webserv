@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 11:13:25 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/15 14:55:04 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/15 15:49:51 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,15 +37,17 @@ void serv_config::parse_blocks(void) { // Cut every server block ("server {" to 
 	std::string line;
 	std::vector<std::string> block;
 	bool recording = false;
+	int	i = 0;
 
 	while (getline(_ifs, line)) {
 		if (line.find("server {") != std::string::npos) {
 			recording = true;
 		}
 		else if (line[0] == '}' && recording == true) {
-			_servers.push_back(Server(block, *this));
+			_servers.push_back(Server(block, *this, i));
 			block.clear();
 			recording = false;
+			i++;
 		}
 		else if (recording == true) {
 			block.push_back(line);

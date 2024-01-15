@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:30:56 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/15 13:43:49 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/15 15:41:49 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,4 +29,6 @@
 #include <cstdlib>
 #include <string>
 
+# define PARAM 3
+# define MAX_CO 10
 #endif
