@@ -11,6 +11,7 @@ public:
 	~HttpStatusCode();
 
 	std::map<int, std::string>	&get_http_status_code();
+	static std::string			get_error_msg(int code);
 };
 
 #endif

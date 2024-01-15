@@ -26,3 +26,7 @@ HttpStatusCode::~HttpStatusCode() {}
 std::map<int, std::string>	&HttpStatusCode::get_http_status_code() {
 		return (_http_status_code);
 }
+
+std::string	HttpStatusCode::get_error_msg(int code) {
+	return _http_status_code.find(code)->second;
+}

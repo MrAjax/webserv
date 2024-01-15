@@ -3,6 +3,10 @@
 
 #include "../inc/webserv.hpp"
 #include "HttpRequest.hpp"
+#include "Method.hpp"
+#include "Get.hpp"
+#include "Post.hpp"
+#include "Delete.hpp"
 
 class HttpResponse {
 	std::string	_method;
@@ -17,9 +21,8 @@ public:
 
 	~HttpResponse();
 
-	int	getResponse();
-
 	void sendhtml(int connfd, std::string ContentType, std::string input);
+	std::string	get_response();
 };
 
 // Building and storing the HTTP response (status line, header, body...)

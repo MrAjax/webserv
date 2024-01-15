@@ -1,37 +1,20 @@
 #include "HttpResponse.hpp"
 
 HttpResponse::HttpResponse(HttpRequest &req) {
-	// On presuppose ici que le header est valide
 	// Recuperer ces infos de la classe Request
 	(void)req;
+	HttpStatusCode	codeHttp;
+
 	_method = "GET";
 	_path = "/";
-	_protocol = "HTTP/1.1";
-	_header = "Host";
-	_response = _protocol + " " + _status_code + _status_msg + "\n" + _header;
-
-	std::cout << "\n\nResponse:\n" << _response << "\n\n";
-/* 	if (getResponse())
-		throw std::runtime_error("ERROR: *****\n"); */
+//	_protocol = "HTTP/1.1";
+//	_header = "Host";
+//	_status_code = 200;
+//	_status_msg = codeHttp.get_http_status_code().find(200)->second;
+//	_response = _protocol + " " + _status_code + _status_msg + "\r\n" + _header;
 }
-
-//STEP by STEP
-//
-// Verifier le path, existence du fichier et droits dessus
-// Identifier le type de methode
-// 
-// Generer 
 
 HttpResponse::~HttpResponse() {}
-
-int	HttpResponse::getResponse() {
-	
-	std::string	resp;
-
-
-	_response = resp;
-	return (1);
-}
 
 void HttpResponse::sendhtml(int connfd, std::string ContentType, std::string input)
 {
@@ -58,4 +41,15 @@ void HttpResponse::sendhtml(int connfd, std::string ContentType, std::string inp
 	else{
 		std::cerr << "Error HTML" << std::endl;
 	}
+}
+
+std::string	HttpResponse::get_response() {
+	//if (GET)
+	//if (POST)
+	//if (DELETE)
+	const Method *m = new Get(_path);
+
+	_response = m->get_header() + m->get_body();
+	delete m;
+	return _response;
 }
