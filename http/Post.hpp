@@ -6,6 +6,8 @@
 
 class Post: public Method {
 	public:
+	Post(std::string path);
+	~Post();
 	void	execute_method();
 };
 

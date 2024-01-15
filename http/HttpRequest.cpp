@@ -119,7 +119,7 @@ void    HttpRequest::parseAllAttributes(std::string &header)
 
 void    HttpRequest::parsingHeader(int connfd)
 {
-	uint8_t recvline[MAXLINE + 1];
+	u_int8_t recvline[MAXLINE + 1];
 	memset(recvline, 0, MAXLINE);
 
 	std::string fullRequest;

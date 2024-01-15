@@ -3,9 +3,9 @@
 HttpResponse::HttpResponse(HttpRequest &req) {
 	// Recuperer ces infos de la classe Request
 	(void)req;
-	HttpStatusCode	codeHttp;
 
 	_method = "GET";
+	_method_code = GET;
 	_path = "/";
 //	_protocol = "HTTP/1.1";
 //	_header = "Host";
@@ -44,12 +44,26 @@ void HttpResponse::sendhtml(int connfd, std::string ContentType, std::string inp
 }
 
 std::string	HttpResponse::get_response() {
-	//if (GET)
-	//if (POST)
-	//if (DELETE)
-	const Method *m = new Get(_path);
+	Method *m;
+
+	switch (_method_code)
+	{
+	case GET:
+		m = new Get(_path);
+		break;
+	case POST:
+		m = new Post(_path);
+		break;
+	case DELETE:
+		m = new Delete(_path);
+		break;
+	default:
+		break;
+	}
 
 	_response = m->get_header() + m->get_body();
+	
 	delete m;
+
 	return _response;
 }

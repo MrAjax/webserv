@@ -5,10 +5,10 @@ Get::Get(std::string path /* std::string type */): Method(path) {/* _ressource_t
 Get::~Get() {}
 
 void	Get::get_text() {
-	std::ifstream		file_requested(this->get_path());
+	std::ifstream		file_requested(this->get_path().c_str());
 	std::stringstream	file_content;
 
-	if (file_requested.is_open() < 0)
+	if (!file_requested.is_open())
 		throw std::runtime_error("ERROR: Cannot open the requested ressource\n");
 	file_content << file_requested.rdbuf();
 	file_requested.close();

@@ -1,7 +1,4 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
-
-#include "webserv.hpp"
+#include "utils.hpp"
 
 std::string	int_to_str(int n) {
 	std::stringstream	ss;
@@ -9,5 +6,3 @@ std::string	int_to_str(int n) {
 	ss << n;
 	return ss.str();
 }
-
-#endif

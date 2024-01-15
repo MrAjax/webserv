@@ -7,9 +7,11 @@
 #include "Get.hpp"
 #include "Post.hpp"
 #include "Delete.hpp"
+#include "HttpStatusCode.hpp"
 
 class HttpResponse {
 	std::string	_method;
+	int			_method_code;
 	std::string	_path;
 	std::string	_protocol;
 	std::string	_status_code;

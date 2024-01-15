@@ -1,6 +1,6 @@
 #include "Post.hpp"
 
-Post::Post() {}
+Post::Post(std::string path): Method(path) {}
 
 Post::~Post() {}
 

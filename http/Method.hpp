@@ -2,8 +2,9 @@
 # define METHOD_HPP
 
 #include "../inc/webserv.hpp"
+#include "HttpStatusCode.hpp"
 
-//enum method_code {GET, POST, DELETE};
+enum {GET, POST, DELETE};
 
 class Method {
 	std::string	_path;
@@ -13,7 +14,7 @@ class Method {
 public:
 	//Method();
 	Method(std::string path);
-	~Method();
+	virtual ~Method();
 
 	virtual void	execute_method() = 0;
 	
