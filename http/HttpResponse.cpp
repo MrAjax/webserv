@@ -4,9 +4,13 @@ HttpResponse::HttpResponse(HttpRequest &req) {
 	// Recuperer ces infos de la classe Request
 	(void)req;
 
-	_method = "GET";
-	_method_code = GET;
-	_path = "/";
+//	_connfd			= req.getConnfd();
+//	_contentType	= req.getContentType();
+//	_input			= req.getInput();
+
+	_method			= "GET";
+	_method_code	= GET;
+	_path			= "/";
 //	_protocol = "HTTP/1.1";
 //	_header = "Host";
 //	_status_code = 200;
@@ -49,7 +53,8 @@ std::string	HttpResponse::get_response() {
 	switch (_method_code)
 	{
 	case GET:
-		m = new Get(_path);
+		m = new Get(/* _path */ "index.html");
+		m->execute_method();
 		break;
 	case POST:
 		m = new Post(_path);
@@ -64,6 +69,5 @@ std::string	HttpResponse::get_response() {
 	_response = m->get_header() + m->get_body();
 	
 	delete m;
-
 	return _response;
 }

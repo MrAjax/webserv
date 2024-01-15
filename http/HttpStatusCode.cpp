@@ -16,7 +16,7 @@ HttpStatusCode::HttpStatusCode() {
 			}
 		}
 		_http_status_code.insert(std::make_pair(code, status));
-		while (_http_error_list[i] != '\n')
+		while (_http_error_list[i] && _http_error_list[i] != '\n')
 			i++;
 	}
 }

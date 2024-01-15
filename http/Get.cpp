@@ -1,6 +1,9 @@
 #include "Get.hpp"
 
-Get::Get(std::string path /* std::string type */): Method(path) {/* _ressource_type = _type (for exemple text, image, etc.) */}
+Get::Get(std::string path /* std::string type */): Method(path) {
+	/* _ressource_type = _type (for exemple text, image, etc.) */
+	std::cout << "Get object created\nPath = " << path  << "\n";
+}
 
 Get::~Get() {}
 

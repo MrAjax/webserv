@@ -10,9 +10,15 @@
 #include "HttpStatusCode.hpp"
 
 class HttpResponse {
+// Request Elements
+	int			_connfd;
+	std::string	_contentType;
+	std::string	_input;
+	
 	std::string	_method;
 	int			_method_code;
 	std::string	_path;
+// Response Elements
 	std::string	_protocol;
 	std::string	_status_code;
 	std::string	_status_msg;
