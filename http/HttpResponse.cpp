@@ -22,6 +22,7 @@ HttpResponse::~HttpResponse() {}
 
 void HttpResponse::sendhtml(int connfd, std::string ContentType, std::string input)
 {
+	(void)connfd;
 	std::ifstream file(input.c_str());
 
 	if (file.is_open())
@@ -40,7 +41,9 @@ void HttpResponse::sendhtml(int connfd, std::string ContentType, std::string inp
 	response += "Content-Length: " + sss.str() + "\r\n\r\n";
     response += htmlcontent;
 
-	write(connfd, response.c_str(), response.length());
+	//std::cout << " === Response ===\n" << response << "\n";
+	_response = response;
+	//write(connfd, response.c_str(), response.length());
 	}
 	else{
 		std::cerr << "Error HTML" << std::endl;
@@ -53,7 +56,7 @@ std::string	HttpResponse::get_response() {
 	switch (_method_code)
 	{
 	case GET:
-		m = new Get(/* _path */ "index.html");
+		m = new Get("index.html"); // _path a la place
 		m->execute_method();
 		break;
 	case POST:

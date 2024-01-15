@@ -20,6 +20,7 @@ class HttpRequest
 {
     public:
         HttpRequest(void);
+        HttpRequest(int connfd, std::string contentType, std::string input);
         HttpRequest(HttpRequest const &copy);
         ~HttpRequest(void);
         //------------OPERATOR------------------//
@@ -41,6 +42,10 @@ class HttpRequest
         std::string getSecFetchDest();
         std::string getSecFetchMode();
         std::string getSecFetchSite();
+
+        int         getConnfd();
+        std::string getContentType();
+        std::string getInput();
 
         //---------Header parser--------------
         std::string getHeader(std::string &fullRequest);
@@ -65,6 +70,9 @@ class HttpRequest
         std::string _secFetchMode;
         std::string _secFetchSite;
         
+        int         _connfd;
+        std::string _contentType;
+        std::string _input;
 };
 
 #endif

@@ -4,22 +4,32 @@
 
 HttpRequest::HttpRequest(void){}
 
+HttpRequest::HttpRequest(int connfd, std::string contentType, std::string input) {
+	_connfd = connfd;
+	_contentType = contentType;
+	_input = input;
+}
+
 HttpRequest::~HttpRequest(void){}
 
 //-----------Guetteurs------------
 
-std::string HttpRequest::getMethod() {return (this->_method);}
-std::string HttpRequest::getPath() {return (this->_path);}
-std::string HttpRequest::getHttp() {return (this->_http);}
-std::string HttpRequest::getHost() {return (this->_host);}
-std::string HttpRequest::getUserAgent() {return (this->_userAgent);}
-std::string HttpRequest::getAccept() {return (this->_accept);}
-std::string HttpRequest::getAcceptLanguage() {return (this->_acceptLanguage);}
-std::string HttpRequest::getConnection() {return (this->_connection);}
-std::string HttpRequest::getReferer() {return (this->_referer);}
-std::string HttpRequest::getSecFetchDest() {return (this->_secFetchDest);}
-std::string HttpRequest::getSecFetchMode() {return (this->_secFetchMode);}
-std::string HttpRequest::getSecFetchSite() {return (this->_secFetchSite);}
+std::string HttpRequest::getMethod()			{return (this->_method);}
+std::string HttpRequest::getPath()				{return (this->_path);}
+std::string HttpRequest::getHttp()				{return (this->_http);}
+std::string HttpRequest::getHost()				{return (this->_host);}
+std::string HttpRequest::getUserAgent()			{return (this->_userAgent);}
+std::string HttpRequest::getAccept()			{return (this->_accept);}
+std::string HttpRequest::getAcceptLanguage()	{return (this->_acceptLanguage);}
+std::string HttpRequest::getConnection()		{return (this->_connection);}
+std::string HttpRequest::getReferer() 			{return (this->_referer);}
+std::string HttpRequest::getSecFetchDest()		{return (this->_secFetchDest);}
+std::string HttpRequest::getSecFetchMode()		{return (this->_secFetchMode);}
+std::string HttpRequest::getSecFetchSite()		{return (this->_secFetchSite);}
+
+int			HttpRequest::getConnfd()			{return _connfd;}
+std::string	HttpRequest::getContentType()		{return _contentType;}
+std::string	HttpRequest::getInput()				{return _input;}
 
 //-----------Utils----------------
 

@@ -2,7 +2,6 @@
 
 Get::Get(std::string path /* std::string type */): Method(path) {
 	/* _ressource_type = _type (for exemple text, image, etc.) */
-	std::cout << "Get object created\nPath = " << path  << "\n";
 }
 
 Get::~Get() {}
@@ -27,7 +26,7 @@ void	Get::get_text() {
 	+ "\r\n" \
 	+ "Content-Type: text/html\r\n" \
 	+ "Content-Length: " \
-	+ int_to_str(get_header().length()) \
+	+ int_to_str(get_body().length()) \
 	+ "\r\n\r\n");
 }
 
