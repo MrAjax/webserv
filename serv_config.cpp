@@ -6,11 +6,12 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 11:13:25 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/11 11:34:24 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/15 14:55:04 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "serv_config.hpp"
+#include "Server.hpp"
 
 serv_config::serv_config(char* file) {
 
@@ -42,7 +43,7 @@ void serv_config::parse_blocks(void) { // Cut every server block ("server {" to 
 			recording = true;
 		}
 		else if (line[0] == '}' && recording == true) {
-			_servers.push_back(Server(block));
+			_servers.push_back(Server(block, *this));
 			block.clear();
 			recording = false;
 		}
@@ -52,3 +53,7 @@ void serv_config::parse_blocks(void) { // Cut every server block ("server {" to 
 	}
 	_ifs.close();
 }
+
+int	serv_config::getSocketfd( void ) const {
+	return socketfd;
+}	

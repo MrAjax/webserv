@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:30:56 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/11 14:08:06 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/15 13:43:49 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,5 +27,6 @@
 #include <netdb.h>
 #include <map>
 #include <cstdlib>
+#include <string>
 
 #endif

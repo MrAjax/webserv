@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/11 11:34:01 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/15 14:53:03 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,15 @@
 # define SERVCONFIG_HPP
 
 #include "parsing.hpp"
-#include "Server.hpp"
-
+class Server;
 class serv_config {
 
 public:
 	serv_config(char* file);
 	~serv_config( void );
 	
+	int	getSocketfd( void ) const;
+
 private:
 	serv_config( void );
 	void parse_blocks( void );
