@@ -57,6 +57,9 @@ std::string HttpRequest::getSecFetchDest()		{return (this->_secFetchDest);}
 std::string HttpRequest::getSecFetchMode()		{return (this->_secFetchMode);}
 std::string HttpRequest::getSecFetchSite()		{return (this->_secFetchSite);}
 
+std::string HttpRequest::getBodyRequest()		{return (this->_bodyRequest);}
+std::string HttpRequest::getHeaderRequest()		{return (this->_headerRequest);}
+
 int			HttpRequest::getConnfd()			{return _connfd;}
 std::string	HttpRequest::getContentType()		{return _contentType;}
 std::string	HttpRequest::getInput()				{return _input;}
@@ -78,14 +81,15 @@ std::size_t	HttpRequest::findLine(std::string &header, std::string &line, std::s
 
 //-----------Header parser----------------
 
-std::string HttpRequest::getHeader(std::string &fullRequest)
+void	HttpRequest::splitHeaderBody(std::string &fullRequest)
 {
 	std::string delimiteur = "\r\n\r\n";
 	std::size_t pos = fullRequest.find(delimiteur);
 	if (pos == std::string::npos)
 		throw std::runtime_error("ERROR: Cannot find end of header in request\n");
-	std::string header = fullRequest.substr(0, pos);
-	return (header);
+	_headerRequest = fullRequest.substr(0, pos);
+	if (fullRequest.size() > pos + delimiteur.size())
+		_bodyRequest = fullRequest.substr(pos + delimiteur.size());
 }
 
 void	HttpRequest::parsingHeader_method_path_http(std::string &line)
@@ -126,7 +130,7 @@ std::string	HttpRequest::parsingHeader_rest(std::string &line, std::string const
 	return (output);
 }
 
-void    HttpRequest::parseAllAttributes(std::string &header)
+void    HttpRequest::parseAllAttributes(std::string header)
 {
 	std::string delimiteur = "\r\n";
 	std::size_t end_pos;
@@ -172,7 +176,7 @@ void    HttpRequest::parsingHeader(int connfd)
 	{
 		// std::cout << recvline << std::endl;
 		fullRequest += reinterpret_cast< char * >(recvline);
-		if (fullRequest.find("\r\n\r\n") || recvline[n - 1] == '\n')
+		if (recvline[n - 1] == '\n')
 			break;
 		memset(recvline, 0, MAXLINE);
 	}
@@ -181,6 +185,6 @@ void    HttpRequest::parsingHeader(int connfd)
 	if (fullRequest.empty())
 		throw std::runtime_error("ERROR: Request is empty\n");
 
-	std::string 	header = getHeader(fullRequest);
-	parseAllAttributes(header);
+	splitHeaderBody(fullRequest);
+	parseAllAttributes(_headerRequest);
 }
