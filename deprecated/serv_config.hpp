@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/15 14:53:03 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/16 11:51:00 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define SERVCONFIG_HPP
 
 #include "parsing.hpp"
+
 class Server;
 class serv_config {
 
@@ -22,6 +23,7 @@ public:
 	~serv_config( void );
 	
 	int	getSocketfd( void ) const;
+	std::vector<Server>& getServerList( void );
 
 private:
 	serv_config( void );

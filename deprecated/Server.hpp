@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/16 13:39:00 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/16 11:43:03 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,16 @@
 
 #include "parsing.hpp"
 
+class serv_config;
 class Server {
 
 typedef void (*FuncPtr)(std::string const&);
 
 public:
-	Server(std::vector<std::string> config, std::vector<Server> const& servers, int i);
+	Server(std::vector<std::string> config, serv_config & webserv, int i);
 	~Server( void );
 
 	std::string getIp( void ) const;
-	std::string getPort( void ) const;
-	int	getSocketfd( void ) const;
 	
 private:
 
@@ -36,17 +35,14 @@ private:
 	void p_host(std::string const& line);
 	void p_server_name(std::string const& line);
 
-	void configServer(void);
-	void openSocket(void);
+	void configServer(serv_config & webserv);
 
-	int					_i; // number of Server 0 is the first etc...
-	int				 	_socketfd;
-	std::vector<Server> _servers;
-	struct addrinfo*	_res;
-	struct sockaddr_in	_server_addr;
-	std::string 		_ip;
-	std::string 		_port;
-	bool				_socketIsSet;
+//	serv_config const& _webserv;
+	int	_i; // number of Server 0 is the first etc...
+	struct addrinfo* _res;
+	struct sockaddr_in _server_addr;
+	std::string _node; // = ip or localhost
+	std::string _service; // = port
 
 };
 

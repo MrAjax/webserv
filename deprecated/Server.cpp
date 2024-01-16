@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/16 13:40:22 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/16 11:59:26 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,10 @@
 
 #include "Server.hpp"
 #include "parsing.hpp"
+#include "serv_config.hpp"
 
-Server::Server(std::vector<std::string> config, std::vector<Server> const& servers, int i)
-	: _i(i), _servers(servers) 
+Server::Server(std::vector<std::string> config, serv_config & webserv, int i)
+	: _i(i) 
 {
 	memset(&_server_addr, 0, sizeof(_server_addr));
 
@@ -58,30 +59,13 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 			}
 		}
 	}
-	openSocket();	
-	configServer();
+
+	configServer(webserv);
 }
 
 Server::~Server(void) {}
 
-void Server::openSocket(void) { // 1st check if open socket is necessary (config ip bind exist) 
-
-	_socketIsSet = false;
-	for (size_t i = 0; i < _servers.size(); i++) {
-		if (_servers[i].getIp() == _ip && _servers[i].getPort() == _port) {
-			_socketfd = _servers[i].getSocketfd();
-			_socketIsSet = true;
-			return;
-		}
-	}
-	_socketfd = socket(AF_INET, SOCK_STREAM, 0); 
-		if (_socketfd == -1) {
-			std::cerr << "socket error:";
-			throw std::runtime_error(strerror(errno));
-		}	
-}	
-
-void Server::configServer(void) {
+void Server::configServer(serv_config & webserv) {
 	
 	struct addrinfo hints;
 	struct addrinfo* current;
@@ -89,37 +73,43 @@ void Server::configServer(void) {
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = _server_addr.sin_family; // = AF_INET = IPV4 for now
 	hints.ai_socktype = SOCK_STREAM;
-
-	int ret = getaddrinfo(_ip.c_str(), _port.c_str(), &hints, &_res);
+	std::cout << "port = " << _service.c_str() << " ip " << _node.c_str() << std::endl;
+	int ret = getaddrinfo(_node.c_str(), _service.c_str(), &hints, &_res);
 	if (ret != 0) {
 		std::cerr << "getaddrinfo error: ";
 		throw std::runtime_error(gai_strerror(ret));
 	}
-	if (_socketIsSet == false) { // Port + ip already binded and listen
-		for (current = _res; current != 0; current = current->ai_next) {
-			if (bind(_socketfd, current->ai_addr, current->ai_addrlen) == 0) {
-				break;
-			} 
-			if (current->ai_next == 0) {
-				std::cerr << "bind error: ";
-				throw std::runtime_error(strerror(errno));
-			}	
-		}
-		ret = listen(_socketfd, MAX_CO);
-		if (ret != 0) {
-			std::cerr << "listen error: ";
-			throw std::runtime_error(strerror(errno));
-		}
+	std::cout << "port = " << _service.c_str() << " ip " << _node.c_str() << std::endl;
+	/*loop to bind*/
+	if (_i != 0) {
+		std::cout << webserv.getServerList()[0].getIp() << std::endl;
 	}	
+	for (current = _res; current != 0; current = current->ai_next) {
+		std::cout << "ai_addr = " << current->ai_addr << " ai_addlen = " << current->ai_addr << std::endl;
+		std::cout << webserv.getSocketfd() << std::endl;
+		if (bind(webserv.getSocketfd(), current->ai_addr, current->ai_addrlen) == 0) {
+			break;
+		} 
+		if (current->ai_next == 0) {
+			std::cerr << "bind error: ";
+			throw std::runtime_error(strerror(errno));
+		}	
+	}
+/*
+	if (_i == 0) { // listen is set only once 
+		ret = listen(_webserv.getSocketfd(), MAX_CO);
+		if (ret != 0) {
+			std::cerr << "listen error: " << strerror(errno) << std::endl;
+		}*/
 }	
 
 void Server::p_listen(std::string const& line) {
 
 	size_t pos = line.find("listen");
 	pos += 6;
-	_port = line.substr(pos, line.length() - 1 - pos);
+	_service = line.substr(pos, line.length() - 1 - pos);
 
-	int int_port = atoi(_port.c_str());
+	int int_port = atoi(_service.c_str());
 	/*define PORT_MAX 65535 PORT_MIN 0*/
 
 	uint16_t port = static_cast<uint16_t>(int_port);
@@ -128,18 +118,17 @@ void Server::p_listen(std::string const& line) {
 	_server_addr.sin_port = htons(port); // converts port in network byte order 
 	_server_addr.sin_family = AF_INET; // for IPV4
 
-	std::cout << "port = " << _port << std::endl;
+	std::cout << "port = " << _service << std::endl;
 }	
 
 void Server::p_host(std::string const& line) {
 	
 	size_t pos = line.find("host");
 	pos+= 5;
-	_ip = line.substr(pos, line.length() - 1 - pos);
+	_node = line.substr(pos, line.length() - 1 - pos);
 	_server_addr.sin_addr.s_addr = htonl(INADDR_ANY); //i should specify address?
-	if (_ip == "localhost")
-		_ip = "127.0.0.1";
-	std::cout << "host = " << _ip << std::endl;
+
+	std::cout << "host = " << _node << std::endl;
 }
 
 void Server::p_server_name(std::string const& line) {
@@ -148,13 +137,5 @@ void Server::p_server_name(std::string const& line) {
 }	
 
 std::string Server::getIp(void) const {
-	return _ip;
+	return _node;
 }
-
-std::string Server::getPort(void) const {
-	return _port;
-}	
-
-int Server::getSocketfd(void) const {
-	return _socketfd;
-}	

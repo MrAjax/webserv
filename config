@@ -20,7 +20,7 @@ server {
 # Premier serveur
 server {
     listen 18000;
-	host 127.0.0.1;
+	host localhost;
     server_name www.monsite1.com;
 
     root /var/www/monsite1;

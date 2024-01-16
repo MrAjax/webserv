@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 11:13:25 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/16 10:22:23 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/16 11:50:28 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,3 +67,7 @@ void serv_config::parse_blocks(void) { // Cut every server block ("server {" to 
 int	serv_config::getSocketfd( void ) const {
 	return socketfd;
 }	
+
+std::vector<Server>& serv_config::getServerList( void ) {
+	return _servers;
+}
