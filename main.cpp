@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 09:22:50 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/08 12:50:34 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/16 10:05:01 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,8 @@ int	main(int ac, char **av)
 
 	try {
 		serv_config servers(av[1]); // create every server 
-		(void) servers;
 	} catch (std::exception& e) {
-		std::cerr << "Error: "  << e.what() << std::endl;
+		std::cerr << " "  << e.what() << std::endl;
 	}
 	return 0;
 }

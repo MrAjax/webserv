@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/15 16:05:23 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/16 10:31:34 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,26 +68,35 @@ Server::~Server(void) {}
 void Server::configServer(void) {
 	
 	struct addrinfo hints;
+	struct addrinfo* current;
+
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = _server_addr.sin_family; // = AF_INET = IPV4 for now
 	hints.ai_socktype = SOCK_STREAM;
-
+	std::cout << "port = " << _service.c_str() << " ip " << _node.c_str() << std::endl;
 	int ret = getaddrinfo(_node.c_str(), _service.c_str(), &hints, &_res);
 	if (ret != 0) {
-		std::cerr << "getaddrinfo error: " << gai_strerror(ret) << std::endl;
+		std::cerr << "getaddrinfo error: ";
+		throw std::runtime_error(gai_strerror(ret));
 	}
-	std::cout << _webserv.getSocketfd() << " " << (struct sockaddr *)&_server_addr.sa_data << std::endl;
 	/*loop to bind*/
-	if (ret != 0) {
-		std::cerr << "bind error: " << strerror(errno) << std::endl;
-	}	
-
+	for (current = _res; current != 0; current = current->ai_next) {
+		std::cout << "ai_addr = " << current->ai_addr << " ai_addlen = " << current->ai_addr << std::endl;
+		std::cout << _webserv.getSocketfd() << std::endl;
+		if (bind(_webserv.getSocketfd(), current->ai_addr, current->ai_addrlen) == 0) {
+			break;
+		} 
+		if (current->ai_next == 0) {
+			std::cerr << "bind error: ";
+			throw std::runtime_error(strerror(errno));
+		}	
+	}
+/*
 	if (_i == 0) { // listen is set only once 
 		ret = listen(_webserv.getSocketfd(), MAX_CO);
 		if (ret != 0) {
 			std::cerr << "listen error: " << strerror(errno) << std::endl;
-		}
-	}	
+		}*/
 }	
 
 void Server::p_listen(std::string const& line) {

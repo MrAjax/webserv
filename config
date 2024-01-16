@@ -1,3 +1,22 @@
+# Deuxième serveur
+server {
+    listen 18000;
+	host 127.0.0.1;
+    server_name www.monsite2.com;
+
+    root /var/www/monsite2;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Configuration pour les fichiers statiques
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+        expires 30d;
+    }
+}
+
 # Premier serveur
 server {
     listen 18000;
@@ -17,22 +36,4 @@ server {
     }
 }
 
-# Deuxième serveur
-server {
-    listen 18000;
-	host localhost;
-    server_name www.monsite2.com;
-
-    root /var/www/monsite2;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
-    # Configuration pour les fichiers statiques
-    location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
-        expires 30d;
-    }
-}
 

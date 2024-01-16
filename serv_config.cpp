@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 11:13:25 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/15 15:49:51 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/16 10:22:23 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,15 @@ serv_config::~serv_config(void) {}
 void serv_config::config_webserv(void) {
 
 	socketfd = socket(AF_INET, SOCK_STREAM, 0); 
-	/* check error */
+	if (socketfd == -1) {
+		std::cerr << "socket error:";
+		throw std::runtime_error(strerror(errno));
+	}	
+	int	yes = 1;
+	if (setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
+		std::cerr << "setsockopt error:";
+		throw std::runtime_error(strerror(errno));
+	}	
 }	
 
 void serv_config::parse_blocks(void) { // Cut every server block ("server {" to ... "}")
