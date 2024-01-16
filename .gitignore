@@ -1,7 +1,8 @@
 **.d
 **.o
 test
-#http/main.cpp
+http/main.cpp
 #http/Makefile
 file
 **.vscode
+test_pierre
