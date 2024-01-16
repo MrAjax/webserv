@@ -64,12 +64,12 @@ int main()
 			if (pfds.fd == listenfd) {
 				connfd = accept(listenfd, (SA *) NULL, NULL); //NULL car on veut accepter n 'importe quelle connexion
 				memset(recvline, 0, MAXLINE);
-				HttpRequest Head;
+				HttpRequest Head(connfd);
 
 				std::string		response;
 				try {
-					HttpResponse	Rep(Head);
-					response = Rep.get_response();
+					// HttpResponse	Rep(Head);
+					// response = Rep.get_response();
 				}
 				catch (...) {
 					throw std::runtime_error("ERRRRRRROOOOOORRRR!!!!!!!!!!!!!!!!!!!!\n");

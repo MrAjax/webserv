@@ -19,7 +19,7 @@
 class HttpRequest
 {
     public:
-        HttpRequest(void);
+        HttpRequest(int connfd);
         HttpRequest(int connfd, std::string contentType, std::string input);
         HttpRequest(HttpRequest const &copy);
         ~HttpRequest(void);
@@ -38,6 +38,7 @@ class HttpRequest
         std::string getAccept();
         std::string getAcceptLanguage();
         std::string getConnection();
+        std::string getUpInsecureRqst();
         std::string getReferer();
         std::string getSecFetchDest();
         std::string getSecFetchMode();
@@ -52,8 +53,10 @@ class HttpRequest
         void        parsingHeader(std::string &header);
         void        parsingHeader_method_path_http(std::string &line);
         std::string parsingHeader_rest(std::string &line, std::string const & keyWord);
+        //---------check error---------------------
+	    void        checkError();
         //---------Utils---------------------
-        std::string findLine(std::string header, std::string &delimiteur, std::size_t & end_pos);
+        std::size_t findLine(std::string &header, std::string &line, std::string &delimiteur);
 
     private:
         std::string _method;
@@ -65,6 +68,7 @@ class HttpRequest
         std::string _acceptLanguage;
         std::string _acceptEncoding;
         std::string _connection;
+        std::string _upInsecureRqst;
         std::string _referer;
         std::string _secFetchDest;
         std::string _secFetchMode;
