@@ -27,7 +27,7 @@ class HttpRequest
         HttpRequest	&operator=(HttpRequest const &rhs);
 
         void        parsingHeader(int connfd);
-        void        parseAllAttributes(std::string & header);
+        void        parseAllAttributes(std::string header);
 
         //---------Guetteurs-----------------
         std::string getMethod();
@@ -44,12 +44,15 @@ class HttpRequest
         std::string getSecFetchMode();
         std::string getSecFetchSite();
 
+        std::string getBodyRequest();
+        std::string getHeaderRequest();
+
         int         getConnfd();
         std::string getContentType();
         std::string getInput();
 
         //---------Header parser--------------
-        std::string getHeader(std::string &fullRequest);
+        void        splitHeaderBody(std::string &fullRequest);
         void        parsingHeader(std::string &header);
         void        parsingHeader_method_path_http(std::string &line);
         std::string parsingHeader_rest(std::string &line, std::string const & keyWord);
@@ -73,6 +76,9 @@ class HttpRequest
         std::string _secFetchDest;
         std::string _secFetchMode;
         std::string _secFetchSite;
+
+        std::string _bodyRequest;
+        std::string _headerRequest;
         
         int         _connfd;
         std::string _contentType;
