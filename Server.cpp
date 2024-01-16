@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/16 13:40:22 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/16 15:13:08 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void Server::configServer(void) {
 	struct addrinfo* current;
 
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = _server_addr.sin_family; // = AF_INET = IPV4 for now
+	hints.ai_family = _server_addr.sin_family; // = AF_INET = IPV4 for now AF_UNSPEC then?
 	hints.ai_socktype = SOCK_STREAM;
 
 	int ret = getaddrinfo(_ip.c_str(), _port.c_str(), &hints, &_res);
@@ -111,6 +111,7 @@ void Server::configServer(void) {
 			throw std::runtime_error(strerror(errno));
 		}
 	}	
+	freeaddrinfo(_res);
 }	
 
 void Server::p_listen(std::string const& line) {
