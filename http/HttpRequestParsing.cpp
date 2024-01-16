@@ -4,6 +4,13 @@
 
 HttpRequest::HttpRequest(void){}
 
+HttpRequest::HttpRequest(int connfd)
+{
+	parsingHeader(connfd);
+	checkError();
+}
+
+
 HttpRequest::HttpRequest(int connfd, std::string contentType, std::string input) {
 	_connfd = connfd;
 	_contentType = contentType;
@@ -138,7 +145,7 @@ void    HttpRequest::parsingHeader(int connfd)
 	{
 		std::cout << recvline << std::endl;
 		fullRequest += reinterpret_cast< char * >(recvline);
-		if (recvline[n - 1] == '\n')
+		if (fullRequest.find("\r\n\r\n") || recvline[n - 1] == '\n')
 			break;
 		memset(recvline, 0, MAXLINE);
 	}

@@ -1,5 +1,5 @@
-#ifndef HTTPREQUEST_HPP
-# define HTTPREQUEST_HPP
+#ifndef HTTPREQUESTPARSING_HPP
+# define HTTPREQUESTPARSING_HPP
 
 #include <iostream>
 #include <unistd.h>
@@ -20,6 +20,7 @@ class HttpRequest
 {
     public:
         HttpRequest(void);
+        HttpRequest(int connfd);
         HttpRequest(int connfd, std::string contentType, std::string input);
         HttpRequest(HttpRequest const &copy);
         ~HttpRequest(void);
