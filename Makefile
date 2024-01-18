@@ -6,7 +6,7 @@
 #    By: bahommer <bahommer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/09/12 13:52:28 by bahommer          #+#    #+#              #
-#    Updated: 2024/01/16 13:21:32 by bahommer         ###   ########.fr        #
+#    Updated: 2024/01/18 15:02:21 by bahommer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,8 @@ I = ./
 D = dep/
 
 SRC		= $(S)main.cpp \
+			$(S)readConfigFile.cpp \
+			$(S)allocatePollFds.cpp \
 			$(S)Server.cpp 
 
 OBJ		= $(SRC:$(S)%=$(O)%.o)

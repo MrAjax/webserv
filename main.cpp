@@ -6,12 +6,11 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 09:22:50 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/16 13:24:20 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/18 16:05:04 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.hpp" 
-#include "Server.hpp"
 
 int	main(int ac, char **av)
 {
@@ -20,38 +19,17 @@ int	main(int ac, char **av)
 		return 0;
 	}
 
-	std::ifstream ifs;
+	std::vector<Server> servers;
+	std::vector<struct pollfd> pollfds;
+	std::map<struct pollfd*, Server const*, pollFdComparer> fdsMap;
+	if (readConfigFile(servers, av[1]) == -1)
+		return 1;
+	allocatePollFds(servers, pollfds, fdsMap);
 
-	ifs.open(av[1]);
-	if (!ifs) {
-		std::cerr << "Error while opening config file." << std::endl;
-		return 0;
-	}
-	try {
-		std::vector<Server> servers;
-		std::string line;
-		std::vector<std::string> block;
-		bool recording = false;
-		int	i = 0;
-	
-		while (getline(ifs, line)) {
-			if (line.find("server {") != std::string::npos) {
-				recording = true;
-			}
-			else if (line[0] == '}' && recording == true) {
-				servers.push_back(Server(block, servers, i));
-				block.clear();
-				recording = false;
-				i++;
-			}
-			else if (recording == true) {
-				block.push_back(line);
-			}
-		}
-		ifs.close();
-	} catch (std::exception& e) {
-		std::cerr << " "  << e.what() << std::endl;
-		ifs.close();
-	}
+	for (std::map<struct pollfd*, Server const*, pollFdComparer>::iterator it = fdsMap.begin(); it != fdsMap.end(); ++it) 
+	{
+		std::cout << "fds = " << it->first->fd << std::endl;
+	}	
+
 	return 0;
 }
