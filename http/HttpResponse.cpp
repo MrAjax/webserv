@@ -8,9 +8,24 @@ HttpResponse::HttpResponse(HttpRequest &req) {
 //	_contentType	= req.getContentType();
 //	_input			= req.getInput();
 
-	_method			= "GET";
-	_method_code	= GET;
-	_path			= "/";
+	_method			= req.getMethod();
+	_method_code	= _method.length();
+	_path			= req.getPath();
+	_contentType	= req.getContentType();
+
+	std::cout << "Constructor called for Response\n";
+	std::cout << "method = " << _method << "\n";
+	std::cout << "method code = " << _method_code << "\n";
+	std::cout << "path = " << _path << "\n";
+	std::cout << "content type = " << _contentType << "\n";
+	if (_path == "/" && _method_code == GET)
+		_path = "index.html";
+	else if (_path == "/") {
+		_status_code = 205;
+		_status_msg = HttpStatusCode::get_error_msg(_status_code);
+		_response = "HTTP/1.1 " + int_to_str(_status_code) \
+				  + " " + _status_msg + "\r\n\r\n";
+	}
 //	_protocol = "HTTP/1.1";
 //	_header = "Host";
 //	_status_code = 200;
@@ -56,14 +71,14 @@ std::string	HttpResponse::get_response() {
 	switch (_method_code)
 	{
 	case GET:
-		m = new Get("index.html"); // _path a la place
+		m = new Get(_path, _contentType); // _path a la place
 		m->execute_method();
 		break;
 	case POST:
-		m = new Post(_path);
+		m = new Post(_path, _contentType);
 		break;
 	case DELETE:
-		m = new Delete(_path);
+		m = new Delete(_path, _contentType);
 		break;
 	default:
 		break;

@@ -1,8 +1,6 @@
 #include "Get.hpp"
 
-Get::Get(std::string path /* std::string type */): Method(path) {
-	/* _ressource_type = _type (for exemple text, image, etc.) */
-}
+Get::Get(std::string path, std::string content): Method(path, content) {}
 
 Get::~Get() {}
 
@@ -24,7 +22,9 @@ void	Get::get_text() {
 	+ " " \
 	+ HttpStatusCode::get_error_msg(get_status_code()) \
 	+ "\r\n" \
-	+ "Content-Type: text/html\r\n" \
+	+ "Content-Type: " \
+	+ get_content_type() \
+	+ "\r\n" \
 	+ "Content-Length: " \
 	+ int_to_str(get_body().length()) \
 	+ "\r\n\r\n");
@@ -33,6 +33,8 @@ void	Get::get_text() {
 void	Get::execute_method() {
 	std::string	header;
 
-	/* if (_type == text) */
-	get_text();
+//	if (get_content_type() == "text/html")
+		get_text();
+//	else
+//		throw (std::runtime_error("Content type not supported yet"));
 }
