@@ -1,7 +1,6 @@
 * implementer post
 
-* verifier content type valide:
-	https://www.iana.org/assignments/media-types/media-types.xhtml
-	https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_Types
-
 * interdire acces aux fichiers en dehors du directory "monsite"
+
+* checker les droits sur les path demandes
+

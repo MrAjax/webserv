@@ -174,7 +174,7 @@ void    HttpRequest::parsingHeader(int connfd)
 	int n;
 	while ((n = read(connfd, recvline, MAXLINE - 1)) > 0)
 	{
-		// std::cout << recvline << std::endl;
+		std::cout << recvline << std::endl;
 		fullRequest += reinterpret_cast< char * >(recvline);
 		if (recvline[n - 1] == '\n')
 			break;

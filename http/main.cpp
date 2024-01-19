@@ -3,7 +3,7 @@
 #include "response/HttpResponse.hpp"
 #include "inc/webserv.hpp"
 
-#define SERVER_PORT 18000
+#define SERVER_PORT 18001
 
 #define MAXLINE 4096
 #define SA struct sockaddr
