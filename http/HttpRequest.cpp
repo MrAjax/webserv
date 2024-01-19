@@ -157,12 +157,12 @@ void    HttpRequest::parseAllAttributes(std::string header)
 		}
 	}
 
-	// std::cout << "-------List command--------" << std::endl; //print pour voir si toutes les valeurs sont bien parse
-	// std::cout << this->_method << std::endl;
-	// std::cout << this->_path << std::endl;
-	// std::cout << this->_http << std::endl;
-	// for (int i = 0; i < 11; i++)
-	// 	std::cout << *tab_ref[i] << std::endl;
+	std::cout << "-------List command--------" << std::endl; //print pour voir si toutes les valeurs sont bien parse
+	std::cout << this->_method << std::endl;
+	std::cout << this->_path << std::endl;
+	std::cout << this->_http << std::endl;
+	for (int i = 0; i < 11; i++)
+		std::cout << *tab_ref[i] << std::endl;
 }
 
 void    HttpRequest::parsingHeader(int connfd)
@@ -187,4 +187,5 @@ void    HttpRequest::parsingHeader(int connfd)
 
 	splitHeaderBody(fullRequest);
 	parseAllAttributes(_headerRequest);
+
 }
