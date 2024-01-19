@@ -1,5 +1,5 @@
 #include "HttpRequest.hpp"
-#include "HttpStatusCode.hpp"
+#include "utils/HttpStatusCode.hpp"
 
 #define MAXLINE 4096
 

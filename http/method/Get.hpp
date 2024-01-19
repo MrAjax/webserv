@@ -3,7 +3,7 @@
 
 #include "../inc/webserv.hpp"
 #include "Method.hpp"
-#include "utils.hpp"
+#include "../utils/utils.hpp"
 
 class Get: public Method {
 public:
