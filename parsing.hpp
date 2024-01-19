@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:30:56 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/18 16:01:50 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/19 09:32:54 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,17 +37,11 @@
 # define MAX_CO 10
 class Server;
 
-struct pollFdComparer {
-    bool operator()(struct pollfd const* lhs, struct pollfd const* rhs) const {
-        return lhs->fd < rhs->fd;
-    }
-};
-
 /*readConfigFile.cpp*/
 int readConfigFile (std::vector<Server> & servers, char const* file);
 
-/*allocatePollFds.cpp*/
+/*allocateSTL.cpp*/
 void	allocatePollFds(std::vector<Server> const& servers,
-	std::vector<struct pollfd> & pollfds,
-		std::map<struct pollfd*, Server const*, pollFdComparer> & fdsMap);
+	std::vector<struct pollfd> & pollfds);
+void	allocateServersMap(std::vector<Server> & servers, std::map<int, Server*>  & serversMap); 
 #endif
