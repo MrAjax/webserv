@@ -35,4 +35,6 @@
 #include <vector>
 #include <fstream>
 
+#define MYWEBSITE "monsite"
+
 #endif

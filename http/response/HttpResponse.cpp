@@ -1,26 +1,9 @@
 #include "HttpResponse.hpp"
 
-/* static	std::string	setContentType(std::string path) {
-	std::string			content_type;
-	std::ifstream		mime_file("httpconfig/MIME_types");
-	std::stringstream	file_content;
-
-	if (!mime_file.is_open())
-		throw std::runtime_error("ERROR: Cannot open the MIME file\n");
-
-	mime_file.close();
-
-	content_type = "text/hmtl";
-
-	return content_type;
-} */
-
 HttpResponse::HttpResponse(HttpRequest &req) {
 	_method			= req.getMethod();
 	_method_code	= _method.length();
 	_path			= std::string(MYWEBSITE) + req.getPath();
-//	_contentType	= setContentType(_path);
-	_contentType	= "text/html";
 
 	if (req.getPath() == "/" && _method_code == GET)
 		_path = std::string(MYWEBSITE) + "/index.html";
@@ -30,6 +13,8 @@ HttpResponse::HttpResponse(HttpRequest &req) {
 		_response = "HTTP/1.1 " + int_to_str(_status_code) \
 				  + " " + _status_msg + "\r\n\r\n";
 	}
+	_contentType	= ContentTypeFinder::get_content_type(_path);
+
 
 	//FOR DEBUG TODO
 	std::cout << "Constructor called for Response\n";

@@ -8,6 +8,7 @@
 #include "../method/Post.hpp"
 #include "../method/Delete.hpp"
 #include "../utils/HttpStatusCode.hpp"
+#include "ContentTypeFinder.hpp"
 
 class HttpResponse {
 // Request Elements

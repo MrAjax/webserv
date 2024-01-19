@@ -1,65 +1,65 @@
-	.abw$		document AbiWord$											application/x-abiword
-	.arc$		archive (contenant plusieurs fichiers)$						application/octet-stream
-	.azw$		format pour eBook Amazon Kindle$							application/vnd.amazon.ebook
-	.bin$		n'importe quelle donnée binaire$							application/octet-stream
-	.bz$		archive BZip$												application/x-bzip
-	.bz2$		archive BZip2$												application/x-bzip2
-	.csh$		script C-Shell$												application/x-csh
-	.doc$		Microsoft Word$												application/msword
-	.docx$		Microsoft Word (OpenXML)$									application/vnd.openxmlformats-officedocument.wordprocessingml.document
-	.eot$		police MS Embedded OpenType$								application/vnd.ms-fontobject
-	.epub$		fichier Electronic publication (EPUB)$						application/epub+zip
-	.jar$		archive Java (JAR)$											application/java-archive
-	.mpkg$		paquet Apple Installer$										application/vnd.apple.installer+xml
-	.odp$		présentation OpenDocument$									application/vnd.oasis.opendocument.presentation
-	.js$		JavaScript (ECMAScript)$									application/javascript
-	.json$		donnée au format JSON$										application/json
-	.ods$		feuille de calcul OpenDocument$								application/vnd.oasis.opendocument.spreadsheet
-	.odt$		document texte OpenDocument$								application/vnd.oasis.opendocument.text
-	.ogx$		OGG$														application/ogg
-	.pdf$		Adobe Portable Document Format (PDF)$						application/pdf
-	.ppt$		présentation Microsoft PowerPoint$							application/vnd.ms-powerpoint
-	.pptx$		présentation Microsoft PowerPoint (OpenXML)$				application/vnd.openxmlformats-officedocument.presentationml.presentation
-	.rar$		archive RAR$												application/x-rar-compressed
-	.rtf$		Rich Text Format (RTF)$										application/rtf
-	.sh$		script shell$												application/x-sh
-	.swf$		fichier Small web format (SWF) ou Adobe Flash$				application/x-shockwave-flash
-	.tar$		fichier d'archive Tape Archive (TAR)$						application/x-tar
-	.ts$		fichier Typescript$											application/typescript
-	.vsd$		Microsoft Visio$											application/vnd.visio
-	.xhtml$		XHTML$														application/xhtml+xml
-	.xls$		Microsoft Excel$											application/vnd.ms-excel
-	.xlsx$		Microsoft Excel (OpenXML)$									application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-	.xml$		XML$														application/xml
-	.xul$		XUL$														application/vnd.mozilla.xul+xml
-	.zip$		archive ZIP$												application/zip
-	.7z$		archive 7-zip$												application/x-7z-compre	sed
-	.aac$		fichier audio AAC$											audio/aac
-	.mid$		fichier audio Musical Instrument Digital Interface (MIDI)$	audio/midi
-	.midi$		fichier audio Musical Instrument Digital Interface (MIDI)$	audio/midi
-	.oga$		fichier audio OGG$											audio/ogg
-	.wav$		Waveform Audio Format$										audio/x-wav
-	.weba$		fichier audio WEBM$											audio/webm
-	.otf$		police OpenType$											font/otf
-	.ttf$		police TrueType$											font/ttf
-	.woff$		police Web Open Font Format (WOFF)$							font/woff
-	.woff2$		police Web Open Font Format (WOFF)$							font/woff2
-	.bmp$		Images bitmap Windows OS/2$									image/bmp
-	.gif$		fichier Graphics Interchange Format (GIF)$					image/gif
-	.ico$		icône$														image/x-icon
-	.jpeg$		image JPEG$													image/jpeg
-	.jpg$		image JPEG$													image/jpeg
-	.png$		fichier Portable Network Graphics$							image/png
-	.svg$		fichier Scalable Vector Graphics (SVG)$						image/svg+xml
-	.tif$		image au format Tagged Image File Format (TIFF)$			image/tiff
-	.tiff$		image au format Tagged Image File Format (TIFF)$			image/tiff
-	.webp$		image WEBP$													image/webp
-	.css$		fichier Cascading Style Sheets (CSS)$						text/css
-	.htm$		fichier HyperText Markup Language (HTML)$					text/html
-	.html$		fichier HyperText Markup Language (HTML)$					text/html
-	.ics$		élément iCalendar$											text/calendar
-	.csv$		fichier Comma-separated values (CSV)$						text/csv
-	.avi$		AVI : Audio Video Interleave$								video/x-msvideo
-	.mpeg$		vidéo MPEG$													video/mpeg
-	.ogv$		fichier vidéo OGG$											video/ogg
-	.webm$		fichier vidéo WEBM$											video/webm
+.abw	application/x-abiword
+.arc	application/octet-stream
+.azw	application/vnd.amazon.ebook
+.bin	application/octet-stream
+.bz		application/x-bzip
+.bz2	application/x-bzip2
+.csh	application/x-csh
+.doc	application/msword
+.docx	application/vnd.openxmlformats-officedocument.wordprocessingml.document
+.eot	application/vnd.ms-fontobject
+.epub	application/epub+zip
+.jar	application/java-archive
+.mpkg	application/vnd.apple.installer+xml
+.odp	application/vnd.oasis.opendocument.presentation
+.js		application/javascript
+.json	application/json
+.ods	application/vnd.oasis.opendocument.spreadsheet
+.odt	application/vnd.oasis.opendocument.text
+.ogx	application/ogg
+.pdf	application/pdf
+.ppt	application/vnd.ms-powerpoint
+.pptx	application/vnd.openxmlformats-officedocument.presentationml.presentation
+.rar	application/x-rar-compressed
+.rtf	application/rtf
+.sh		application/x-sh
+.swf	application/x-shockwave-flash
+.tar	application/x-tar
+.ts		application/typescript
+.vsd	application/vnd.visio
+.xhtml	application/xhtml+xml
+.xls	application/vnd.ms-excel
+.xlsx	application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+.xml	application/xml
+.xul	application/vnd.mozilla.xul+xml
+.zip	application/zip
+.7z		application/x-7z-compressed
+.aac	audio/aac
+.mid	audio/midi
+.midi	audio/midi
+.oga	audio/ogg
+.wav	audio/x-wav
+.weba	audio/webm
+.otf	font/otf
+.ttf	font/ttf
+.woff	font/woff
+.woff2	font/woff2
+.bmp	image/bmp
+.gif	image/gif
+.ico	image/x-icon
+.jpeg	image/jpeg
+.jpg	image/jpeg
+.png	image/png
+.svg	image/svg+xml
+.tif	image/tiff
+.tiff	image/tiff
+.webp	image/webp
+.css	text/css
+.htm	text/html
+.html	text/html
+.ics	text/calendar
+.csv	text/csv
+.avi	video/x-msvideo
+.mpeg	video/mpeg
+.ogv	video/ogg
+.webm	video/webm
