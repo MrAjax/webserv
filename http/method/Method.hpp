@@ -2,7 +2,7 @@
 # define METHOD_HPP
 
 #include "../inc/webserv.hpp"
-#include "HttpStatusCode.hpp"
+#include "../utils/HttpStatusCode.hpp"
 
 enum {ZERO, ONE, TWO, GET, POST, FIVE, DELETE};
 

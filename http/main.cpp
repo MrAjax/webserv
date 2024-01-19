@@ -1,9 +1,9 @@
-#include "HttpStatusCode.hpp"
+#include "utils/HttpStatusCode.hpp"
 #include "HttpRequest.hpp"
-#include "HttpResponse.hpp"
-#include "../inc/webserv.hpp"
+#include "response/HttpResponse.hpp"
+#include "inc/webserv.hpp"
 
-#define SERVER_PORT 18001
+#define SERVER_PORT 18000
 
 #define MAXLINE 4096
 #define SA struct sockaddr
@@ -73,7 +73,7 @@ int main()
 				catch (const std::exception &e) {
 					std::cerr << "Error: " << e.what() << "\n";
 				}
-				std::cout << "=== Response ===\n" << response << "\n";
+				//std::cout << "=== Response ===\n" << response << "\n";
 				write(connfd, response.c_str(), response.length());
 				close(connfd);
 			}

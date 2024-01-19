@@ -2,15 +2,15 @@ CC = c++
 CXXFLAGS = -Iinc -MMD -g3 -Wall -Wextra -Werror -std=c++98
 NAME = test
 
-SRC = main.cpp \
+SRC = 	main.cpp \
 		HttpRequest.cpp \
-		HttpResponse.cpp \
-		HttpStatusCode.cpp \
-		Method.cpp \
-		Get.cpp \
-		Post.cpp \
-		Delete.cpp \
-		utils.cpp
+		method/Delete.cpp \
+		method/Get.cpp \
+		method/Method.cpp \
+		method/Post.cpp \
+		response/HttpResponse.cpp \
+		utils/HttpStatusCode.cpp \
+		utils/utils.cpp \
 
 
 OBJ = $(SRC:.cpp=.o)
@@ -47,3 +47,4 @@ leaks : all
 
 .PHONY: all clean fclean re leaks
 .SILENT:
+

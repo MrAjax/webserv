@@ -2,12 +2,12 @@
 # define HTTPRESPONSE_HPP
 
 #include "../inc/webserv.hpp"
-#include "HttpRequest.hpp"
-#include "Method.hpp"
-#include "Get.hpp"
-#include "Post.hpp"
-#include "Delete.hpp"
-#include "HttpStatusCode.hpp"
+#include "../HttpRequest.hpp"
+#include "../method/Method.hpp"
+#include "../method/Get.hpp"
+#include "../method/Post.hpp"
+#include "../method/Delete.hpp"
+#include "../utils/HttpStatusCode.hpp"
 
 class HttpResponse {
 // Request Elements
