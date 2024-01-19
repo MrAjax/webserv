@@ -168,25 +168,28 @@ std::string	HttpRequest::parsingHeader_rest(std::string &line, std::string const
 
 void    HttpRequest::parseAllAttributes(std::string header)
 {
-	std::string delimiteur = "\r\n";
+	std::size_t nbParam = 13;
 	std::size_t end_pos;
+	std::string delimiteur = "\r\n";
 	std::string	line;
-	std::string	tab_key[12] = {"Host:", "User-Agent:", "Accept:", "Accept-Language:", "Accept-Encoding:",
-				"Connection:", "Upgrade-Insecure-Requests:", "Referer:", "Sec-Fetch-Dest:", "Sec-Fetch-Mode:", "Sec-Fetch-Site:", "Content-Length:"};
-	std::string *tab_ref[12] = {&_host, &_userAgent, &_accept, &_acceptLanguage, &_acceptEncoding,
-				&_connection, &_upInsecureRqst, &_referer, &_secFetchDest, &_secFetchMode, &_secFetchSite, &_contentLength};
+	std::string	tab_key[nbParam] = {"Host:", "User-Agent:", "Accept:", "Accept-Language:", "Accept-Encoding:",
+				"Connection:", "Upgrade-Insecure-Requests:", "Referer:", "Sec-Fetch-Dest:", "Sec-Fetch-Mode:",
+				"Sec-Fetch-Site:", "Content-Length:", "Content-Type:"};
+	std::string *tab_ref[nbParam] = {&_host, &_userAgent, &_accept, &_acceptLanguage, &_acceptEncoding,
+				&_connection, &_upInsecureRqst, &_referer, &_secFetchDest, &_secFetchMode,
+				&_secFetchSite, &_contentLength, &_contentType};
 
 	end_pos = findLine(header, line, delimiteur);
 	parsingHeader_method_path_http(line);
 	while (end_pos != std::string::npos)
 	{
 		end_pos = findLine(header, line, delimiteur);
-		for (int i = 0 ; i < 12; i++)
+		for (int i = 0 ; i < nbParam; i++)
 		{
 			if (line.find(tab_key[i]) != std::string::npos)
 			{
 				if (!(*tab_ref[i]).empty())
-					throw std::runtime_error("Error: Bad request synthax");
+					throw std::runtime_error("Error: Bad request synthax duplicate information");
 				*tab_ref[i] = parsingHeader_rest(line, tab_key[i]);
 				break ;
 			}
@@ -212,10 +215,10 @@ std::string HttpRequest::getSecFetchDest()		{return (this->_secFetchDest);}
 std::string HttpRequest::getSecFetchMode()		{return (this->_secFetchMode);}
 std::string HttpRequest::getSecFetchSite()		{return (this->_secFetchSite);}
 std::string HttpRequest::getContentLength()		{return (this->_contentLength);}
+std::string	HttpRequest::getContentType()		{return (this->_contentType);}
 
 std::string HttpRequest::getBodyRequest()		{return (this->_bodyRequest);}
 std::string HttpRequest::getHeaderRequest()		{return (this->_headerRequest);}
 
 int			HttpRequest::getConnfd()			{return _connfd;}
-std::string	HttpRequest::getContentType()		{return _contentType;}
 std::string	HttpRequest::getInput()				{return _input;}

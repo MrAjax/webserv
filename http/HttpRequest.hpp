@@ -79,12 +79,12 @@ class HttpRequest
 		std::string getSecFetchMode();
 		std::string getSecFetchSite();
 		std::string getContentLength();
+		std::string getContentType();
 
 		std::string getBodyRequest();
 		std::string getHeaderRequest();
 
 		int         getConnfd();
-		std::string getContentType();
 		std::string getInput();
 		
 
@@ -104,12 +104,12 @@ class HttpRequest
 		std::string _secFetchMode;
 		std::string _secFetchSite;
 		std::string _contentLength;
+		std::string _contentType;
 
 		std::string _bodyRequest;
 		std::string _headerRequest;
 		
 		int         _connfd;
-		std::string _contentType;
 		std::string _input;
 
 		int         STATUS;
