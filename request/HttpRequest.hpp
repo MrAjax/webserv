@@ -22,6 +22,7 @@
 # define PURPLE	"\e[35m"
 # define CYAN	"\e[36m"
 
+#define MAXLINE 415
 
 #define NEW 0
 #define PROCESSING_HEADER 1
@@ -34,8 +35,8 @@ class HttpRequest
 	public:
 
 		HttpRequest(void);
-		HttpRequest(int connfd);
 		HttpRequest(struct pollfd request); //TEST
+		HttpRequest(int connfd);
 
 		HttpRequest(int connfd, std::string contentType, std::string input);
 		HttpRequest(HttpRequest const &copy);
@@ -48,8 +49,8 @@ class HttpRequest
 		void	recvfd(int & fd); //on read buffer[MAXLINE -1] du fd
 
 
-		void    parsingHeader(void);
-		void    parsingBody(void);
+		void    parsingHeader(int fd);
+		void    parsingBody(int fd);
 
 
 		//---------Header parser--------------
@@ -62,7 +63,6 @@ class HttpRequest
 		void        checkError();
 		//---------Utils---------------------
 		std::size_t findLine(std::string &header, std::string &line, std::string &delimiteur);
-		std::size_t convert(std::string &toConvert);
 
 		//---------Guetteurs-----------------
 		std::string getMethod();

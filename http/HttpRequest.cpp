@@ -1,68 +1,95 @@
 #include "HttpRequest.hpp"
-#include "HttpStatusCode.hpp"
 
 #define MAXLINE 4096
 
+HttpRequest::HttpRequest(void)
+{
+	STATUS = NEW;
+	fullRequest = "";
+}
+
 HttpRequest::HttpRequest(int connfd)
 {
-	try{
-	parsingHeader(connfd);
-	checkError();
+	_connfd = connfd;
+	STATUS = NEW;
+	fullRequest = "";
+}
+
+
+HttpRequest::~HttpRequest(void){}
+
+//-----------Core functions----------
+
+void	HttpRequest::recvfd(int & fd)
+{
+	u_int8_t recvline[MAXLINE + 1];
+	memset(recvline, 0, MAXLINE);
+	int numbytes;
+	numbytes = recv(fd, recvline, MAXLINE - 1, 0);
+	fullRequest += reinterpret_cast< char * >(recvline); 
+	if (numbytes < 0)
+		throw std::runtime_error("ERROR: Cannot read request\n");
+	if (fullRequest.empty())
+		throw std::runtime_error("ERROR: Request is empty\n");
+}
+
+int    HttpRequest::processingRequest(struct pollfd &request)
+{
+	try
+	{
+		recvfd(request.fd);
+		if (STATUS < DONE_HEADER)
+			parsingHeader();
+		if (STATUS != DONE_ALL && STATUS >= DONE_HEADER)
+			parsingBody();
 	}
 	catch (std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
+	std::cout << YELLOW  "STATUS after BODY " << STATUS << RESET << std::endl;
+	return (STATUS);
 }
 
-HttpRequest::HttpRequest(int connfd, std::string contentType, std::string input) {
-	_connfd = connfd;
-	_contentType = contentType;
-	_input = input;
-}
-
-HttpRequest::~HttpRequest(void){}
-
-//-----------Check Errors------------
-
-void	HttpRequest::checkError(void)
+void    HttpRequest::parsingHeader(void)
 {
-	std::string *key_infos[4] = {&_method , &_path, &_http, &_host};
-
-	for (int i = 0; i < 4; i++)
-		if ((*key_infos[i]).empty())
-			throw std::runtime_error("ERROR: Key info missing in request\n");
-	if (_method != "GET" && _method != "POST" && _method != "DELETE")
-		throw std::runtime_error("ERROR: Dont now the method in request\n");
-	if (_http != "HTTP/1.1")
-		throw std::runtime_error("ERROR: Bad protocol in request\n");
-	if (_path != "/")
-		if (access("index.html", F_OK) != 0)
-			throw std::runtime_error("ERROR: Cant acces file\n");
+	if (STATUS >= DONE_HEADER)
+		return ;
+	std::string delimiteur = "\r\n\r\n";
+	std::size_t pos = fullRequest.find(delimiteur);
+	if (pos == std::string::npos)
+	{
+		STATUS = PROCESSING_HEADER;
+		return ;
+	}
+	_headerRequest = fullRequest.substr(0, pos);
+	if (fullRequest.size() > pos + delimiteur.size())
+		fullRequest = fullRequest.substr(pos + delimiteur.size());
+	else
+		fullRequest = "";
+	parseAllAttributes(_headerRequest);
 }
 
-//-----------Guetteurs------------
-
-std::string HttpRequest::getMethod()			{return (this->_method);}
-std::string HttpRequest::getPath()				{return (this->_path);}
-std::string HttpRequest::getHttp()				{return (this->_http);}
-std::string HttpRequest::getHost()				{return (this->_host);}
-std::string HttpRequest::getUserAgent()			{return (this->_userAgent);}
-std::string HttpRequest::getAccept()			{return (this->_accept);}
-std::string HttpRequest::getAcceptLanguage()	{return (this->_acceptLanguage);}
-std::string HttpRequest::getConnection()		{return (this->_connection);}
-std::string HttpRequest::getUpInsecureRqst()	{return (this->_upInsecureRqst);}
-std::string HttpRequest::getReferer() 			{return (this->_referer);}
-std::string HttpRequest::getSecFetchDest()		{return (this->_secFetchDest);}
-std::string HttpRequest::getSecFetchMode()		{return (this->_secFetchMode);}
-std::string HttpRequest::getSecFetchSite()		{return (this->_secFetchSite);}
-
-std::string HttpRequest::getBodyRequest()		{return (this->_bodyRequest);}
-std::string HttpRequest::getHeaderRequest()		{return (this->_headerRequest);}
-
-int			HttpRequest::getConnfd()			{return _connfd;}
-std::string	HttpRequest::getContentType()		{return _contentType;}
-std::string	HttpRequest::getInput()				{return _input;}
+void    HttpRequest::parsingBody(void)
+{
+	if (STATUS == DONE_ALL || STATUS < DONE_HEADER)
+		return ;
+	
+	if (_contentLength.empty())
+	{
+		STATUS = DONE_ALL;
+		return ;
+	}
+	std::size_t	contlength =  convert(_contentLength);
+	if (fullRequest.size() >= contlength)
+	{
+		_bodyRequest = fullRequest.substr(0, contlength);
+		fullRequest = "";
+		STATUS = DONE_ALL;
+	}
+	else
+		STATUS = PROCESSING_BODY;
+}
 
 //-----------Utils----------------
 
@@ -79,18 +106,27 @@ std::size_t	HttpRequest::findLine(std::string &header, std::string &line, std::s
 	return (end_pos);
 }
 
-//-----------Header parser----------------
-
-void	HttpRequest::splitHeaderBody(std::string &fullRequest)
+std::size_t HttpRequest::convert(std::string &toConvert)
 {
-	std::string delimiteur = "\r\n\r\n";
-	std::size_t pos = fullRequest.find(delimiteur);
-	if (pos == std::string::npos)
-		throw std::runtime_error("ERROR: Cannot find end of header in request\n");
-	_headerRequest = fullRequest.substr(0, pos);
-	if (fullRequest.size() > pos + delimiteur.size())
-		_bodyRequest = fullRequest.substr(pos + delimiteur.size());
+	if (toConvert.empty())
+		throw std::runtime_error("ERROR: string to size_t convertor nothing to convert\n");
+	if (toConvert[0] == '0' && toConvert.size() > 1)
+		throw std::runtime_error("ERROR: string to size_t convertor bad synthax\n");
+	for (std::size_t i = 0; i < toConvert.size(); i++)
+	{
+		if (!std::isdigit(toConvert[i]))
+			throw std::runtime_error("ERROR: string to size_t convertor != digit\n");
+	}
+	std::stringstream ss;
+	ss << toConvert;
+	std::size_t	value;
+	ss >> value;
+	if (value == std::numeric_limits<std::size_t>::max())
+		throw std::runtime_error("ERROR: string to size_t convertor value >= size_t MAX\n");
+	return (value);
 }
+
+//-----------Header parser----------------
 
 void	HttpRequest::parsingHeader_method_path_http(std::string &line)
 {
@@ -135,17 +171,17 @@ void    HttpRequest::parseAllAttributes(std::string header)
 	std::string delimiteur = "\r\n";
 	std::size_t end_pos;
 	std::string	line;
-	std::string	tab_key[11] = {"Host:", "User-Agent:", "Accept:", "Accept-Language:", "Accept-Encoding:",
-				"Connection:", "Upgrade-Insecure-Requests:", "Referer:", "Sec-Fetch-Dest:", "Sec-Fetch-Mode:", "Sec-Fetch-Site:"};
-	std::string *tab_ref[11] = {&_host, &_userAgent, &_accept, &_acceptLanguage, &_acceptEncoding,
-				&_connection, &_upInsecureRqst, &_referer, &_secFetchDest, &_secFetchMode, &_secFetchSite};
+	std::string	tab_key[12] = {"Host:", "User-Agent:", "Accept:", "Accept-Language:", "Accept-Encoding:",
+				"Connection:", "Upgrade-Insecure-Requests:", "Referer:", "Sec-Fetch-Dest:", "Sec-Fetch-Mode:", "Sec-Fetch-Site:", "Content-Length:"};
+	std::string *tab_ref[12] = {&_host, &_userAgent, &_accept, &_acceptLanguage, &_acceptEncoding,
+				&_connection, &_upInsecureRqst, &_referer, &_secFetchDest, &_secFetchMode, &_secFetchSite, &_contentLength};
 
 	end_pos = findLine(header, line, delimiteur);
 	parsingHeader_method_path_http(line);
 	while (end_pos != std::string::npos)
 	{
 		end_pos = findLine(header, line, delimiteur);
-		for (int i = 0 ; i < 11; i++)
+		for (int i = 0 ; i < 12; i++)
 		{
 			if (line.find(tab_key[i]) != std::string::npos)
 			{
@@ -156,36 +192,30 @@ void    HttpRequest::parseAllAttributes(std::string header)
 			}
 		}
 	}
-
-	std::cout << "-------List command--------" << std::endl; //print pour voir si toutes les valeurs sont bien parse
-	std::cout << this->_method << std::endl;
-	std::cout << this->_path << std::endl;
-	std::cout << this->_http << std::endl;
-	for (int i = 0; i < 11; i++)
-		std::cout << *tab_ref[i] << std::endl;
+	STATUS = DONE_HEADER;
 }
 
-void    HttpRequest::parsingHeader(int connfd)
-{
-	u_int8_t recvline[MAXLINE + 1];
-	memset(recvline, 0, MAXLINE);
 
-	std::string fullRequest;
-	int n;
-	while ((n = read(connfd, recvline, MAXLINE - 1)) > 0)
-	{
-		// std::cout << recvline << std::endl;
-		fullRequest += reinterpret_cast< char * >(recvline);
-		if (recvline[n - 1] == '\n')
-			break;
-		memset(recvline, 0, MAXLINE);
-	}
-	if (n < 0)
-		throw std::runtime_error("ERROR: Cannot read request\n");
-	if (fullRequest.empty())
-		throw std::runtime_error("ERROR: Request is empty\n");
+//-----------Guetteurs------------
 
-	splitHeaderBody(fullRequest);
-	parseAllAttributes(_headerRequest);
+std::string HttpRequest::getMethod()			{return (this->_method);}
+std::string HttpRequest::getPath()				{return (this->_path);}
+std::string HttpRequest::getHttp()				{return (this->_http);}
+std::string HttpRequest::getHost()				{return (this->_host);}
+std::string HttpRequest::getUserAgent()			{return (this->_userAgent);}
+std::string HttpRequest::getAccept()			{return (this->_accept);}
+std::string HttpRequest::getAcceptLanguage()	{return (this->_acceptLanguage);}
+std::string HttpRequest::getConnection()		{return (this->_connection);}
+std::string HttpRequest::getUpInsecureRqst()	{return (this->_upInsecureRqst);}
+std::string HttpRequest::getReferer() 			{return (this->_referer);}
+std::string HttpRequest::getSecFetchDest()		{return (this->_secFetchDest);}
+std::string HttpRequest::getSecFetchMode()		{return (this->_secFetchMode);}
+std::string HttpRequest::getSecFetchSite()		{return (this->_secFetchSite);}
+std::string HttpRequest::getContentLength()		{return (this->_contentLength);}
 
-}
+std::string HttpRequest::getBodyRequest()		{return (this->_bodyRequest);}
+std::string HttpRequest::getHeaderRequest()		{return (this->_headerRequest);}
+
+int			HttpRequest::getConnfd()			{return _connfd;}
+std::string	HttpRequest::getContentType()		{return _contentType;}
+std::string	HttpRequest::getInput()				{return _input;}
