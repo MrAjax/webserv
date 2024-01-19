@@ -7,7 +7,7 @@
 
 class Get: public Method {
 public:
-	Get(std::string path);
+	Get(std::string path, std::string content);
 	~Get();
 	
 	void	get_text();

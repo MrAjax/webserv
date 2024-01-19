@@ -6,7 +6,7 @@
 
 class Delete: public Method {
 	public:
-	Delete(std::string path);
+	Delete(std::string path, std::string content);
 	~Delete();
 	void	execute_method();
 };

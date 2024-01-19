@@ -20,7 +20,7 @@ class HttpResponse {
 	std::string	_path;
 // Response Elements
 	std::string	_protocol;
-	std::string	_status_code;
+	int			_status_code;
 	std::string	_status_msg;
 	std::string	_header;
 	std::string	_response;

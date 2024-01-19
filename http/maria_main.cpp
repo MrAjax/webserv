@@ -63,7 +63,7 @@ int main()
 			if (pfds.fd == listenfd) {
 				connfd = accept(listenfd, (SA *) NULL, NULL); //NULL car on veut accepter n 'importe quelle connexion
 				memset(recvline, 0, MAXLINE);
-				HttpRequest Req(connfd);
+				HttpRequest Req;
 
 				std::string		response;
 				try {

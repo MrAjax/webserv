@@ -1,6 +1,6 @@
 #include "Delete.hpp"
 
-Delete::Delete(std::string path): Method(path) {}
+Delete::Delete(std::string path, std::string content): Method(path, content) {}
 
 Delete::~Delete() {}
 
