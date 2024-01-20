@@ -2,7 +2,8 @@
 server {
     listen 18000;
 	host 127.0.0.1;
-    server_name www.monsite2.com;
+    server_name
+	client_max_body_size 1024
 
     root /var/www/monsite2;
     index index.html;
@@ -35,5 +36,3 @@ server {
         expires 30d;
     }
 }
-
-

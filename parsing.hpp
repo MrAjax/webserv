@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:30:56 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/20 08:15:09 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/20 11:09:22 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@
 
 #include "Server.hpp"
 
-# define PARAM 3
+# define PARAM 4
 # define MAX_CO 10
 # define MAXLINE 4096
 class Server;
