@@ -199,7 +199,24 @@ void    HttpRequest::parseAllAttributes(std::string header)
 }
 
 
+<<<<<<< HEAD:http/request/HttpRequest.cpp
 //-----------Guetteurs------------
+=======
+	std::string fullRequest;
+	int n;
+	while ((n = read(connfd, recvline, MAXLINE - 1)) > 0)
+	{
+		std::cout << recvline << std::endl;
+		fullRequest += reinterpret_cast< char * >(recvline);
+		if (recvline[n - 1] == '\n')
+			break;
+		memset(recvline, 0, MAXLINE);
+	}
+	if (n < 0)
+		throw std::runtime_error("ERROR: Cannot read request\n");
+	if (fullRequest.empty())
+		throw std::runtime_error("ERROR: Request is empty\n");
+>>>>>>> maria:http/HttpRequest.cpp
 
 std::string HttpRequest::getMethod()			{return (this->_method);}
 std::string HttpRequest::getPath()				{return (this->_path);}

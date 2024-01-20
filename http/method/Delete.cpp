@@ -6,5 +6,11 @@ Delete::~Delete() {}
 
 void	Delete::execute_method() {
 	if (std::remove(this->get_path().c_str()) != 0)
-		throw std::runtime_error("std::remove failed\n");
+		error_throw("std::remove failed");
+	set_statuscode(200);
+	set_header(" " \
+	+ int_to_str(get_status_code()) \
+	+ " " \
+	+ HttpStatusCode::get_error_msg(get_status_code()) \
+	+ "\r\n\r\n");
 }

@@ -1,102 +1,81 @@
 #include "utils/HttpStatusCode.hpp"
+#include "HttpRequest.hpp"
 #include "response/HttpResponse.hpp"
-#include "request/HttpRequest.hpp"
 #include "inc/webserv.hpp"
 
-#define SERVER_PORT 18000
+static	void	send_response(int connfd) {
+	server_log("Activity detected", DEBUG);
+	if (connfd < 0)
+		throw error_throw("send response - main.cpp");
+	server_log("connfd ready", DEBUG);
+	server_log("Request received", INFO);
+	server_log("Parsing Request...", DEBUG);
+	server_log("Request is valid", DEBUG);
+	HttpRequest 	Req(connfd);
+	server_log(Req.getHeaderRequest() + "\n\n", DIALOG);
+	server_log("Building Response..", DEBUG);
+	HttpResponse	Rep(Req);
+	std::string		response(Rep.get_response());
+	server_log("Sending response...", DEBUG);
+	write(connfd, response.c_str(), response.length());
+	close(connfd);
+	server_log("Response sent", INFO);
+	server_log(Rep.get_header(), DIALOG);
+}
 
-#define MAXLINE 4096
-#define SA struct sockaddr
+static	void	open_connection(int &listenfd, struct sockaddr_in &servaddr) {
+	server_log("Openning connection...", DEBUG);
 
-void	err_n_die(const char *fmt, ...) {
-	(void)fmt;
-	int		errno_save;
-	va_list	ap;
+	if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+		error_throw("open connection - socket creation - main.cpp");
+	bzero (&servaddr, sizeof(servaddr));
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	servaddr.sin_port = htons(SERVER_PORT);
 
-	errno_save = errno;
+	if ((bind(listenfd, (SA *) &servaddr, sizeof(servaddr))) < 0)
+		throw error_throw("Port " + int_to_str(SERVER_PORT));
+	if (listen(listenfd, 10) < 0)
+		throw error_throw("listen error - open_connection - main.cpp");
+		
+	server_log("Connection established on port " + int_to_str(SERVER_PORT), INFO);
+	std::cout << "PORT " << SERVER_PORT << ": Ready for connection\n";
+}
 
-	va_start(ap, fmt);
-	vfprintf(stdout, fmt, ap);
-	fprintf(stdout, "\n");
-	fflush(stdout);
-	if (errno_save != 0) {
-		std::cout << "(errno = " << errno_save << ") : " << strerror(errno_save) << "\n";
-		std::cout << "\n";
-		fflush(stdout);
-	}
-	va_end(ap);
-	std::cout << "===> Error Exit and Ciao!\n";
-	exit(1);
+static	void	init_log_file() {
+	std::fstream log_file("server/log", std::ios::out | std::ios::trunc);
+    
+    if (!log_file.is_open())
+		throw error_throw("log file cannot be created - init_log_file - main.cpp");
+    log_file.close();
 }
 
 int main()
 {
-	int					listenfd, newfd;
+	int					listenfd;
 	struct sockaddr_in	servaddr;
 	uint8_t				recvline[MAXLINE + 1];
+	struct pollfd 		pfds;
 
-    if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-		err_n_die("Error while creating the socket!");
-
-    bzero (&servaddr, sizeof(servaddr));
-	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(SERVER_PORT);
-
-    if ((bind(listenfd, (SA *) &servaddr, sizeof(servaddr))) < 0)
-		err_n_die("bind error.");
-	if (listen(listenfd, 10) < 0)
-		err_n_die("listen error.");
-
-    
-	struct pollfd pfds;
-	pfds.fd = listenfd;
-	pfds.events = POLLIN;
-
-	std::vector< class HttpRequest *> list;
-	
-	for (;;)
-	{
-		std::cout << "PORT " << SERVER_PORT << ": Ready for connection\n";
-
-		if (poll(&pfds, 1, -1) == -1)
-			throw std::runtime_error("poll error\n");
-		
-		if (pfds.revents & POLLIN)
-		{
-			
-				if (pfds.fd == listenfd)
-				{
-					newfd = accept(listenfd, (SA *) NULL, NULL); //NULL car on veut accepter n'importe quelle connexion
+	try {
+		init_log_file();
+		server_log("SERVER STARTED", INFO);
+		open_connection(listenfd, servaddr);
+		pfds.fd = listenfd;
+		pfds.events = POLLIN;
+		for (;;) { /* Here is the main loop */
+			if (poll(&pfds, 1, -1) == -1)
+				error_throw("poll failure - main - main.cpp");
+			if (pfds.revents & POLLIN) {
+				if (pfds.fd == listenfd) {
 					memset(recvline, 0, MAXLINE);
-				
-					struct pollfd test;
-					test.fd = newfd;
-					test.events = POLLIN;
-					
-					HttpRequest Req;
-
-					list.push_back(&Req);
-
-					poll(&test, 1, -1);
-					if (test.revents == POLLIN)
-					{
-						list[0]->processingRequest(test);
-					}
-
-				std::string		response;
-				try {
-					HttpResponse	Rep(Req);
-					response = Rep.get_response();
+					send_response(accept(listenfd, (SA *) NULL, NULL));
 				}
-				catch (const std::exception &e) {
-					std::cerr << "Error: " << e.what() << "\n";
-				}
-				std::cout << "=== Response ===\n" << response << "\n";
-				write(newfd, response.c_str(), response.length());
-				close(newfd);
 			}
 		}
-		
-    }
-	close(listenfd);
-}
+		close(listenfd);
+		server_log("CONNECTION CLOSED", DIALOG);
+		server_log("SERVER STOPPED", INFO);
+	}
+	catch (const std::exception &e) {
+		std::cerr << e.what() << "\n";
+	}

@@ -11,16 +11,11 @@
 #include "ContentTypeFinder.hpp"
 
 class HttpResponse {
-// Request Elements
-	int			_connfd;
 	std::string	_contentType;
-	std::string	_input;
-	
 	std::string	_method;
 	int			_method_code;
 	std::string	_path;
-// Response Elements
-	std::string	_protocol;
+	std::string	_body_request;
 	int			_status_code;
 	std::string	_status_msg;
 	std::string	_header;
@@ -30,8 +25,8 @@ public:
 
 	~HttpResponse();
 
-	void sendhtml(int connfd, std::string ContentType, std::string input);
 	std::string	get_response();
+	std::string	get_header();
 };
 
 // Building and storing the HTTP response (status line, header, body...)
