@@ -26,19 +26,22 @@ END=\033[0m
 valgrind = valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes --trace-children=yes ./$(NAME)
 
 $(NAME) : $(OBJ)
+	@chmod 400 server/MIME_types
 	@$(CC) $(CXXFLAGS) $(OBJ) -o $(NAME)
-	@echo "$(RED) Exec ready $(END)"
+	@echo "$(YELLOW) Exec ready $(END)"
 
 -include $(DEP)
 
 all:	$(NAME)
 
 clean :
-	@rm $(OBJ) $(DEP)
 	@echo "$(GREEN2)🦕 All clean! 🤠$(END)"
 
 fclean : clean
 	@rm ${NAME}
+	@if [ -e "server/log" ]; then \
+		rm "server/log"; \
+	fi
 	@echo "$(GREEN1)🌈 Full clean done!🌻$(END)"
 
 re : fclean all

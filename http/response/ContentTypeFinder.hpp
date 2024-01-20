@@ -2,6 +2,7 @@
 # define CONTENTTYPEFINDER_HPP
 
 #include "../inc/webserv.hpp"
+#include "../utils/utils.hpp"
 
 class ContentTypeFinder {
 	std::map<std::string, std::string>	_type_dictionnary;

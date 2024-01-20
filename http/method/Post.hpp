@@ -6,7 +6,7 @@
 
 class Post: public Method {
 	public:
-	Post(std::string path, std::string content);
+	Post(std::string path, std::string content, std::string body_request);
 	~Post();
 	void	execute_method();
 };
