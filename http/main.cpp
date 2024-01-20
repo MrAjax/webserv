@@ -73,9 +73,9 @@ int main()
 					test.fd = newfd;
 					test.events = POLLIN;
 					
-					HttpRequest Req;
+					HttpRequest *Req = new HttpRequest;
 
-					list.push_back(&Req);
+					list.push_back(Req);
 
 					poll(&test, 1, -1);
 					if (test.revents == POLLIN)
@@ -85,8 +85,8 @@ int main()
 
 				std::string		response;
 				try {
-					HttpResponse	Rep(Req);
-					response = Rep.get_response();
+					// HttpResponse	Rep(*Req);
+					// response = Rep.get_response();
 				}
 				catch (const std::exception &e) {
 					std::cerr << "Error: " << e.what() << "\n";
@@ -94,6 +94,8 @@ int main()
 				std::cout << "=== Response ===\n" << response << "\n";
 				write(newfd, response.c_str(), response.length());
 				close(newfd);
+				delete Req;
+				list.pop_back();
 			}
 		}
 		

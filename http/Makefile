@@ -4,6 +4,7 @@ NAME = test
 
 SRC = 	main.cpp \
 		request/HttpRequest.cpp \
+		request/HttpRequestError.cpp \
 		method/Delete.cpp \
 		method/Get.cpp \
 		method/Method.cpp \

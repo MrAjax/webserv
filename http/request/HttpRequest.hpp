@@ -60,8 +60,6 @@ class HttpRequest
 		void        parsingHeader_method_path_http(std::string &line);
 		std::string parsingHeader_rest(std::string &line, std::string const & keyWord);
 
-		//---------check error---------------------
-		void        checkError();
 		//---------Utils---------------------
 		std::size_t findLine(std::string &header, std::string &line, std::string &delimiteur);
 		std::size_t convert(std::string &toConvert);

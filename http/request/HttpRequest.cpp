@@ -1,4 +1,6 @@
 #include "HttpRequest.hpp"
+#include "HttpRequestError.hpp"
+
 
 #define MAXLINE 4096
 
@@ -40,6 +42,11 @@ int    HttpRequest::processingRequest(struct pollfd &request)
 		recvfd(request.fd);
 		if (STATUS < DONE_HEADER)
 			parsingHeader();
+		if (STATUS == DONE_HEADER)
+		{
+			HttpRequestError checkError(*this);
+			checkError.Method();
+		}
 		if (STATUS != DONE_ALL && STATUS >= DONE_HEADER)
 			parsingBody();
 	}
@@ -47,7 +54,7 @@ int    HttpRequest::processingRequest(struct pollfd &request)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-	std::cout << YELLOW  "STATUS after BODY " << STATUS << RESET << std::endl;
+	// std::cout << YELLOW  "STATUS after BODY " << STATUS << RESET << std::endl;
 	return (STATUS);
 }
 
