@@ -1,6 +1,6 @@
 #include "utils/HttpStatusCode.hpp"
-#include "HttpRequest.hpp"
 #include "response/HttpResponse.hpp"
+#include "request/HttpRequest.hpp"
 #include "inc/webserv.hpp"
 
 #define SERVER_PORT 18000
@@ -31,7 +31,7 @@ void	err_n_die(const char *fmt, ...) {
 
 int main()
 {
-	int					listenfd, connfd;
+	int					listenfd, newfd;
 	struct sockaddr_in	servaddr;
 	uint8_t				recvline[MAXLINE + 1];
 
@@ -51,6 +51,8 @@ int main()
 	struct pollfd pfds;
 	pfds.fd = listenfd;
 	pfds.events = POLLIN;
+
+	std::vector< class HttpRequest *> list;
 	
 	for (;;)
 	{
@@ -59,11 +61,27 @@ int main()
 		if (poll(&pfds, 1, -1) == -1)
 			throw std::runtime_error("poll error\n");
 		
-		if (pfds.revents & POLLIN) {
-			if (pfds.fd == listenfd) {
-				connfd = accept(listenfd, (SA *) NULL, NULL); //NULL car on veut accepter n 'importe quelle connexion
-				memset(recvline, 0, MAXLINE);
-				HttpRequest Req(connfd);
+		if (pfds.revents & POLLIN)
+		{
+			
+				if (pfds.fd == listenfd)
+				{
+					newfd = accept(listenfd, (SA *) NULL, NULL); //NULL car on veut accepter n'importe quelle connexion
+					memset(recvline, 0, MAXLINE);
+				
+					struct pollfd test;
+					test.fd = newfd;
+					test.events = POLLIN;
+					
+					HttpRequest Req;
+
+					list.push_back(&Req);
+
+					poll(&test, 1, -1);
+					if (test.revents == POLLIN)
+					{
+						list[0]->processingRequest(test);
+					}
 
 				std::string		response;
 				try {
@@ -73,9 +91,9 @@ int main()
 				catch (const std::exception &e) {
 					std::cerr << "Error: " << e.what() << "\n";
 				}
-				//std::cout << "=== Response ===\n" << response << "\n";
-				write(connfd, response.c_str(), response.length());
-				close(connfd);
+				std::cout << "=== Response ===\n" << response << "\n";
+				write(newfd, response.c_str(), response.length());
+				close(newfd);
 			}
 		}
 		
