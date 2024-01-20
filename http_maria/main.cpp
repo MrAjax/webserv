@@ -1,6 +1,5 @@
 #include "utils/HttpStatusCode.hpp"
 #include "HttpRequest.hpp"
-#include "HttpRequest.hpp"
 #include "response/HttpResponse.hpp"
 #include "inc/webserv.hpp"
 
@@ -80,3 +79,4 @@ int main()
 	catch (const std::exception &e) {
 		std::cerr << e.what() << "\n";
 	}
+}
