@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:30:56 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/19 09:32:54 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/20 08:15:09 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@
 
 # define PARAM 3
 # define MAX_CO 10
+# define MAXLINE 4096
 class Server;
 
 /*readConfigFile.cpp*/

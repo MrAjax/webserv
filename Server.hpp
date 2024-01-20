@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/16 13:39:00 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/19 10:55:58 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ public:
 
 	std::string getIp( void ) const;
 	std::string getPort( void ) const;
+	struct sockaddr_in getclientAddr( void ) const;
 	int	getSocketfd( void ) const;
 	
 private:

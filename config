@@ -1,6 +1,6 @@
 # Deuxième serveur
 server {
-    listen 18001;
+    listen 18000;
 	host 127.0.0.1;
     server_name www.monsite2.com;
 

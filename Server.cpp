@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/16 15:13:08 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/20 09:07:05 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,8 @@ void Server::openSocket(void) { // 1st check if open socket is necessary (config
 			std::cerr << "socket error:";
 			throw std::runtime_error(strerror(errno));
 		}	
+	int yes = 1;	
+	setsockopt(_socketfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));	
 }	
 
 void Server::configServer(void) {
@@ -95,7 +97,7 @@ void Server::configServer(void) {
 		std::cerr << "getaddrinfo error: ";
 		throw std::runtime_error(gai_strerror(ret));
 	}
-	if (_socketIsSet == false) { // Port + ip already binded and listen
+	if (_socketIsSet == false) { // Port + ip not already binded and listen
 		for (current = _res; current != 0; current = current->ai_next) {
 			if (bind(_socketfd, current->ai_addr, current->ai_addrlen) == 0) {
 				break;
@@ -158,4 +160,8 @@ std::string Server::getPort(void) const {
 
 int Server::getSocketfd(void) const {
 	return _socketfd;
+}	
+
+sockaddr_in Server::getclientAddr(void) const {
+	return _server_addr;
 }	
