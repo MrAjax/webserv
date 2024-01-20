@@ -184,7 +184,7 @@ void    HttpRequest::parseAllAttributes(std::string header)
 	while (end_pos != std::string::npos)
 	{
 		end_pos = findLine(header, line, delimiteur);
-		for (int i = 0 ; i < nbParam; i++)
+		for (std::size_t i = 0 ; i < nbParam; i++)
 		{
 			if (line.find(tab_key[i]) != std::string::npos)
 			{

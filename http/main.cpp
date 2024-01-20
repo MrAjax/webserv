@@ -1,5 +1,4 @@
 #include "HttpStatusCode.hpp"
-#include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "../inc/webserv.hpp"
 

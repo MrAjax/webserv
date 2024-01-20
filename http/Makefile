@@ -3,7 +3,7 @@ CXXFLAGS = -Iinc -MMD -g3 -Wall -Wextra -Werror -std=c++98
 NAME = test
 
 SRC = main.cpp \
-		HttpRequest.cpp \
+		../request/HttpRequest.cpp \
 		HttpResponse.cpp \
 		HttpStatusCode.cpp \
 		Method.cpp \

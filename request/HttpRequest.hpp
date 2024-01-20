@@ -14,6 +14,8 @@
 
 #include <limits>
 
+
+
 # define RESET	"\e[0m"
 # define RED	"\e[31m"
 # define GREEN	"\e[32m"
@@ -22,7 +24,6 @@
 # define PURPLE	"\e[35m"
 # define CYAN	"\e[36m"
 
-#define MAXLINE 415
 
 #define NEW 0
 #define PROCESSING_HEADER 1
@@ -35,8 +36,8 @@ class HttpRequest
 	public:
 
 		HttpRequest(void);
-		HttpRequest(struct pollfd request); //TEST
 		HttpRequest(int connfd);
+		HttpRequest(struct pollfd request); //TEST
 
 		HttpRequest(int connfd, std::string contentType, std::string input);
 		HttpRequest(HttpRequest const &copy);
@@ -49,8 +50,8 @@ class HttpRequest
 		void	recvfd(int & fd); //on read buffer[MAXLINE -1] du fd
 
 
-		void    parsingHeader(int fd);
-		void    parsingBody(int fd);
+		void    parsingHeader(void);
+		void    parsingBody(void);
 
 
 		//---------Header parser--------------
@@ -63,6 +64,7 @@ class HttpRequest
 		void        checkError();
 		//---------Utils---------------------
 		std::size_t findLine(std::string &header, std::string &line, std::string &delimiteur);
+		std::size_t convert(std::string &toConvert);
 
 		//---------Guetteurs-----------------
 		std::string getMethod();
@@ -79,16 +81,16 @@ class HttpRequest
 		std::string getSecFetchMode();
 		std::string getSecFetchSite();
 		std::string getContentLength();
+		std::string getContentType();
 
 		std::string getBodyRequest();
 		std::string getHeaderRequest();
 
 		int         getConnfd();
-		std::string getContentType();
 		std::string getInput();
 		
 
-	private:
+	protected:
 		std::string _method;
 		std::string _path;
 		std::string _http;
@@ -104,12 +106,12 @@ class HttpRequest
 		std::string _secFetchMode;
 		std::string _secFetchSite;
 		std::string _contentLength;
+		std::string _contentType;
 
 		std::string _bodyRequest;
 		std::string _headerRequest;
 		
 		int         _connfd;
-		std::string _contentType;
 		std::string _input;
 
 		int         STATUS;

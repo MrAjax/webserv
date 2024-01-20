@@ -35,4 +35,7 @@
 #include <vector>
 #include <fstream>
 
+//request
+#include "../request/HttpRequest.hpp"
+
 #endif
