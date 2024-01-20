@@ -38,7 +38,7 @@ static	void	open_connection(int &listenfd, struct sockaddr_in &servaddr) {
 		throw error_throw("listen error - open_connection - main.cpp");
 		
 	server_log("Connection established on port " + int_to_str(SERVER_PORT), INFO);
-	std::cout << "PORT " << SERVER_PORT << ": Ready for connection\n";
+	std::cout << std::string(GREENN) + "PORT " << SERVER_PORT << ": Ready for connection\n" + std::string(ENDD);
 }
 
 static	void	init_log_file() {

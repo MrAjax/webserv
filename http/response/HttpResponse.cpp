@@ -17,9 +17,9 @@ HttpResponse::HttpResponse(HttpRequest &req) {
 	if (_method_code == POST)
 		_body_request = req.getBodyRequest();
 
-	server_log(std::string(WHITE) + "method = " + _method, DEBUG);
-	server_log(std::string(WHITE) + "method code = " + int_to_str(_method_code), DEBUG);
-	server_log(std::string(WHITE) + "path = " + _path, DEBUG);
+	server_log(std::string(WHITEE) + "method = " + _method, DEBUG);
+	server_log(std::string(WHITEE) + "method code = " + int_to_str(_method_code), DEBUG);
+	server_log(std::string(WHITEE) + "path = " + _path, DEBUG);
 }
 
 HttpResponse::~HttpResponse() {}
@@ -48,7 +48,7 @@ std::string	HttpResponse::get_response() {
 
 	_header = m->get_header();
 	_response = _header + m->get_body();	
-	std::cout << std::string(GREEN) + m->get_header() << "\n" + std::string(END);
+	//std::cout << std::string(GREENN) + m->get_header() << "\n";
 	delete m;
 	server_log("Response ready to send", DEBUG);
 	return _response;

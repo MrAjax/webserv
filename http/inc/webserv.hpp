@@ -41,12 +41,12 @@
 #define MYWEBSITE "Zzewebsite"
 // Log file config
 enum {NOLOG, ERROR, DIALOG, INFO, DEBUG};
-#define LOGLVL INFO
-#define GREEN "\033[32;1m"
-#define YELLOW "\033[38;5;227;1m"
-#define RED "\033[31;1m"
-#define BLUE "\033[36;1m"
-#define WHITE "\033[37;1m"
-#define END "\033[0m"
+#define LOGLVL DEBUG
+#define GREENN "\033[32;1m"
+#define YELLOWW "\033[38;5;227;1m"
+#define REDD "\033[31;1m"
+#define BLUEE "\033[36;1m"
+#define WHITEE "\033[37;1m"
+#define ENDD "\033[0m"
 // End
 #endif

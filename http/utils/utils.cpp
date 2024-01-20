@@ -42,16 +42,16 @@ void	server_log(std::string content, int log_level) {
 	switch (log_level)
 	{
 	case ERROR:
-		content = std::string(RED) + getTimestamp() + " " + content + END;
+		content = std::string(REDD) + getTimestamp() + " " + content + ENDD;
 		break;
 	case DIALOG:
-		content = std::string(GREEN) + "\n" + content + END;
+		content = std::string(GREENN) + "\n" + content + ENDD;
 		break;
 	case INFO:
-		content = std::string(BLUE) + getTimestamp() + " " + content + END;
+		content = std::string(BLUEE) + getTimestamp() + " " + content + ENDD;
 		break;
 	case DEBUG:
-		content = std::string(YELLOW) + "            " + content + END;
+		content = std::string(YELLOWW) + "            " + content + ENDD;
 		break;
 	default:
 		break;
@@ -61,11 +61,11 @@ void	server_log(std::string content, int log_level) {
 }
 
 std::runtime_error	error_throw(std::string description) {
-	std::string	error(std::string(RED) + "ERROR: " \
+	std::string	error(std::string(REDD) + "ERROR: " \
 						+ description \
 						+ ": " \
 						+ std::string(strerror(errno)) \
-						+ std::string(END));
+						+ std::string(ENDD));
 	server_log(error, ERROR);
 	return std::runtime_error(error);
 }
