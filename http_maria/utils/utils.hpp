@@ -2,6 +2,8 @@
 #define UTILS_HPP
 
 #include "../inc/webserv.hpp"
+#include "ContentTypeFinder.hpp"
+#include "HttpStatusCode.hpp"
 
 std::string			int_to_str(int n);
 std::string			getTimestamp(void);

@@ -2,24 +2,27 @@
 # define HTTPRESPONSE_HPP
 
 #include "../inc/webserv.hpp"
+#include "HttpError.hpp"
 #include "../HttpRequest.hpp"
 #include "../method/Method.hpp"
 #include "../method/Get.hpp"
 #include "../method/Post.hpp"
 #include "../method/Delete.hpp"
-#include "../utils/HttpStatusCode.hpp"
-#include "ContentTypeFinder.hpp"
 
 class HttpResponse {
-	std::string	_contentType;
-	std::string	_method;
-	int			_method_code;
-	std::string	_path;
-	std::string	_body_request;
-	int			_status_code;
-	std::string	_status_msg;
-	std::string	_header;
-	std::string	_response;
+	std::string		_method;
+	int				_method_code;
+	std::string		_path;
+/*		For post and delete methods		*/
+	std::string		_body_request;
+/*		Not set in the consructor		*/
+	int				_status_code;
+	std::string		_status_msg;
+	std::string		_contentType;
+	std::string		_header;
+	std::string		_body;
+	std::string		_response;
+	Method	*_execute_method(int method_code);
 public:
 	HttpResponse(HttpRequest &req);
 
@@ -28,26 +31,5 @@ public:
 	std::string	get_response();
 	std::string	get_header();
 };
-
-// Building and storing the HTTP response (status line, header, body...)
-// Setting the appropriate status code
-
-/*
-
-	1- Locates the appropriate document and returns it.
-
-*/
-
-/*
-
-	=== HTTP RESPONSE FORM ===
-
-	HTTP/[VER] [CODE] [TEXT]
-	Field1: Value1
-	Field2: Value2
-
-	...Document content here...
-
-*/
 
 #endif

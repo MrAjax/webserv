@@ -36,7 +36,7 @@
 // General
 #define SA struct sockaddr
 // Server config
-#define SERVER_PORT 18007
+#define SERVER_PORT 18000
 #define MAXLINE 4096
 #define MYWEBSITE "Zzewebsite"
 // Log file config

@@ -6,6 +6,7 @@ Post::~Post() {}
 
 void	Post::execute_method() {
 	// TODO generaliser le path du post file suivant le contexte
+	// TODO Status 200: A description of the result of the action is transmitted to the message body.
 	std::fstream	post_file("data/ground_beetle_club.csv");
 
 	if (!post_file.is_open())

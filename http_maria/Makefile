@@ -11,7 +11,8 @@ SRC = 	main.cpp \
 		method/Method.cpp \
 		method/Post.cpp \
 		response/HttpResponse.cpp \
-		response/ContentTypeFinder.cpp \
+		response/HttpError.cpp \
+		utils/ContentTypeFinder.cpp \
 		utils/HttpStatusCode.cpp \
 		utils/utils.cpp \
 		signal/signal.cpp \
@@ -38,6 +39,7 @@ $(NAME) : $(OBJ)
 all:	$(NAME)
 
 clean :
+	rm $(OBJ) $(DEP)
 	@echo "$(GREEN2)🦕 All clean! 🤠$(END)"
 
 fclean : clean
