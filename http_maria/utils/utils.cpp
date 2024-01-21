@@ -69,3 +69,7 @@ std::runtime_error	error_throw(std::string description) {
 	server_log(error, ERROR);
 	return std::runtime_error(error);
 }
+
+std::string	website(std::string path) {
+	return (std::string(MYWEBSITE) + path);
+}

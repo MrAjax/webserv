@@ -42,8 +42,10 @@ std::string	ContentTypeFinder::get_content_type(std::string path) {
 	type_map = Finder.get_map();
 	extension_pos = path.find('.', 0);
 
-	if (extension_pos >= path.size())
+	if (extension_pos >= path.size()) {
+		server_log("Content type not supported for file: " + path, INFO);
 		return "";
+	}
 	extension = path.substr(extension_pos, path.size());
 	server_log(std::string(WHITEE) + "File extension: " + extension, DEBUG);
 

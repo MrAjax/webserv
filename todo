@@ -1,9 +1,0 @@
-* implementer post
-
-* interdire acces aux fichiers en dehors du directory MYWEBSITE
-
-* checker les droits sur les path demandes --> client_rules
-
-* telecharger / uploader des fichiers de differents types: video, zip, gif, application, etc
-
-* verifier que le port n'a pas ete ferme manuellement pendant que le programme run

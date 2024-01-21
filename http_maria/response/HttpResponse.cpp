@@ -3,15 +3,16 @@
 HttpResponse::HttpResponse(HttpRequest &req) {
 	_method			= req.getMethod();
 	_method_code	= _method.length();
-	_path			= std::string(MYWEBSITE) + req.getPath();
+	_path			= website(req.getPath());
 
-	if (req.getPath() == "/" && _method_code == GET)
-		_path = std::string(MYWEBSITE) + "/index/index.html";
+	if (_path == "/" && _method_code == GET)
+		_path = website("/index/index.html");
 	else if (_path == "/") {
 		_status_code = 205;
 		_status_msg = HttpStatusCode::get_error_msg(_status_code);
 		_response = "HTTP/1.1 " + int_to_str(_status_code) \
 				  + " " + _status_msg + "\r\n\r\n";
+				  // TODO implementer les pages erreur directement dans les methodes
 	}
 	
 	if (_method_code == POST)
