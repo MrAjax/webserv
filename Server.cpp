@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/20 11:27:29 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/21 08:32:39 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,15 +42,15 @@
 #include "parsing.hpp"
 
 Server::Server(std::vector<std::string> config, std::vector<Server> const& servers, int i)
-	: _i(i), _socketfd(-1), _max_body_size(1024), _servers(servers), /*_ip(0), _port(0),
-	 _server_name(0),*/ _socketIsSet(false) {
+	: _i(i), _socketfd(-1), _max_body_size(1024), _servers(servers), _ip(""), _port(""),
+	 _server_name(""), _root(""), _socketIsSet(false) {
 
 	memset(&_server_addr, 0, sizeof(_server_addr));
 	memset(&_res, 0, sizeof(_res));
 
 	void (Server::*ptr[PARAM])(std::string const&) =
-		{ &Server::p_listen, &Server::p_host, &Server::p_server_name, &Server::p_bodySize };
-	std::string keyword[] = {"listen", "host", "server_name", "client_max_body_size"};
+		{ &Server::p_listen, &Server::p_host, &Server::p_server_name, &Server::p_bodySize, &Server::p_root };
+	std::string keyword[] = {"listen", "host", "server_name", "client_max_body_size", "root"};
 
 	for (size_t i = 0; i < config.size() ; i++) {
 		for (int j = 0; j < PARAM ; ++j) {
@@ -175,6 +175,17 @@ void Server::p_server_name(std::string const& line) {
 	std::cout << "server_name " << _server_name << std::endl;
 }	
 
+void Server::p_root(std::string const& line) {
+
+	size_t pos = line.find("root");
+	pos+= std::string("root").length();
+	while (pos < line.length() && std::isspace(line[pos])) {
+		++pos;
+	}
+	_root = line.substr(pos, line.length() - 1 - pos);
+	std::cout << "root = " << _root << std::endl;
+}
+	
 std::string Server::getIp(void) const {
 	return _ip;
 }
@@ -198,3 +209,7 @@ std::string Server::getServerName(void) const {
 int	Server::getMaxBodySize(void) const {
 	return _max_body_size;
 }		
+
+std::string Server::getRoot(void) const {
+	return _root;
+}	

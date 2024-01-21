@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/20 11:12:27 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/21 08:29:51 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ public:
 	std::string getIp( void ) const;
 	std::string getPort( void ) const;
 	std::string getServerName(void) const; 
+	std::string getRoot(void) const;
 	struct sockaddr_in getclientAddr( void ) const;
 	int	getMaxBodySize(void) const;
 	int	getSocketfd( void ) const;
@@ -39,6 +40,7 @@ private:
 	void p_host(std::string const& line);
 	void p_server_name(std::string const& line);
 	void p_bodySize(std::string const& line);
+	void p_root(std::string const& line);
 
 	void configServer(void);
 	void openSocket(void);
@@ -52,6 +54,7 @@ private:
 	std::string 		_ip;
 	std::string 		_port;
 	std::string			_server_name;
+	std::string			_root;
 	bool				_socketIsSet;
 
 };
