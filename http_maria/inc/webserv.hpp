@@ -36,10 +36,11 @@
 // General
 #define SA struct sockaddr
 // Server config
-#define SERVER_PORT 18000
+#define SERVER_PORT 18007
 #define MAXLINE 4096
 #define MYWEBSITE "Zzewebsite"
 // Log file config
+#define LOG_FILE "server/server.log"
 enum {NOLOG, ERROR, DIALOG, INFO, DEBUG};
 #define LOGLVL DEBUG
 #define GREENN "\033[32;1m"
@@ -48,5 +49,15 @@ enum {NOLOG, ERROR, DIALOG, INFO, DEBUG};
 #define BLUEE "\033[36;1m"
 #define WHITEE "\033[37;1m"
 #define ENDD "\033[0m"
+// Signal handling
+extern volatile int	g_sig;
+// Server stuff
+typedef struct	s_server {
+	int					listenfd;
+	struct sockaddr_in	servaddr;
+	uint8_t				recvline[MAXLINE + 1];
+	struct pollfd 		pfds;
+	int					connfd;
+}	t_server;
 // End
 #endif

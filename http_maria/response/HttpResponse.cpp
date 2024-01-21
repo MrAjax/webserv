@@ -3,10 +3,12 @@
 HttpResponse::HttpResponse(HttpRequest &req) {
 	_method			= req.getMethod();
 	_method_code	= _method.length();
-	_path			= website(req.getPath());
+	_path			= req.getPath();
 
-	if (_path == "/" && _method_code == GET)
+	if (_path == "/" && _method_code == GET) {
+		server_log(std::string(WHITEE) + "Get Request for / --> replace by index.html", DEBUG);
 		_path = website("/index/index.html");
+	}
 	else if (_path == "/") {
 		_status_code = 205;
 		_status_msg = HttpStatusCode::get_error_msg(_status_code);
@@ -14,6 +16,8 @@ HttpResponse::HttpResponse(HttpRequest &req) {
 				  + " " + _status_msg + "\r\n\r\n";
 				  // TODO implementer les pages erreur directement dans les methodes
 	}
+	else
+		_path = website(_path);
 	
 	if (_method_code == POST)
 		_body_request = req.getBodyRequest();

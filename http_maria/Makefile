@@ -2,6 +2,8 @@ CC = c++
 CXXFLAGS = -Iinc -MMD -g3 -Wall -Wextra -Werror -std=c++98
 NAME = test
 
+LOG_FILE = server/server.log
+
 SRC = 	main.cpp \
 		HttpRequest.cpp \
 		method/Delete.cpp \
@@ -12,6 +14,7 @@ SRC = 	main.cpp \
 		response/ContentTypeFinder.cpp \
 		utils/HttpStatusCode.cpp \
 		utils/utils.cpp \
+		signal/signal.cpp \
 
 
 OBJ = $(SRC:.cpp=.o)
@@ -39,8 +42,8 @@ clean :
 
 fclean : clean
 	@rm ${NAME}
-	@if [ -e "server/log" ]; then \
-		rm "server/log"; \
+	@if [ -e $(LOG_FILE) ]; then \
+		rm $(LOG_FILE); \
 	fi
 	@echo "$(GREEN1)🌈 Full clean done!🌻$(END)"
 
@@ -49,6 +52,11 @@ re : fclean all
 leaks : all
 	@ $(valgrind)
 
-.PHONY: all clean fclean re leaks
+display :
+	@if [ -e $(LOG_FILE) ]; then \
+		more $(LOG_FILE); \
+	fi
+
+.PHONY: all clean fclean re leaks display
 .SILENT:
 

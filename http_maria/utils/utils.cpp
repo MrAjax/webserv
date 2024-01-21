@@ -33,7 +33,7 @@ void	server_log(std::string content, int log_level) {
 	if (log_level > LOGLVL)
 		return ;
 
-	std::fstream	log_file("server/log", std::ios::out | std::ios::app);
+	std::fstream	log_file(LOG_FILE, std::ios::out | std::ios::app);
 	std::string		begin;
 
 	if (!log_file.is_open())

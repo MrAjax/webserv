@@ -36,9 +36,9 @@ void	HttpRequest::checkError(void)
 		throw std::runtime_error("ERROR: Dont now the method in request\n");
 	if (_http != "HTTP/1.1")
 		throw std::runtime_error("ERROR: Bad protocol in request\n");
-	if (_path != "/")
+	/* if (_path != "/")
 		if (access("index.html", F_OK) != 0)
-			throw std::runtime_error("ERROR: Cant acces file\n");
+			throw std::runtime_error("ERROR: Cant acces file\n"); */
 }
 
 //-----------Guetteurs------------
