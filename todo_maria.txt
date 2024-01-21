@@ -1,0 +1,19 @@
+//////////////////////////////////////////// M - A ////////////////////////////////////////////////////////////////////////////////
+* implementer post
+
+* interdire acces aux fichiers en dehors du directory MYWEBSITE
+
+* checker les droits sur les path demandes --> read only / read/write / etc
+
+* telecharger / uploader des fichiers de differents types: video, zip, gif, application, etc
+
+* verifier que le port n'a pas ete ferme manuellement pendant que le programme run
+
+* check si le dossier du site contient:	/index 
+											/index/index.html 
+											/data
+
+* faire un vrai site web avec des vraies pages et des vraies pages d'erreur
+
+* faire bouger les yeux de la pieuvre pour error 404 pour montrer que cgi marche
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
