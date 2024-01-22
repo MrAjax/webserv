@@ -43,30 +43,13 @@ class HttpRequest
 		HttpRequest(HttpRequest const &copy);
 		~HttpRequest(void);
 		//------------OPERATOR------------------//
- 
-		void        parseAllAttributes(std::string header);
 
 		int     processingRequest(struct pollfd &request); //on recupere le header et le boby + parsing
 		void	recvfd(int & fd); //on read buffer[MAXLINE -1] du fd
 
-
-		void    parsingHeader(void);
-		void    parsingBody(void);
-
-
-		//---------Header parser--------------
-		void        splitHeaderBody(std::string &fullRequest);
-		void        parsingHeader(std::string &header);
-		void        parsingHeader_method_path_http(std::string &line);
-		std::string parsingHeader_rest(std::string &line, std::string const & keyWord);
-
-		//---------check error---------------------
-		void        checkError();
-		//---------Utils---------------------
-		std::size_t findLine(std::string &header, std::string &line, std::string &delimiteur);
-		std::size_t convert(std::string &toConvert);
-
-		//---------Guetteurs-----------------
+		//------------UTIL----------------------
+		void		printAttribute(void);
+		//---------Guetter-----------------
 		std::string getMethod();
 		std::string getPath();
 		std::string getHttp();
@@ -74,13 +57,14 @@ class HttpRequest
 		std::string getUserAgent();
 		std::string getAccept();
 		std::string getAcceptLanguage();
+		std::string getAcceptEncoding();
 		std::string getConnection();
 		std::string getUpInsecureRqst();
 		std::string getReferer();
 		std::string getSecFetchDest();
 		std::string getSecFetchMode();
 		std::string getSecFetchSite();
-		std::string getContentLength();
+		std::size_t getContentLength();
 		std::string getContentType();
 
 		std::string getBodyRequest();
@@ -88,9 +72,44 @@ class HttpRequest
 
 		int         getConnfd();
 		std::string getInput();
-		
 
-	protected:
+		std::string getSaveString();
+
+		std::string getStrContentLength();
+
+		int         STATUS;
+
+
+		// ----------------------Setter--------------
+
+		void setMethod(const std::string &value);
+		void setPath(const std::string &value);
+		void setHttp(const std::string &value);
+		void setHost(const std::string &value);
+		void setUserAgent(const std::string &value);
+		void setAccept(const std::string &value);
+		void setAcceptLanguage(const std::string &value);
+		void setAcceptEncoding(const std::string &value);
+		void setConnection(const std::string &value);
+		void setUpInsecureRqst(const std::string &value);
+		void setReferer(const std::string &value);
+		void setSecFetchDest(const std::string &value);
+		void setSecFetchMode(const std::string &value);
+		void setSecFetchSite(const std::string &value);
+		void setContentLength(const std::size_t &value);
+		void setContentType(const std::string &value);
+
+		void setBodyRequest(const std::string &value);
+		void setHeaderRequest(const std::string &value);
+
+		void setConnfd(const int &value);
+		void setInput(const std::string &value);
+
+		void setSaveString(const std::string & value);
+
+		void setStrContentLength(const std::string &value);
+
+	private:
 		std::string _method;
 		std::string _path;
 		std::string _http;
@@ -105,7 +124,7 @@ class HttpRequest
 		std::string _secFetchDest;
 		std::string _secFetchMode;
 		std::string _secFetchSite;
-		std::string _contentLength;
+		std::size_t _contentLength;
 		std::string _contentType;
 
 		std::string _bodyRequest;
@@ -114,8 +133,9 @@ class HttpRequest
 		int         _connfd;
 		std::string _input;
 
-		int         STATUS;
-		std::string fullRequest;
+		std::string saveString;
+
+		std::string _strContentLength;
 
 };
 
