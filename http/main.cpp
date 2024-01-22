@@ -14,8 +14,8 @@ static	void	send_response(int connfd) {
 
 	HttpRequest 	Request(connfd);
 
-	Request.processingRequest();
-	
+	Request.processingRequest(); //permet de parser par chunk la data
+
 	server_log(Request.getHeaderRequest() + "\n\n", DIALOG);
 	server_log("Building Response..", DEBUG);
 	HttpResponse	Rep(Request);
@@ -73,9 +73,11 @@ int main()
 			if (poll(&pfds, 1, -1) == -1)
 				error_throw("poll failure - main - main.cpp");
 				
-			if (pfds.revents & POLLIN) {
+			if (pfds.revents & POLLIN)
+			{
 				if (pfds.fd == listenfd) {
 					memset(recvline, 0, MAXLINE);
+					int newfd = accept(listenfd, (SA *) NULL, NULL);
 					send_response(accept(listenfd, (SA *) NULL, NULL));
 				}
 			}
