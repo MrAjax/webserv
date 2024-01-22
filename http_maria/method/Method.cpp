@@ -2,7 +2,7 @@
 
 //Method::Method() {};
 
-Method::Method(std::string path, std::string content): _path(path), _content_type(content), _header("HTTP/1.1"), _body(""), _status_code(0) {}
+Method::Method(std::string path, std::string content): _path(path), _content_type(content), _header(""), _body(""), _status_code(0) {}
 
 Method::Method(std::string path, std::string content, std::string body_request): _path(path), _content_type(content), _body_request(body_request), _header("HTTP/1.1"), _body(""), _status_code(0) {}
 

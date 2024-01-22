@@ -23,12 +23,12 @@ HttpStatusCode::HttpStatusCode() {
 
 HttpStatusCode::~HttpStatusCode() {}
 
-std::map<int, std::string>	&HttpStatusCode::get_http_status_code() {
+std::map<int, std::string>	&HttpStatusCode::_get_http_status_code() {
 		return (_http_status_code);
 }
 
 std::string	HttpStatusCode::get_error_msg(int key) {
 	HttpStatusCode	code_list;
 
-	return code_list.get_http_status_code().find(key)->second;
+	return code_list._get_http_status_code().find(key)->second;
 }

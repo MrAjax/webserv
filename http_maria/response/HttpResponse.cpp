@@ -1,19 +1,32 @@
 #include "HttpResponse.hpp"
 
+void	check_rights(std::string path, int method_code) {
+	(void)path;
+	(void)method_code;
+	// TODO
+
+	// Check for the rights of the request	
+	// Not the right rights ? --> Send Status code 403 + associated page
+	// Check if the user is logged (user or admin)
+	// If the request wants to access a welcome page for example and there is no authentication
+	// then, send Status code 401 - Unauthorized
+}
+
 HttpResponse::HttpResponse(HttpRequest &req):  _method(req.getMethod()), \
 										_method_code(_method.length()), \
 										_path(req.getPath()), \
 										_status_code(202 /* should take it from the req in case of an error */) {
 	if (_status_code != 202)
-		throw HttpError(_status_code);
-	
+		throw StatusSender::send_status(_status_code);
+
 	if (_path == "/") {
 		server_log(std::string(WHITEE) + "Get Request for / --> replace by index.html", DEBUG);
 		_path = website("/index/index.html");
 	}
 	else
 		_path = (website(_path));
-	
+
+	check_rights(_path, _method_code);	
 	if (_method_code == POST || _method_code == DELETE)
 		_body_request = req.getBodyRequest();
 
@@ -48,16 +61,9 @@ Method	*HttpResponse::_execute_method(int method_code) {
 std::string	HttpResponse::get_response() {
 	Method *m;
 	_contentType = ContentTypeFinder::get_content_type(_path);
-	// TODO --> essayer un fichier avec extension inconnue
-//	try {
-		m = _execute_method(_method_code);
-//	}
-//	catch (HttpError &error) {
-		// should we delete m ?? -> TODO
-//		delete m;
-		// If we don't need to delete m, we don't need to try and catch
-//		throw error;
-//	}
+	if (_contentType.empty())
+		throw StatusSender::send_status(404);
+	m = _execute_method(_method_code);
 	_header = m->get_header();
 	_response = _header + m->get_body();
 	//std::cout << std::string(GREENN) + _header << "\n";

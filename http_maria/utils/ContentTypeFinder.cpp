@@ -24,7 +24,7 @@ ContentTypeFinder::ContentTypeFinder() {
 
 ContentTypeFinder::~ContentTypeFinder() {}
 
-std::map<std::string, std::string>	ContentTypeFinder::get_map() {
+std::map<std::string, std::string>	ContentTypeFinder::_get_map() {
 	return _type_dictionnary;
 }
 
@@ -39,7 +39,7 @@ std::string	ContentTypeFinder::get_content_type(std::string path) {
 	std::string										extension;
 	std::string										type;
 
-	type_map = Finder.get_map();
+	type_map = Finder._get_map();
 	extension_pos = path.find('.', 0);
 
 	if (extension_pos >= path.size()) {

@@ -9,8 +9,10 @@ void	Post::execute_method() {
 	// TODO Status 200: A description of the result of the action is transmitted to the message body.
 	std::fstream	post_file("data/ground_beetle_club.csv");
 
-	if (!post_file.is_open())
-		error_throw("Cannot open post file");
+	if (!post_file.is_open()) {
+		server_log("Cannot open post file - Post.cpp", ERROR);
+		throw StatusSender::send_status(500);
+	}
 	post_file << this->get_body_request();
 	post_file.close();
 	set_statuscode(200);

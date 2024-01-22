@@ -2,7 +2,6 @@
 # define HTTPRESPONSE_HPP
 
 #include "../inc/webserv.hpp"
-#include "HttpError.hpp"
 #include "../HttpRequest.hpp"
 #include "../method/Method.hpp"
 #include "../method/Get.hpp"

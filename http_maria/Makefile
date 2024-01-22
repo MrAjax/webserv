@@ -1,5 +1,5 @@
 CC = c++
-CXXFLAGS = -Iinc -MMD -g3 -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -MMD -g3 -Wall -Wextra -Werror -std=c++98
 NAME = test
 
 LOG_FILE = server/server.log
@@ -11,7 +11,7 @@ SRC = 	main.cpp \
 		method/Method.cpp \
 		method/Post.cpp \
 		response/HttpResponse.cpp \
-		response/HttpError.cpp \
+		response/StatusSender.cpp \
 		utils/ContentTypeFinder.cpp \
 		utils/HttpStatusCode.cpp \
 		utils/utils.cpp \

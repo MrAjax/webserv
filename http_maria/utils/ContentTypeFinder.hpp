@@ -6,12 +6,10 @@
 
 class ContentTypeFinder {
 	std::map<std::string, std::string>	_type_dictionnary;
-public:
 	ContentTypeFinder();
 	~ContentTypeFinder();
-
-	std::map<std::string, std::string>	get_map();
-	
+	std::map<std::string, std::string>	_get_map();
+public:	
 	static	std::string	get_content_type(std::string path);
 };
 
