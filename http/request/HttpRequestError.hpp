@@ -40,12 +40,11 @@ class HttpRequestError
         int         GET();
         int         POST();
         int         DELETE();
+        int         protocol();
 
         int         Method();
-
         int         Path();
-
-        int         Other();
+        int         maxSize();
 
         private:
             HttpRequest &_request;
