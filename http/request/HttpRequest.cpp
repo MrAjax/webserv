@@ -6,17 +6,14 @@
 
 #define MAXLINE 4096
 
-HttpRequest::HttpRequest(void)
+HttpRequest::HttpRequest(void) : STATUS(NEW)
 {
-	STATUS = NEW;
-	saveString = "";
+	
 }
 
-HttpRequest::HttpRequest(int connfd)
+HttpRequest::HttpRequest(int connfd) : STATUS(NEW), _connfd(connfd)
 {
-	_connfd = connfd;
-	STATUS = NEW;
-	saveString = "";
+
 }
 
 

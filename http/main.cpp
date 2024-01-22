@@ -1,6 +1,5 @@
 #include "utils/HttpStatusCode.hpp"
-#include "HttpRequest.hpp"
-#include "HttpRequest.hpp"
+#include "request/HttpRequest.hpp"
 #include "response/HttpResponse.hpp"
 #include "inc/webserv.hpp"
 
@@ -12,10 +11,12 @@ static	void	send_response(int connfd) {
 	server_log("Request received", INFO);
 	server_log("Parsing Request...", DEBUG);
 	server_log("Request is valid", DEBUG);
-	HttpRequest 	Req(connfd);
-	server_log(Req.getHeaderRequest() + "\n\n", DIALOG);
+
+	HttpRequest 	Request(connfd);
+
+	server_log(Request.getHeaderRequest() + "\n\n", DIALOG);
 	server_log("Building Response..", DEBUG);
-	HttpResponse	Rep(Req);
+	HttpResponse	Rep(Request);
 	std::string		response(Rep.get_response());
 	server_log("Sending response...", DEBUG);
 	write(connfd, response.c_str(), response.length());
@@ -63,9 +64,11 @@ int main()
 		open_connection(listenfd, servaddr);
 		pfds.fd = listenfd;
 		pfds.events = POLLIN;
-		for (;;) { /* Here is the main loop */
+		for (;;) /* Here is the main loop */
+		{
 			if (poll(&pfds, 1, -1) == -1)
 				error_throw("poll failure - main - main.cpp");
+				
 			if (pfds.revents & POLLIN) {
 				if (pfds.fd == listenfd) {
 					memset(recvline, 0, MAXLINE);
