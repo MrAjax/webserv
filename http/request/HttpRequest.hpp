@@ -44,7 +44,7 @@ class HttpRequest
 		~HttpRequest(void);
 		//------------OPERATOR------------------//
 
-		int     processingRequest(struct pollfd &request); //on recupere le header et le boby + parsing
+		int     processingRequest(void); //on recupere le header et le boby + parsing
 		void	recvfd(int & fd); //on read buffer[MAXLINE -1] du fd
 
 		//------------UTIL----------------------

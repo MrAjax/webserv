@@ -56,11 +56,11 @@ void	HttpRequest::recvfd(int & fd)
 		throw std::runtime_error("ERROR: Request is empty\n");
 }
 
-int    HttpRequest::processingRequest(struct pollfd &request)
+int    HttpRequest::processingRequest(void)
 {
 	try
 	{
-		recvfd(request.fd);
+		recvfd(_connfd);
 		if (STATUS < DONE_HEADER)
 		{
 			HttpRequestParsing header(*this);
@@ -82,7 +82,7 @@ int    HttpRequest::processingRequest(struct pollfd &request)
 		std::cerr << e.what() << std::endl;
 	}
 	// std::cout << YELLOW  "STATUS after BODY " << STATUS << RESET << std::endl;
-	printAttribute();
+	// printAttribute();
 	return (STATUS);
 }
 

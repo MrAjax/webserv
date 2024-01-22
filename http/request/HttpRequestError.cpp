@@ -1,6 +1,6 @@
 #include "HttpRequestError.hpp"
 
-#define ROOT "monsite/index.html"
+#define ROOT "/Zzewebsite/index/chien.jpeg"
 #define MAXSIZE 100000
 
 HttpRequestError::HttpRequestError(HttpRequest &request) : _request(request)
@@ -12,14 +12,14 @@ HttpRequestError::~HttpRequestError() {}
 
 int HttpRequestError::GET(void)
 {
-    if (_request.getPath() == "/")
-        _request.getPath() = ROOT;
-    int status = access(_request.getPath().c_str(), F_OK);
-    if (status < 0)
-    {
-        std::cout << "ACCESSSSS TESSSSSSSSST\n";
-        return (1);
-    }
+    // if (_request.getPath() == "/")
+    //     _request.getPath() = ROOT;
+    // int status = access(_request.getPath().c_str(), F_OK);
+    // if (status < 0)
+    // {
+    //     std::cout << "ACCESSSSS TESSSSSSSSST\n";
+    //     return (1);
+    // }
     if (protocol() > 0)
         return (4);
     return (0);

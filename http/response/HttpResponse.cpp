@@ -13,13 +13,13 @@ HttpResponse::HttpResponse(HttpRequest &req) {
 		_response = "HTTP/1.1 " + int_to_str(_status_code) \
 				  + " " + _status_msg + "\r\n\r\n";
 	}
-	
+
 	if (_method_code == POST)
 		_body_request = req.getBodyRequest();
-
 	server_log(std::string(WHITEE) + "method = " + _method, DEBUG);
 	server_log(std::string(WHITEE) + "method code = " + int_to_str(_method_code), DEBUG);
 	server_log(std::string(WHITEE) + "path = " + _path, DEBUG);
+
 }
 
 HttpResponse::~HttpResponse() {}
@@ -29,7 +29,7 @@ std::string	HttpResponse::get_response() {
 
 	_contentType = ContentTypeFinder::get_content_type(_path);
 	// TODO --> essayer un fichier avec extension inconnue
-
+	
 	switch (_method_code)
 	{
 	case GET:

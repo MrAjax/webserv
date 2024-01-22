@@ -14,10 +14,14 @@ static	void	send_response(int connfd) {
 
 	HttpRequest 	Request(connfd);
 
+	Request.processingRequest();
+	
 	server_log(Request.getHeaderRequest() + "\n\n", DIALOG);
 	server_log("Building Response..", DEBUG);
 	HttpResponse	Rep(Request);
 	std::string		response(Rep.get_response());
+
+
 	server_log("Sending response...", DEBUG);
 	write(connfd, response.c_str(), response.length());
 	close(connfd);
