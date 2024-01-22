@@ -6,11 +6,12 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 12:43:31 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/22 12:47:27 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/22 15:55:17 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.hpp"
+#include "utils.hpp"
 
 void trimWhiteSpaces(std::string & str) {
 
@@ -38,23 +39,21 @@ int readConfigFile (std::vector<Server> & servers, char const* file)
 	
 		while (getline(ifs, line)) {
 			trimWhiteSpaces(line);
+			std::cout << "line = " << line << std::endl;
 			if (line[0] == '\0' || line[0] == '#') // skip empty and comment lines
 				continue;
-	/*		else if (recording == false && line.find("server") == std::string::npos) { // Text uncomment outside a bloc server 
-				throw std::runtime_error("*/
+		//	else if (recording == false && line.find("server") == std::string::npos)  // Text uncomment outside a bloc server 
+		//		server_log("unknown directive \"" + line + "\"", ERROR);
 			else if (line.find("server {") != std::string::npos) {
-				std::cout << "line trim= " << line << std::endl;
 				recording = true;
 			}
 			else if (line[0] == '}' && recording == true) {
-				std::cout << "line trim= " << line << std::endl;
 				servers.push_back(Server(block, servers, i));
 				block.clear();
 				recording = false;
 				i++;
 			}
 			else if (recording == true) {
-				std::cout << "line trim= " << line << std::endl;
 				block.push_back(line);
 			}
 		}
