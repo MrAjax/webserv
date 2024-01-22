@@ -24,3 +24,6 @@ nginx: configuration file /etc/nginx/nginx.conf test failed
 // error_page 50
 2024/01/21 17:51:27 [emerg] 9690#9690: value "50" must be between 300 and 599 in /etc/nginx/nginx.conf:52
 nginx: configuration file /etc/nginx/nginx.conf test failed
+// listen 8080 60;
+nginx: [emerg] invalid parameter "60" in /opt/homebrew/etc/nginx/nginx.conf:36
+nginx: configuration file /opt/homebrew/etc/nginx/nginx.conf test failed

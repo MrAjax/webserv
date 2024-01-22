@@ -1,4 +1,7 @@
 # Deuxième serveur
+
+
+
 server {
     listen 18000;
 	host 127.0.0.1;

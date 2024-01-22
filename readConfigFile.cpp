@@ -6,11 +6,20 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 12:43:31 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/20 11:14:02 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/22 12:47:27 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.hpp"
+
+void trimWhiteSpaces(std::string & str) {
+
+	std::size_t first = str.find_first_not_of(" \t\n\r\f\v");
+	if (first != std::string::npos) {
+		str.erase(0, first);
+	}		
+}	
+
 
 int readConfigFile (std::vector<Server> & servers, char const* file)
 {
@@ -28,16 +37,24 @@ int readConfigFile (std::vector<Server> & servers, char const* file)
 		int	i = 0;
 	
 		while (getline(ifs, line)) {
-			if (line.find("server {") != std::string::npos) {
+			trimWhiteSpaces(line);
+			if (line[0] == '\0' || line[0] == '#') // skip empty and comment lines
+				continue;
+	/*		else if (recording == false && line.find("server") == std::string::npos) { // Text uncomment outside a bloc server 
+				throw std::runtime_error("*/
+			else if (line.find("server {") != std::string::npos) {
+				std::cout << "line trim= " << line << std::endl;
 				recording = true;
 			}
 			else if (line[0] == '}' && recording == true) {
+				std::cout << "line trim= " << line << std::endl;
 				servers.push_back(Server(block, servers, i));
 				block.clear();
 				recording = false;
 				i++;
 			}
 			else if (recording == true) {
+				std::cout << "line trim= " << line << std::endl;
 				block.push_back(line);
 			}
 		}
@@ -47,4 +64,4 @@ int readConfigFile (std::vector<Server> & servers, char const* file)
 		ifs.close();
 	}
 	return 0;
-}	
+}

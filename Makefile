@@ -6,7 +6,7 @@
 #    By: bahommer <bahommer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/09/12 13:52:28 by bahommer          #+#    #+#              #
-#    Updated: 2024/01/19 09:17:54 by bahommer         ###   ########.fr        #
+#    Updated: 2024/01/22 12:43:45 by bahommer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,6 +18,7 @@ D = dep/
 SRC		= $(S)main.cpp \
 			$(S)readConfigFile.cpp \
 			$(S)allocateSTL.cpp \
+			$(S)utils.cpp \
 			$(S)Server.cpp 
 
 OBJ		= $(SRC:$(S)%=$(O)%.o)

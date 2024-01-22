@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:30:56 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/21 08:24:08 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/22 12:47:09 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <exception>
 #include <unistd.h>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <sys/types.h>
 #include <sys/socket.h>
