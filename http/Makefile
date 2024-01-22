@@ -35,6 +35,7 @@ $(NAME) : $(OBJ)
 all:	$(NAME)
 
 clean :
+	@rm $(OBJ) $(DEP)
 	@echo "$(GREEN2)🦕 All clean! 🤠$(END)"
 
 fclean : clean
