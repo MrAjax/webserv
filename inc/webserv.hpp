@@ -32,12 +32,7 @@
 #include <map>
 #include <vector>
 #include <fstream>
-#include <ostream>
 #include <ctime>
-#include <exception>
-#include <cstdlib>
-#include <string>
-
 // General
 #define SA struct sockaddr
 // Server config
@@ -47,7 +42,7 @@
 // Log file config
 #define LOG_FILE "server/server.log"
 enum {NOLOG, ERROR, DIALOG, INFO, DEBUG};
-#define LOGLVL DIALOG
+#define LOGLVL DEBUG 
 #define GREENN "\033[32;1m"
 #define YELLOWW "\033[38;5;227;1m"
 #define REDD "\033[31;1m"

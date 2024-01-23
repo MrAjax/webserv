@@ -1,27 +1,24 @@
 CC = c++
 CXXFLAGS = -MMD -g3 -Wall -Wextra -Werror -std=c++98
-NAME = webserv 
+NAME = test
 
 LOG_FILE = server/server.log
 
 SRC = 	main.cpp \
+		HttpRequest.cpp \
+		method/Delete.cpp \
+		method/Get.cpp \
+		method/Method.cpp \
+		method/Post.cpp \
+		response/HttpResponse.cpp \
+		response/StatusSender.cpp \
+		utils/ContentTypeFinder.cpp \
+		utils/HttpStatusCode.cpp \
+		utils/utils.cpp \
 		parsing/allocateSTL.cpp \
 		parsing/readConfigFile.cpp \
 		parsing/Server.cpp \
-		utils/utils.cpp \
-		utils/HttpStatusCode.cpp \
-		utils/ContentTypeFinder.cpp
-		#HttpRequest.cpp \
-		#method/Delete.cpp \
-		#method/Get.cpp \
-		#method/Method.cpp \
-		#method/Post.cpp \
-		#response/HttpResponse.cpp \
-		#response/StatusSender.cpp \
-		#utils/ContentTypeFinder.cpp \
-		#utils/HttpStatusCode.cpp \
-		#utils/utils.cpp \
-		#signal/signal.cpp \
+		signal/signal.cpp \
 
 
 OBJ = $(SRC:.cpp=.o)

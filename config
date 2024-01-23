@@ -2,7 +2,7 @@
 
 
 server{	
-    listen 18000;
+    listen 18004;
 	host 127.0.0.1;
     server_name;
 	client_max_body_size 1024;            
@@ -11,24 +11,6 @@ server{
     index index.html;
 
 	error_page 404 502 503 /error.html;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
-    # Configuration pour les fichiers statiques
-    location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
-        expires 30d;
-    }
-}
-# Premier serveur
-server {
-    listen 18000;
-	host localhost;
-    server_name www.monsite1.com;
-
-    root /var/www/monsite1;
-    index index.html;
 
     location / {
         try_files $uri $uri/ =404;
