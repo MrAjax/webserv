@@ -6,11 +6,20 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 09:22:50 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/20 09:12:06 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/23 13:53:00 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "parsing.hpp" 
+#include "inc/parsing.hpp" 
+#include "utils/utils.hpp"
+
+static	void	init_log_file() {
+	std::fstream log_file(LOG_FILE, std::ios::out | std::ios::trunc);
+    
+    if (!log_file.is_open())
+		throw error_throw("log file cannot be created - init_log_file - main.cpp");
+    log_file.close();
+}
 
 int	main(int ac, char **av)
 {
@@ -23,6 +32,7 @@ int	main(int ac, char **av)
 	std::vector<struct pollfd> pollfds;
 	std::map<int, Server*> serversMap;
 	std::map<int, struct sockaddr_in> clientMap;
+	init_log_file();
 
 	if (readConfigFile(servers, av[1]) == -1)
 		return 1;

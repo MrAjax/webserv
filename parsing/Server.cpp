@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/23 11:58:21 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/23 13:51:35 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@
 */
 
 #include "Server.hpp"
-#include "parsing.hpp"
+#include "../inc/parsing.hpp"
 
 Server::Server(std::vector<std::string> config, std::vector<Server> const& servers, int i)
 	: _i(i), _socketfd(-1), _max_body_size(1024), _error_pages(1, 404), _servers(servers), _ip(""), _port(""), _server_name(""), _root(""), _location_error_page("/default"), _socketIsSet(false) {
@@ -121,12 +121,11 @@ void Server::configServer(void) {
 
 void Server::p_listen(std::string const& line) {
 
-	size_t pos = line.find("listen");
-	pos += std::string("listen").length();
+	size_t pos = std::string("listen").length();
 	while (pos < line.length() && std::isspace(line[pos])) {
 		++pos;
 	}	
-	_port = line.substr(pos, line.length() - 1 - pos);
+	_port = line.substr(pos, line.length() - pos);
 
 	int int_port = atoi(_port.c_str());
 	if (int_port < 1024 || int_port > 65535)
@@ -141,12 +140,11 @@ void Server::p_listen(std::string const& line) {
 
 void Server::p_host(std::string const& line) {
 	
-	size_t pos = line.find("host");
-	pos+= std::string("host").length();
+	size_t pos= std::string("host").length();
 	while (pos < line.length() && std::isspace(line[pos])) {
 		++pos;
 	}
-	_ip = line.substr(pos, line.length() - 1 - pos);
+	_ip = line.substr(pos, line.length() - pos);
 	_server_addr.sin_addr.s_addr = htonl(INADDR_ANY); //i should specify address?
 	if (_ip == "localhost")
 		_ip = "127.0.0.1";
@@ -156,8 +154,7 @@ void Server::p_host(std::string const& line) {
 
 void Server::p_bodySize(std::string const& line) {
 
-	size_t pos = line.find("client_max_body_size");
-	pos+= std::string("client_max_body_size").length();
+	size_t pos = std::string("client_max_body_size").length();
 	while (pos < line.length() && std::isspace(line[pos])) {
 		++pos;
 	}
@@ -167,24 +164,22 @@ void Server::p_bodySize(std::string const& line) {
 
 void Server::p_server_name(std::string const& line) {
 	
-	size_t pos = line.find("server_name");
-	pos+= std::string("server_name").length();
+	size_t pos= std::string("server_name").length();
 	while (pos < line.length() && std::isspace(line[pos])) {
 		++pos;
 	}	
-	_server_name = line.substr(pos, line.length() - 1 - pos);
+	_server_name = line.substr(pos, line.length() - pos);
 	
 	std::cout << "server_name " << _server_name << std::endl;
 }	
 
 void Server::p_root(std::string const& line) {
 
-	size_t pos = line.find("root");
-	pos+= std::string("root").length();
+	size_t pos = std::string("root").length();
 	while (pos < line.length() && std::isspace(line[pos])) {
 		++pos;
 	}
-	_root = line.substr(pos, line.length() - 1 - pos);
+	_root = line.substr(pos, line.length() - pos);
 	std::cout << "root = " << _root << std::endl;
 }
 

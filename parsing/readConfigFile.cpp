@@ -6,12 +6,11 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 12:43:31 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/23 11:56:40 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/23 13:53:21 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "parsing.hpp"
-#include "utils.hpp"
+#include "../inc/parsing.hpp"
 
 void trimWhiteSpaces(std::string & str) {
 

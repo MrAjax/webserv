@@ -131,7 +131,7 @@ void	stop_server(t_server &server) {
 	std::cout << std::string(GREENN) + "\nConnection closed - Bye!\n" + std::string(ENDD);
 }
 
-int main()
+int main():
 {
 	t_server	server;
 
