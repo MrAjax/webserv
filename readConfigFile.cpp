@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 12:43:31 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/23 10:04:33 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/23 11:56:40 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,15 @@
 
 void trimWhiteSpaces(std::string & str) {
 
-	std::size_t first = str.find_first_not_of(" \t\n\r\f\v");
+	size_t first = str.find_first_not_of(" \t\n\r\f\v");
 	if (first != std::string::npos) {
 		str.erase(0, first);
 	}		
+
+	size_t last = str.find_last_not_of(" \t\n\r\f\v");
+	if (last != std::string::npos) {
+		str.erase(last + 1);
+	}	
 }	
 
 void countBrackets(int & bracket, std::string const& line) 
@@ -29,6 +34,16 @@ void countBrackets(int & bracket, std::string const& line)
 		bracket--;
 	if (bracket < 0)
 		throw std::runtime_error("Miss bracket, config file bad syntax");
+}
+
+void chekLastchar(std::string & line) {
+
+	if (line[line.length() - 1] == '{' || line[line.length() - 1] == '}')
+		return;
+	if (line[line.length() - 1] != ';')
+	 	throw std::runtime_error("line [" + line + "] Miss ; in the end");
+	line.erase(line.length() - 1); //suppr ;
+	trimWhiteSpaces(line);
 }
 
 int readConfigFile (std::vector<Server> & servers, char const* file)
@@ -62,7 +77,8 @@ int readConfigFile (std::vector<Server> & servers, char const* file)
 			trimWhiteSpaces(line);
 			if (line[0] == '\0' || line[0] == '#') // skip empty and comment lines
 				continue;
-			std::cout << "line recorded = " << line << std::endl;
+			chekLastchar(line);	
+			std::cout << "line recorded = [" << line << "]" << std::endl;
 			if (recording == false && line.find_first_not_of(" \t\n\r\f\v") != std::string::npos) 
 				throw std::runtime_error("unknown directive \"" + line + "\"");
 			countBrackets(bracket, line);
