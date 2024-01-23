@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/21 08:32:39 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/23 11:22:03 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,19 +42,21 @@
 #include "parsing.hpp"
 
 Server::Server(std::vector<std::string> config, std::vector<Server> const& servers, int i)
-	: _i(i), _socketfd(-1), _max_body_size(1024), _servers(servers), _ip(""), _port(""),
-	 _server_name(""), _root(""), _socketIsSet(false) {
+	: _i(i), _socketfd(-1), _max_body_size(1024), _error_pages(1, 404), _servers(servers), _ip(""), _port(""), _server_name(""), _root(""), _location_error_page("/default"), _socketIsSet(false) {
 
 	memset(&_server_addr, 0, sizeof(_server_addr));
 	memset(&_res, 0, sizeof(_res));
 
 	void (Server::*ptr[PARAM])(std::string const&) =
-		{ &Server::p_listen, &Server::p_host, &Server::p_server_name, &Server::p_bodySize, &Server::p_root };
-	std::string keyword[] = {"listen", "host", "server_name", "client_max_body_size", "root"};
+		{ &Server::p_listen, &Server::p_host, &Server::p_server_name, &Server::p_bodySize,
+			&Server::p_root, &Server::p_errorPage };
+	std::string keyword[] = {"listen", "host", "server_name", "client_max_body_size", "root",
+		"error_page"};
 
 	for (size_t i = 0; i < config.size() ; i++) {
 		for (int j = 0; j < PARAM ; ++j) {
-			if (config[i].find(keyword[j]) != std::string::npos) {
+		//	if (config[i].find(keyword[j]) != std::string::npos) { find is useless : line are trim
+			if (config[i].compare(0, keyword[j].length(), keyword[j]) == 0) {
 				(this->*ptr[j])(config[i]);
 				break;
 			}
@@ -185,6 +187,44 @@ void Server::p_root(std::string const& line) {
 	_root = line.substr(pos, line.length() - 1 - pos);
 	std::cout << "root = " << _root << std::endl;
 }
+
+void Server::p_errorPage(std::string const& line) {
+	
+	_error_pages.clear(); //clean defaut error page;
+	size_t pos = std::string("error_page").length();
+	while (pos < line.length()) {
+		while (pos < line.length() && std::isspace(line[pos])) {
+			++pos;
+		}	
+		if (isdigit(line[pos])) {
+			size_t length = 0;
+			while (isdigit(line[pos + length])) 
+				length++;
+			std::string temp = line.substr(pos, length);
+			int number = atoi(temp.c_str());
+			if (number < 300 || number > 599)
+				throw std::runtime_error("Value \"" + temp + "\" must be between 300 and 500");
+			else
+				_error_pages.push_back(number);
+			pos += length;
+		}
+		else if (line[pos] == ';') 
+			throw std::runtime_error("No location error page");
+		else { 
+			size_t length = 0;	
+			while (pos + length < line.size() && line[pos + length] != ';')
+				length++;
+			_location_error_page = line.substr(pos, length);
+			break; //no text after location
+		}
+	}
+	std::cout << "Error pages: ";
+	for (size_t i = 0; i < _error_pages.size(); i++) {
+		std::cout << _error_pages[i] << " ";
+	}
+	std:: cout << "Location: " << _location_error_page << std::endl;
+}
+	
 	
 std::string Server::getIp(void) const {
 	return _ip;
@@ -212,4 +252,12 @@ int	Server::getMaxBodySize(void) const {
 
 std::string Server::getRoot(void) const {
 	return _root;
+}	
+
+std::vector<int> Server::getErrorPages(void) const {
+	return _error_pages;
+}
+
+std::string Server::getLocationErrorPage(void) const {
+	return _location_error_page;
 }	
