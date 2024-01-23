@@ -9,8 +9,8 @@ std::string	int_to_str(int n) {
 
 std::string	getTimestamp(void)
 {
-	std::time_t t = std::time(0);
-	std::tm		*ltm = std::localtime(&t);
+	time_t t = time(0);
+	tm		*ltm = localtime(&t);
 	std::string	time_stamp;
 
 	time_stamp = "[";
