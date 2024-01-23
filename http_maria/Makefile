@@ -15,6 +15,9 @@ SRC = 	main.cpp \
 		utils/ContentTypeFinder.cpp \
 		utils/HttpStatusCode.cpp \
 		utils/utils.cpp \
+		parsing/allocateSTL.cpp \
+		parsing/readConfigFile.cpp \
+		parsing/Server.cpp \
 		signal/signal.cpp \
 
 

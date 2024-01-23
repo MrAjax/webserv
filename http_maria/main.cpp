@@ -2,6 +2,7 @@
 #include "response/HttpResponse.hpp"
 #include "inc/webserv.hpp"
 #include "signal/signal.hpp"
+#include "inc/parsing.hpp"
 
 volatile int	g_sig;
 
@@ -56,6 +57,7 @@ static	void	send_response_to_client(int connfd, std::string response) {
 }
 
 static	void	send_response(int connfd) {
+
 	std::string	response;
 	server_log("Activity detected", DEBUG);
 	if (connfd < 0)
@@ -85,27 +87,6 @@ static	void	send_response(int connfd) {
 	// Remove the client in case of an error
 }
 
-static	void	open_connection(t_server &server) {
-	server_log("Openning connection...", DEBUG);
-
-	if ((server.listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-		error_throw("open connection - socket creation - main.cpp");
-	bzero (&server.servaddr, sizeof(server.servaddr));
-	server.servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	server.servaddr.sin_port = htons(SERVER_PORT);
-
-	if ((bind(server.listenfd, (SA *) &server.servaddr, sizeof(server.servaddr))) < 0)
-		throw error_throw("Port " + int_to_str(SERVER_PORT));
-	if (listen(server.listenfd, 10) < 0)
-		throw error_throw("listen error - open_connection - main.cpp");
-		
-	server_log("Connection established on port " + int_to_str(SERVER_PORT), INFO);
-	std::cout << std::string(GREENN) + "PORT " << SERVER_PORT << ": Ready for connection" + std::string(ENDD) + "\n";
-	server_log("Initialization of poll variables\n", DEBUG);
-	server.pfds.fd = server.listenfd;
-	server.pfds.events = POLLIN;
-}
-
 static	void	init_log_file() {
 	std::fstream log_file(LOG_FILE, std::ios::out | std::ios::trunc);
     
@@ -114,15 +95,14 @@ static	void	init_log_file() {
     log_file.close();
 }
 
-void	init_server(t_server &server) {
+void	init_server(void) {
 	g_sig = 0;
 	signal(SIGINT, &sigint_handler);
 	signal(SIGQUIT, &sigquit_handler);
 	init_log_file();
 	server_log("SERVER STARTED", INFO);
-	open_connection(server);
 }
-
+/*
 void	stop_server(t_server &server) {
 	close(server.listenfd);
 	close(server.connfd);
@@ -130,28 +110,79 @@ void	stop_server(t_server &server) {
 	server_log("SERVER STOPPED", INFO);
 	std::cout << std::string(GREENN) + "\nConnection closed - Bye!\n" + std::string(ENDD);
 }
-
-int main():
+*/
+int main(int ac, char **av)
 {
-	t_server	server;
+	if (ac != 2) {
+		std::cerr << "Usage ./webserv config_file!" << std::endl;
+		return 0;
+	}
 
-	bzero(&server, sizeof(server));
 	try {
-		init_server(server);
+		std::vector<Server> servers;
+		std::vector<struct pollfd> pollfds;
+		std::map<int, Server*> serversMap;
+		std::map<int, struct sockaddr_in> clientMap;
+		init_server();
+		if (readConfigFile(servers, av[1]) == -1)
+			return 1;
+		allocatePollFds(servers, pollfds); //set struct pollfd
+		allocateServersMap(servers, serversMap); //set map pollfd.fd Server*
+
+
 		while (g_sig == 0) { /* Here is the main loop */
-			if (poll(&server.pfds, 1, -1) == -1)
-					error_throw("poll failure - main - main.cpp");
-			if (server.pfds.revents & POLLIN \
-			&& server.pfds.fd == server.listenfd) {
-					memset(server.recvline, 0, MAXLINE);
-					server.connfd = accept(server.listenfd, (SA *) NULL, NULL);
-					send_response(server.connfd);
-					close(server.connfd);
+
+			int poll_count = poll(&pollfds[0], pollfds.size(), -1);
+			if (poll_count == -1) 
+				std::cerr << "poll error: " << strerror(errno) << std::endl;
+
+			for(size_t i = 0; i < pollfds.size(); i++)
+			{
+				if (pollfds[i].revents & POLLIN) //EVENT!
+				{
+					server_log("EVENT", DEBUG);
+					std::map<int, Server*>::iterator it = serversMap.find(pollfds[i].fd);
+					if (it != serversMap.end()) //socketfd is listener == 1st co
+					{
+						struct sockaddr_in clientAddr;
+						socklen_t tempAddrlen = sizeof(clientAddr);
+						int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
+						if (clientFd == -1){
+							std::cerr << "Accept error: " << strerror(errno) << std::endl;
+						}
+						else {
+							clientMap[clientFd] = clientAddr; //add client information to map Client
+							struct pollfd newPfd;
+							newPfd.fd = clientFd;
+							newPfd.events = POLLIN;
+							pollfds.push_back(newPfd); // add new fd to monitoring
+							server_log("New connexion on fd " + int_to_str(clientFd) , DEBUG);
+							send_response(clientFd);
+						}	
+					}
+					else // socketfd aldready set c/p from HttpRequest
+					{
+						server_log("other request on clientFD", DEBUG);
+						send_response(pollfds[i].fd);
+
+					//	close(pollfds[i].fd);
+					/*	u_int8_t recvline[MAXLINE + 1];
+						memset(recvline, 0, MAXLINE);
+						int numbytes;
+						numbytes = recv(pollfds[i].fd, recvline, MAXLINE - 1, 0);
+						if (numbytes == 0) { //connection close
+							std::map<int, struct sockaddr_in>::iterator it;
+							it = clientMap.find(pollfds[i].fd);
+							close(pollfds[i].fd);
+							clientMap.erase(it); //delete fd client side
+							pollfds.erase(pollfds.begin() + i); //delete fd monitoring side
+						}*/
+					}
+				}
 			}
 		}
-	}
+	}		
 	catch (const std::exception &e) {
 		std::cerr << e.what() << "\n";
-		stop_server(server);
 	}
 }
