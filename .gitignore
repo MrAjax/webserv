@@ -1,0 +1,11 @@
+**.d
+**.o
+test
+http/main.cpp
+#http/Makefile
+file
+**.vscode
+test_pierre
+test_newclass
+**.log
+**/.nfs*

@@ -1,0 +1,5 @@
+* remove deux fois de suite un fichier -> checker que le fichier existe dans la classe Request ?
+
+* bug de post -> reste bloque dans HttpRequest ??
+
+* segfault inexplique --> image trop lourde ??
