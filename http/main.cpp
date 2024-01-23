@@ -12,9 +12,9 @@ static	void	send_response(int connfd) {
 	server_log("Parsing Request...", DEBUG);
 	server_log("Request is valid", DEBUG);
 
-	HttpRequest 	Request(connfd);
+	HttpRequest 	Request(connfd); //il faudra malloc pour pouvoir delete quand on a envoye la response
 
-	Request.processingRequest(); //permet de parser par chunk la data
+	Request.processingRequest(); //permet de parser par chunk la data, il faut check via poll le fd pour éviter que recv bloque
 
 	server_log(Request.getHeaderRequest() + "\n\n", DIALOG);
 	server_log("Building Response..", DEBUG);
@@ -77,7 +77,6 @@ int main()
 			{
 				if (pfds.fd == listenfd) {
 					memset(recvline, 0, MAXLINE);
-					int newfd = accept(listenfd, (SA *) NULL, NULL);
 					send_response(accept(listenfd, (SA *) NULL, NULL));
 				}
 			}

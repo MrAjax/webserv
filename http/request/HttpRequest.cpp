@@ -3,23 +3,34 @@
 #include "HttpRequestParsing.hpp"
 
 
-
+#define TIMEOUT_REQUEST 10 // en seconds
 #define MAXLINE 4096
 
 HttpRequest::HttpRequest(void) : STATUS(NEW)
 {
-	
+	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 }
 
 HttpRequest::HttpRequest(int connfd) : STATUS(NEW), _connfd(connfd)
 {
-
+	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 }
 
 
 HttpRequest::~HttpRequest(void){}
 
 //-----------UTILS------------------
+
+int			HttpRequest::checkTimeout(void) // permet de check si on doit kill la requette car timout
+{
+	struct timespec end;
+	clock_gettime(CLOCK_REALTIME, &end);
+	int timeSec = end.tv_sec - _lastUpdate.tv_sec;
+	if (timeSec > TIMEOUT_REQUEST)
+		return (1);
+	else
+		return (0);
+}
 
 void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que tout est bien parse
 {
@@ -58,6 +69,8 @@ void	HttpRequest::recvfd(int & fd)
 
 int    HttpRequest::processingRequest(void)
 {
+	clock_gettime(CLOCK_REALTIME, &_lastUpdate); // a chaque passage de processing le timer se reset pour le moment
+	// On peut rajouter un timer global à la création de la classe pour définir une durée max pour chaque requette
 	try
 	{
 		recvfd(_connfd);

@@ -48,6 +48,7 @@ class HttpRequest
 		void	recvfd(int & fd); //on read buffer[MAXLINE -1] du fd
 
 		//------------UTIL----------------------
+		int			checkTimeout(void);
 		void		printAttribute(void);
 		//---------Guetter-----------------
 		std::string getMethod();
@@ -136,6 +137,8 @@ class HttpRequest
 		std::string saveString;
 
 		std::string _strContentLength;
+
+		struct timespec _lastUpdate;
 
 };
 
