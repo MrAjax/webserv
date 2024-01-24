@@ -120,9 +120,13 @@ int main(int ac, char **av)
 
 	try {
 		std::vector<Server> servers;
+
 		std::vector<struct pollfd> pollfds;
+
 		std::map<int, Server*> serversMap;
+
 		std::map<int, struct sockaddr_in> clientMap;
+
 		init_server();
 		if (readConfigFile(servers, av[1]) == -1)
 			return 1;
@@ -132,7 +136,7 @@ int main(int ac, char **av)
 
 		while (g_sig == 0) { /* Here is the main loop */
 
-			int poll_count = poll(&pollfds[0], pollfds.size(), -1);
+			int poll_count = poll(&pollfds[0], pollfds.size(), -1); // NON il faut lui donner une array de pollfd on lui donne que un ici
 			if (poll_count == -1) 
 				std::cerr << "poll error: " << strerror(errno) << std::endl;
 
@@ -141,7 +145,7 @@ int main(int ac, char **av)
 				if (pollfds[i].revents & POLLIN) //EVENT!
 				{
 					server_log("EVENT", DEBUG);
-					std::map<int, Server*>::iterator it = serversMap.find(pollfds[i].fd);
+					std::map<int, Server*>::iterator it = serversMap.find(pollfds[i].fd); //
 					if (it != serversMap.end()) //socketfd is listener == 1st co
 					{
 						struct sockaddr_in clientAddr;
