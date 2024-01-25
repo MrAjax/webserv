@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 12:43:31 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/25 12:19:59 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/25 16:13:53 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void countBrackets(int & bracket, std::string const& line)
 		bracket++;
 	if (line.find("}") != std::string::npos)
 		bracket--;
-	std::cout << "bracket =" << bracket << std::endl;	
+//	std::cout << "bracket =" << bracket << std::endl;	
 	if (bracket < 0)
 		throw std::runtime_error("Config file Miss closed bracket - config file");
 }
@@ -42,10 +42,26 @@ void chekLastchar(std::string & line) {
 	if (line[line.length() - 1] == '{' || line[line.length() - 1] == '}')
 		return;
 	if (line[line.length() - 1] != ';')
-	 	throw std::runtime_error("line [" + line + "] Miss ; in the end");
+	 	throw error_throw("invalid parameter \"" + line + "\" - config file", false);
 	line.erase(line.length() - 1); //suppr ;
 	trimWhiteSpaces(line);
 }
+
+void checkServerLine(std::string & line, int bracket) { //check first line "server {"
+
+	if (bracket != 0)
+		throw error_throw("Unclosed bracket - config file", false);
+	size_t pos = 6;	
+	while(pos < line.length() && std::isspace(line[pos])) {
+		++pos;
+	}
+	if (line[pos] == '\0')  
+		throw error_throw("Miss bracket in the beginning of server - config file" , false);
+	else if (line[pos] != '{')	
+		throw error_throw("unknown directive \"" + line.substr(pos) + "\" - config file", false);
+	else if (line[pos + 1] != '\0')	
+		throw error_throw("unknown directive \"" + line.substr(pos + 1) + "\" - config file", false);
+}		
 
 void readConfigFile (std::vector<Server> & servers, char const* file)
 {
@@ -63,36 +79,26 @@ void readConfigFile (std::vector<Server> & servers, char const* file)
 	
 	while (getline(ifs, line)) {
 
-		if (line.compare(0, 6, "server") == 0) { //line MUST start with server, no \t or " "
-			if (bracket != 0)
-				throw std::runtime_error("Unclosed bracket");
-			if (line.find("{") != std::string::npos) { //{ MUST be on the same line 
-				recording = true;
-				block.push_back(line);
-			}	
-			else {
-			//	server_log("Miss bracket in the beginning of server", ERROR);
-			//	throw std::runtime_error("Miss bracket in the beginning of server");
-				throw error_throw("Miss bracket in the beginning of server", false);
-			}
-		}	
 		trimWhiteSpaces(line);
 		if (line[0] == '\0' || line[0] == '#') // skip empty and comment lines
 			continue;
-		chekLastchar(line);	
-		std::cout << "line recorded = [" << line << "]" << std::endl;
-		if (recording == false && line.find_first_not_of(" \t\n\r\f\v") != std::string::npos) 
-			throw std::runtime_error("unknown directive \"" + line + "\"");
+		if (line.compare(0, 6, "server") == 0 && recording == false) { 
+			checkServerLine(line, bracket);
+			recording = true;
+		}	
+		else if (recording == true) {
+			chekLastchar(line);	
+			block.push_back(line);
+		}
+		else if (line.find_first_not_of(" \t\n\r\f\v") != std::string::npos) 
+			throw error_throw("unknown directive \"" + line + "\" - config file", false);
+	//	std::cout << "line recorded = [" << line << "]" << std::endl;
 		countBrackets(bracket, line);
 		if (line[0] == '}' && bracket == 0 && recording == true) {
-		block.push_back(line);
 			servers.push_back(Server(block, servers, i));
 			block.clear();
 			recording = false;
 			i++;
-		}
-		else if (recording == true) {
-			block.push_back(line);
 		}
 	}
 	ifs.close();

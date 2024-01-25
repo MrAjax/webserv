@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/23 13:51:35 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/25 16:13:00 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@
 
 #include "Server.hpp"
 #include "../inc/parsing.hpp"
+#include "../utils/utils.hpp"
 
 Server::Server(std::vector<std::string> config, std::vector<Server> const& servers, int i)
 	: _i(i), _socketfd(-1), _max_body_size(1024), _error_pages(1, 404), _servers(servers), _ip(""), _port(""), _server_name(""), _root(""), _location_error_page("/default"), _socketIsSet(false) {
@@ -54,13 +55,16 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 		"error_page"};
 
 	for (size_t i = 0; i < config.size() ; i++) {
-		for (int j = 0; j < PARAM ; ++j) {
-		//	if (config[i].find(keyword[j]) != std::string::npos) { find is useless : line are trim
+		int j = 0;
+		while (j < PARAM) {
 			if (config[i].compare(0, keyword[j].length(), keyword[j]) == 0) {
 				(this->*ptr[j])(config[i]);
 				break;
 			}
-		}
+			j++;	
+		}	
+	/*	if (j == PARAM) // no condition
+			throw error_throw("unknown directive \"" + config[i] + "\" - config file", false);*/
 	}
 	openSocket();	
 	configServer();
