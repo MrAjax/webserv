@@ -8,7 +8,7 @@ ContentTypeFinder::ContentTypeFinder() {
 	std::string		value;
 
 	if (!mime_file.is_open())
-		error_throw(std::string(WHITEE) + "Cannot open the MIME file");
+		error_throw(std::string(WHITEE) + "Cannot open the MIME file", true);
 	
 	server_log(std::string(WHITEE) + "server/MIME_types file is ready", DEBUG);
 	server_log(std::string(WHITEE) + "Reading server/MIME_types file...", DEBUG);

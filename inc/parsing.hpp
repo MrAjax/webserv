@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:30:56 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/23 13:51:08 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/25 08:52:47 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 class Server;
 
 /*readConfigFile.cpp*/
-int readConfigFile (std::vector<Server> & servers, char const* file);
+void readConfigFile (std::vector<Server> & servers, char const* file);
 
 /*allocateSTL.cpp*/
 void	allocatePollFds(std::vector<Server> const& servers,

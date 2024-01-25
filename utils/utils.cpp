@@ -37,7 +37,7 @@ void	server_log(std::string content, int log_level) {
 	std::string		begin;
 
 	if (!log_file.is_open())
-		error_throw("cannot open server log file");
+		error_throw("cannot open server log file", true);
 
 	switch (log_level)
 	{
@@ -60,12 +60,13 @@ void	server_log(std::string content, int log_level) {
 	log_file.close();
 }
 
-std::runtime_error	error_throw(std::string description) {
+std::runtime_error	error_throw(std::string description, bool errno_need) {
 	std::string	error(std::string(REDD) + "ERROR: " \
-						+ description \
-						+ ": " \
-						+ std::string(strerror(errno)) \
-						+ std::string(ENDD));
+						+ description);
+	if (errno_need == true) {
+		error += ": " + std::string(strerror(errno));
+	}	
+	error += std::string(ENDD);
 	server_log(error, ERROR);
 	return std::runtime_error(error);
 }

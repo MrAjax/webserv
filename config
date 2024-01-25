@@ -1,7 +1,7 @@
 # Deuxième serveur
 
 
-server{	
+server	{
     listen 18004;
 	host 127.0.0.1;
     server_name;
@@ -20,4 +20,4 @@ server{
     location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
         expires 30d;
     }
-}
+}	
