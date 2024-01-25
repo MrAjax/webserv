@@ -89,13 +89,13 @@ styles for this page
 @font-face {
 	font-family: 'Open Sans Condensed';
 	font-weight: bold;
-	src: url(/errorpages/fonts/opensanscondensed-bold.ttf) format("truetype");
+	src: url(/fonts/opensanscondensed-bold.ttf) format("truetype");
 }
 
 @font-face {
 	font-family: 'Open Sans';
 	font-weight: normal;
-	src: url(/errorpages/fonts/opensans-regular.ttf) format("truetype");
+	src: url(/fonts/opensans-regular.ttf) format("truetype");
 }
 
 /* define variables */
