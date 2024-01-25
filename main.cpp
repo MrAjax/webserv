@@ -61,7 +61,7 @@ static	void	send_response(int connfd) {
 	std::string	response;
 	server_log("Activity detected", DEBUG);
 	if (connfd < 0)
-		throw error_throw("send response - main.cpp");
+		throw error_throw("send response - main.cpp", true);
 	
 	try {
 		HttpRequest 	Req(connfd);
@@ -91,7 +91,7 @@ static	void	init_log_file() {
 	std::fstream log_file(LOG_FILE, std::ios::out | std::ios::trunc);
     
     if (!log_file.is_open())
-		throw error_throw("log file cannot be created - init_log_file - main.cpp");
+		throw error_throw("log file cannot be created - init_log_file - main.cpp", true);
     log_file.close();
 }
 
@@ -118,21 +118,22 @@ int main(int ac, char **av)
 		return 0;
 	}
 
-	try {
 		std::vector<Server> servers;
-
 		std::vector<struct pollfd> pollfds;
-
 		std::map<int, Server*> serversMap;
-
 		std::map<int, struct sockaddr_in> clientMap;
 
+	try {
 		init_server();
-		if (readConfigFile(servers, av[1]) == -1)
-			return 1;
+		readConfigFile(servers, av[1]);
 		allocatePollFds(servers, pollfds); //set struct pollfd
 		allocateServersMap(servers, serversMap); //set map pollfd.fd Server*
-
+	}
+	catch (const std::exception &e) {
+		std::cerr << e.what() << std::endl;
+		return 1;
+	}
+	try {
 
 		while (g_sig == 0) { /* Here is the main loop */
 
@@ -151,7 +152,7 @@ int main(int ac, char **av)
 						struct sockaddr_in clientAddr;
 						socklen_t tempAddrlen = sizeof(clientAddr);
 						int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
-						if (clientFd == -1){
+						if (clientFd == -1) {
 							std::cerr << "Accept error: " << strerror(errno) << std::endl;
 						}
 						else {

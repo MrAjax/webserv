@@ -46,7 +46,7 @@ std::string StatusSender::_error_400() {
         file_content << error_file.rdbuf();
         error_file.close();
         if (ContentTypeFinder::get_content_type(file_path).empty())
-            error_throw("Server crashed");
+            error_throw("Server crashed", true);
     }
     _body = file_content.str();
     _header = build_header(_status_code, "text/html", _body.length());
@@ -69,7 +69,7 @@ std::string StatusSender::_error_401() {
         file_content << error_file.rdbuf();
         error_file.close();
         if (ContentTypeFinder::get_content_type(file_path).empty())
-            error_throw("Server crashed");
+            error_throw("Server crashed", true);
     }
     _body = file_content.str();
     _header = build_header(_status_code, "text/html", _body.length());
@@ -94,7 +94,7 @@ std::string	StatusSender::_error_403() {
 		file_content << error_file.rdbuf();
 		error_file.close();
 		if (ContentTypeFinder::get_content_type(file_path) != "text/html")
-			error_throw("Server crashed");
+			error_throw("Server crashed", true);
 	}
 	_body = file_content.str();
 	_header = build_header(_status_code, "text/html", _body.length());
@@ -145,7 +145,7 @@ std::string	StatusSender::_error_500() {
 		file_content << error_file.rdbuf();
 		error_file.close();
 		if (ContentTypeFinder::get_content_type(file_path).empty())
-			error_throw("Server crashed");
+			error_throw("Server crashed", true);
 	}
 	_body = file_content.str();
 	_header = build_header(_status_code, "text/html", _body.length());

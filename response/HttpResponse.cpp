@@ -40,6 +40,7 @@ HttpResponse::~HttpResponse() {}
 Method	*HttpResponse::_execute_method(int method_code) {
 	Method	*m;
 
+	m = NULL;
 	switch (method_code)
 	{
 	case GET:
