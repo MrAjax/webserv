@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/26 13:21:21 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/26 15:30:22 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ public:
 	int	getMaxBodySize( void ) const;
 	int	getSocketfd( void ) const;
 	std::vector<int> getErrorPages( void ) const;
+	Location *getLocation( std::string type ) const;
 	
 private:
 

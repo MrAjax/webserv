@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/26 13:22:57 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/26 15:38:52 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@
 #include "Server.hpp"
 #include "../inc/parsing.hpp"
 #include "../utils/utils.hpp"
+#include "../inc/webserv.hpp"
+#include "Location.hpp"
 
 Server::Server(std::vector<std::string> config, std::vector<Server> const& servers, int i)
 	: _i(i), _socketfd(-1), _max_body_size(1024), _error_pages(1, 404), _servers(servers), _ip(""), _port(""), _server_name(""), _root(""), _location_error_page("/default"), _socketIsSet(false) {
@@ -70,7 +72,6 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 		}	
 		else if (config[i].compare(0, 8, "location") == 0) {
 			tempLocation = settempLocation(config[i]);
-			//std::cout << "Temp loc =" << tempLocation << std::endl;
 			recording = true;
 		}	
 		else if (recording == true)
@@ -312,3 +313,16 @@ std::string Server::getLocationErrorPage(void) const {
 std::string Server::getIndex(void) const {
 	return _index;
 }	
+
+Location* Server::getLocation(std::string type) const {
+
+	std::map<std::string, Location*>::const_iterator it;
+
+	it = _locations.find(type);
+	if (it != _locations.end()) 
+		return it->second;
+	else {
+		server_log("This location " + type + " does not exist", ERROR);
+		return NULL;
+	}
+}
