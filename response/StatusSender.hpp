@@ -3,6 +3,7 @@
 
 #include "../inc/webserv.hpp"
 #include "../utils/utils.hpp"
+#include "../parsing/Server.hpp"
 
 class StatusSender {
 	std::string		_path;
@@ -12,8 +13,10 @@ class StatusSender {
 	std::string		_header;
 	std::string		_body;
 	std::string		_response;
+	std::string		_server_name;
+	std::string		_error_pages;
 
-	StatusSender(int err);
+	StatusSender(int err, Server &serv);
 	~StatusSender();
 
 	std::string		_error_400();
@@ -23,7 +26,7 @@ class StatusSender {
 	std::string		_error_500();
 	std::string		_get_response();
 public:
-	static	std::string		send_status(int err);
+	static	std::string		send_status(int err, Server &serv);
 };
 
 #endif

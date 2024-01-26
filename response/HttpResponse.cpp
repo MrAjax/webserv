@@ -12,12 +12,12 @@ void	check_rights(std::string path, int method_code) {
 	// then, send Status code 401 - Unauthorized
 }
 
-HttpResponse::HttpResponse(HttpRequest &req):  _method(req.getMethod()), \
+HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMethod()), \
 										_method_code(_method.length()), \
 										_path(req.getPath()), \
 										_status_code(202 /* should take it from the req in case of an error */) {
 	if (_status_code != 202)
-		throw StatusSender::send_status(_status_code);
+		throw StatusSender::send_status(_status_code, serv);
 
 	if (_path == "/") {
 		server_log(std::string(WHITEE) + "Get Request for / --> replace by index.html", DEBUG);
@@ -37,7 +37,7 @@ HttpResponse::HttpResponse(HttpRequest &req):  _method(req.getMethod()), \
 
 HttpResponse::~HttpResponse() {}
 
-Method	*HttpResponse::_execute_method(int method_code) {
+Method	*HttpResponse::_execute_method(int method_code,Server &serv) {
 	Method	*m;
 
 	m = NULL;
@@ -55,16 +55,16 @@ Method	*HttpResponse::_execute_method(int method_code) {
 	default:
 		break;
 	}
-	m->execute_method();
+	m->execute_method(serv);
 	return m;
 }
 
-std::string	HttpResponse::get_response() {
+std::string	HttpResponse::get_response(Server &serv) {
 	Method *m;
 	_contentType = ContentTypeFinder::get_content_type(_path);
 	if (_contentType.empty())
-		throw StatusSender::send_status(404);
-	m = _execute_method(_method_code);
+		throw StatusSender::send_status(404, serv);
+	m = _execute_method(_method_code, serv);
 	_header = m->get_header();
 	_response = _header + m->get_body();
 	//std::cout << std::string(GREENN) + _header << "\n";

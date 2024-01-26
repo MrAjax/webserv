@@ -21,13 +21,13 @@ class HttpResponse {
 	std::string		_header;
 	std::string		_body;
 	std::string		_response;
-	Method	*_execute_method(int method_code);
+	Method	*_execute_method(int method_code, Server &serv);
 public:
-	HttpResponse(HttpRequest &req);
+	HttpResponse(HttpRequest &req, Server &serv);
 
 	~HttpResponse();
 
-	std::string	get_response();
+	std::string	get_response(Server &serv);
 	std::string	get_header();
 };
 

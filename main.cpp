@@ -56,10 +56,10 @@ static	void	send_response_to_client(int connfd, std::string response) {
 	server_log("Response sent", INFO);
 }
 
-static	void	send_response(int connfd) {
+static	void	send_response(int connfd, Server &serv) {
 
 	std::string	response;
-	server_log("Activity detected", DEBUG);
+	server_log("Activity detected on server: " + serv.getServerName(), DEBUG);
 	if (connfd < 0)
 		throw error_throw("send response - main.cpp", true);
 	
@@ -75,8 +75,8 @@ static	void	send_response(int connfd) {
 		server_log("Request is valid", DEBUG);
 		server_log(request_header + "\n\n", DIALOG);
 		server_log("Building Response...", DEBUG);
-		HttpResponse	Rep(Req);
-		response = Rep.get_response();
+		HttpResponse	Rep(Req, serv);
+		response = Rep.get_response(serv);
 		server_log(Rep.get_header(), DIALOG);
 		send_response_to_client(connfd, response);
 	}
@@ -174,14 +174,14 @@ int main(int ac, char **av)
 								newPfd.events = POLLIN;
 								pollfds.push_back(newPfd); // add new fd to monitoring
 								server_log("New connexion on fd " + int_to_str(clientFd) , DEBUG);
-								send_response(clientFd);
+								send_response(clientFd, *it->second);
 							}	
 						}
 						else // socketfd aldready set c/p from HttpRequest
 						{
 							//std::cout << "server name: " << it->second->getServerName() << "\n";
 							server_log("other request on clientFD", DEBUG);
-							send_response(pollfds[i].fd);
+							send_response(pollfds[i].fd, *it->second);
 
 					//	close(pollfds[i].fd);
 					/*	u_int8_t recvline[MAXLINE + 1];

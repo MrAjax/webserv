@@ -4,14 +4,14 @@ Post::Post(std::string path, std::string content, std::string body_request): Met
 
 Post::~Post() {}
 
-void	Post::execute_method() {
+void	Post::execute_method(Server &serv) {
 	// TODO generaliser le path du post file suivant le contexte
 	// TODO Status 200: A description of the result of the action is transmitted to the message body.
 	std::fstream	post_file("data/ground_beetle_club.csv");
 
 	if (!post_file.is_open()) {
 		server_log("Cannot open post file - Post.cpp", ERROR);
-		throw StatusSender::send_status(500);
+		throw StatusSender::send_status(500, serv);
 	}
 	post_file << this->get_body_request();
 	post_file.close();

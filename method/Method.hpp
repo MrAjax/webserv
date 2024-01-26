@@ -21,7 +21,7 @@ public:
 
 	virtual ~Method();
 
-	virtual void	execute_method() = 0;
+	virtual void	execute_method(Server &serv) = 0;
 	
 	std::string		get_path();
 	std::string		get_content_type();

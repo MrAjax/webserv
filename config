@@ -2,13 +2,13 @@
 server{
 	listen 18004;
 	host 127.0.0.1;
-    server_name;
+    server_name Zzewebsitee;
 	client_max_body_size 1024;            
 
     root /var/www/monsite2;
-    index index.html;
+    index index/index.html;
 
-	error_page 404 502 503 /error.html;
+	error_page 404 502 503 /errorpages;
 lol;
     location / {
         try_files $uri $uri/ =404;

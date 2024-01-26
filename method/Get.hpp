@@ -9,7 +9,7 @@ public:
 	Get(std::string path, std::string content);
 	~Get();
 	
-	void	execute_method();
+	void	execute_method(Server &serv);
 };
 
 #endif

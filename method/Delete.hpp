@@ -8,7 +8,7 @@ class Delete: public Method {
 	public:
 	Delete(std::string path, std::string content);
 	~Delete();
-	void	execute_method();
+	void	execute_method(Server &serv);
 };
 
 #endif

@@ -8,7 +8,7 @@ Method::Method(std::string path, std::string content, std::string body_request):
 
 Method::~Method() {}
 
-void	Method::execute_method() {}
+void	Method::execute_method(Server &serv) {(void)serv;}
 
 std::string	Method::get_path() {
 	return _path;

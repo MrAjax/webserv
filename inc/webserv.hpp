@@ -51,13 +51,5 @@ enum {NOLOG, ERROR, DIALOG, INFO, DEBUG};
 #define ENDD "\033[0m"
 // Signal handling
 extern volatile int	g_sig;
-// Server stuff
-typedef struct	s_server {
-	int					listenfd;
-	struct sockaddr_in	servaddr;
-	uint8_t				recvline[MAXLINE + 1];
-	struct pollfd 		pfds;
-	int					connfd;
-}	t_server;
 // End
 #endif
