@@ -71,10 +71,6 @@ std::runtime_error	error_throw(std::string description, bool errno_need) {
 	return std::runtime_error(error);
 }
 
-std::string	website(std::string path) {
-	return (std::string(MYWEBSITE) + path);
-}
-
 std::string	build_header(int status_code, std::string content_type, size_t body_len) {
 	server_log("Building header...", DEBUG);
 	std::string	header("HTTP/1.1 ");

@@ -15,16 +15,17 @@ void	check_rights(std::string path, int method_code) {
 HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMethod()), \
 										_method_code(_method.length()), \
 										_path(req.getPath()), \
+										_server_name(serv.getServerName()), \
 										_status_code(202 /* should take it from the req in case of an error */) {
 	if (_status_code != 202)
 		throw StatusSender::send_status(_status_code, serv);
 
 	if (_path == "/") {
 		server_log(std::string(WHITEE) + "Get Request for / --> replace by index.html", DEBUG);
-		_path = website("/index/index.html");
+		_path = _server_name + "/index/index.html";
 	}
 	else
-		_path = (website(_path));
+		_path = _server_name + _path;
 
 	check_rights(_path, _method_code);	
 	if (_method_code == POST || _method_code == DELETE)
