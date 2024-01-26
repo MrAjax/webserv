@@ -111,6 +111,14 @@ void	stop_server(t_server &server) {
 	std::cout << std::string(GREENN) + "\nConnection closed - Bye!\n" + std::string(ENDD);
 }
 */
+
+bool isListener(int fd, std::vector<Server> servers) {
+	for (size_t i = 0; i < servers.size(); i++) {
+		if (fd == servers[i].getSocketfd())
+			return true;	
+	}
+	return false;
+}
 int main(int ac, char **av)
 {
 	if (ac != 2) {
@@ -147,28 +155,33 @@ int main(int ac, char **av)
 				{
 					server_log("EVENT", DEBUG);
 					std::map<int, Server*>::iterator it = serversMap.find(pollfds[i].fd); //
-					if (it != serversMap.end()) //socketfd is listener == 1st co
-					{
-						struct sockaddr_in clientAddr;
-						socklen_t tempAddrlen = sizeof(clientAddr);
-						int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
-						if (clientFd == -1) {
-							std::cerr << "Accept error: " << strerror(errno) << std::endl;
+					if (it != serversMap.end()) {
+						if (isListener(pollfds[i].fd, servers)) //socketfd is listener == 1st co
+						{
+							std::cout << "server name: " << it->second->getServerName() << "\n";
+							struct sockaddr_in clientAddr;
+							socklen_t tempAddrlen = sizeof(clientAddr);
+							int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
+							if (clientFd == -1) {
+								std::cerr << "Accept error: " << strerror(errno) << std::endl;
+							}
+							else {
+								serversMap[clientFd] = it->second;
+								std::cout << it->second->getSocketfd() << std::endl;
+								clientMap[clientFd] = clientAddr; //add client information to map Client
+								struct pollfd newPfd;
+								newPfd.fd = clientFd;
+								newPfd.events = POLLIN;
+								pollfds.push_back(newPfd); // add new fd to monitoring
+								server_log("New connexion on fd " + int_to_str(clientFd) , DEBUG);
+								send_response(clientFd);
+							}	
 						}
-						else {
-							clientMap[clientFd] = clientAddr; //add client information to map Client
-							struct pollfd newPfd;
-							newPfd.fd = clientFd;
-							newPfd.events = POLLIN;
-							pollfds.push_back(newPfd); // add new fd to monitoring
-							server_log("New connexion on fd " + int_to_str(clientFd) , DEBUG);
-							send_response(clientFd);
-						}	
-					}
-					else // socketfd aldready set c/p from HttpRequest
-					{
-						server_log("other request on clientFD", DEBUG);
-						send_response(pollfds[i].fd);
+						else // socketfd aldready set c/p from HttpRequest
+						{
+							//std::cout << "server name: " << it->second->getServerName() << "\n";
+							server_log("other request on clientFD", DEBUG);
+							send_response(pollfds[i].fd);
 
 					//	close(pollfds[i].fd);
 					/*	u_int8_t recvline[MAXLINE + 1];
@@ -182,12 +195,17 @@ int main(int ac, char **av)
 							clientMap.erase(it); //delete fd client side
 							pollfds.erase(pollfds.begin() + i); //delete fd monitoring side
 						}*/
-					}
+						}
+					}	
 				}
 			}
 		}
+
 	}		
 	catch (const std::exception &e) {
 		std::cerr << e.what() << "\n";
 	}
+	for (size_t i = 0; i < pollfds.size(); i++) {
+		close(pollfds[i].fd);
+	}	
 }
