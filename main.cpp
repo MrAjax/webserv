@@ -67,6 +67,7 @@ static	void	send_response(int connfd, Server &serv) {
 		HttpRequest 	Req(connfd);
 		server_log("Parsing Request...", DEBUG);
 		std::string	request_header = Req.getHeaderRequest();
+
 		server_log("All the chunks received", DEBUG);
 		if (request_header.empty()) {
 			server_log("Invalid request", ERROR);
@@ -75,7 +76,10 @@ static	void	send_response(int connfd, Server &serv) {
 		server_log("Request is valid", DEBUG);
 		server_log(request_header + "\n\n", DIALOG);
 		server_log("Building Response...", DEBUG);
+
 		HttpResponse	Rep(Req, serv);
+
+		
 		response = Rep.get_response(serv);
 		server_log(Rep.get_header(), DIALOG);
 		send_response_to_client(connfd, response);
@@ -145,7 +149,7 @@ int main(int ac, char **av)
 
 		while (g_sig == 0) { /* Here is the main loop */
 
-			int poll_count = poll(&pollfds[0], pollfds.size(), -1); // NON il faut lui donner une array de pollfd on lui donne que un ici
+			int poll_count = poll(&pollfds[0], pollfds.size(), -1);
 			if (poll_count == -1) 
 				std::cerr << "poll error: " << strerror(errno) << std::endl;
 
