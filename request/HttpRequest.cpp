@@ -2,7 +2,7 @@
 #include "HttpRequestError.hpp"
 #include "HttpRequestParsing.hpp"
 
-
+//throw StatusSender::send_status(500, serv); quand le server et la requete n'est pas conforme il faut envoyer ca et pas un autre truc avec erreur 500 le server ne doit pas s arreter
 #define TIMEOUT_REQUEST 10 // en seconds
 #define MAXLINE 4960
 
@@ -58,6 +58,33 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
 		std::cout << YELLOW << tab[i].key << RESET << (this->*(tab[i].getter))() << std::endl;
 }
 
+void		HttpRequest::resetRequest(void)
+{
+	STATUS = 0;
+	_method = "";
+	_path = "";
+	_http = "";
+	_host = "";
+	_userAgent = "";
+	_accept = "";
+	_acceptLanguage = "";
+	_acceptEncoding = "";
+	_connection = "";
+	_upInsecureRqst = "";
+	_referer = "";
+	_secFetchDest = "";
+	_secFetchMode = "";
+	_secFetchSite = "";
+	_contentLength = 0;
+	_contentType = "";
+	_bodyRequest = "";
+	_headerRequest = "";
+	
+	saveString = "";
+	_strContentLength = "";
+	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
+}
+
 //-----------Core functions----------
 
 void	HttpRequest::recvfd(int & fd)
@@ -65,11 +92,8 @@ void	HttpRequest::recvfd(int & fd)
 	u_int8_t recvline[MAXLINE + 1];
 	memset(recvline, 0, MAXLINE);
 	int numbytes;
-	std::cout << YELLOW << "STARTING RECEVING" << RESET << std::endl;
-	numbytes = recv(fd, recvline, MAXLINE - 1, 0);
-	// numbytes = read(fd, recvline, MAXLINE - 1);
-	std::cout << YELLOW << "ENDING RECEVING" << RESET << std::endl;
-
+	// numbytes = recv(fd, recvline, MAXLINE - 1, 0);
+	numbytes = read(fd, recvline, MAXLINE - 1);
 	saveString += reinterpret_cast< char * >(recvline); 
 	if (numbytes == 0)
 		throw std::runtime_error("ERROR: Nb bytes = 0\n");

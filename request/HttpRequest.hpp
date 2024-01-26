@@ -50,6 +50,7 @@ class HttpRequest
 		//------------UTIL----------------------
 		int			checkTimeout(void);
 		void		printAttribute(void);
+		void		resetRequest(void);
 		//---------Guetter-----------------
 		std::string getMethod();
 		std::string getPath();
