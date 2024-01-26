@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/23 13:52:26 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/26 13:21:21 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,27 @@
 # define SERVER_HPP
 
 #include "../inc/parsing.hpp"
+#include "Location.hpp"
 
 class Server {
 
 typedef void (*FuncPtr)(std::string const&);
 
 public:
+
 	Server(std::vector<std::string> config, std::vector<Server> const& servers, int i);
 	~Server( void );
 
 	std::string getIp( void ) const;
 	std::string getPort( void ) const;
-	std::string getServerName(void) const; 
-	std::string getRoot(void) const;
-	std::string getLocationErrorPage(void) const;
+	std::string getServerName( void ) const; 
+	std::string getRoot( void ) const;
+	std::string getLocationErrorPage( void ) const;
+	std::string getIndex( void )const;
 	struct sockaddr_in getclientAddr( void ) const;
-	int	getMaxBodySize(void) const;
+	int	getMaxBodySize( void ) const;
 	int	getSocketfd( void ) const;
-	std::vector<int> getErrorPages(void) const;
-
+	std::vector<int> getErrorPages( void ) const;
 	
 private:
 
@@ -45,9 +47,12 @@ private:
 	void p_bodySize(std::string const& line);
 	void p_root(std::string const& line);
 	void p_errorPage(std::string const& line);
+	void p_index(std::string const& line);
 
 	void configServer(void);
 	void openSocket(void);
+
+	std::string settempLocation(std::string line);
 
 	int					_i; // number of Server 0 is the first etc...
 	int				 	_socketfd;
@@ -61,7 +66,9 @@ private:
 	std::string			_server_name;
 	std::string			_root;
 	std::string			_location_error_page;
+	std::string			_index;	
 	bool				_socketIsSet;
+	std::map<std::string, Location*> _locations;
 
 };
 
