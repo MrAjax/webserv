@@ -66,7 +66,7 @@ static	void	send_response(int connfd, Server &serv) {
 	try {
 		HttpRequest 	Req(connfd);
 		server_log("Parsing Request...", DEBUG);
-		std::string	request_header = Req.getHeaderRequest();
+		std::string	request_header = Req.getHeaderRequest(); // change that
 
 		server_log("All the chunks received", DEBUG);
 		if (request_header.empty()) {
@@ -133,7 +133,8 @@ int main(int ac, char **av)
 		std::vector<Server> servers;
 		std::vector<struct pollfd> pollfds;
 		std::map<int, Server*> serversMap;
-		std::map<int, struct sockaddr_in> clientMap;
+
+		std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > clientMap;
 
 	try {
 		init_server();
@@ -178,7 +179,7 @@ int main(int ac, char **av)
 								newPfd.events = POLLIN;
 								pollfds.push_back(newPfd); // add new fd to monitoring
 								server_log("New connexion on fd " + int_to_str(clientFd) , DEBUG);
-								send_response(clientFd, *it->second);
+								// send_response(clientFd, *it->second); pas ici
 							}	
 						}
 						else // socketfd aldready set c/p from HttpRequest
