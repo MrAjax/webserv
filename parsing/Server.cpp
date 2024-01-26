@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/25 16:13:00 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/26 09:13:11 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,10 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 	/*	if (j == PARAM) // no condition
 			throw error_throw("unknown directive \"" + config[i] + "\" - config file", false);*/
 	}
+	server_log("Server " + int_to_str(_i + 1) + " parsed", INFO);
 	openSocket();	
 	configServer();
+	server_log("Server " + int_to_str(_i + 1) + " set up and ready to listen", INFO);
 }
 
 Server::~Server(void) {}
@@ -83,11 +85,11 @@ void Server::openSocket(void) { // 1st check if open socket is necessary (config
 	}
 	_socketfd = socket(AF_INET, SOCK_STREAM, 0); 
 		if (_socketfd == -1) {
-			std::cerr << "socket error:";
-			throw std::runtime_error(strerror(errno));
-		}	
+			error_throw("Socket error - parsing/Server.cpp", true);
+		}
 	int yes = 1;	
-	setsockopt(_socketfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));	
+	if (setsockopt(_socketfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
+		error_throw("setsockopt error - parsing/Server.cpp", true);
 }	
 
 void Server::configServer(void) {
@@ -101,7 +103,7 @@ void Server::configServer(void) {
 
 	int ret = getaddrinfo(_ip.c_str(), _port.c_str(), &hints, &_res);
 	if (ret != 0) {
-		std::cerr << "getaddrinfo error: ";
+		server_log("getaddrinfo error - parsing/Server.cpp", ERROR);
 		throw std::runtime_error(gai_strerror(ret));
 	}
 	if (_socketIsSet == false) { // Port + ip not already binded and listen
@@ -110,14 +112,12 @@ void Server::configServer(void) {
 				break;
 			} 
 			if (current->ai_next == 0) {
-				std::cerr << "bind error: ";
-				throw std::runtime_error(strerror(errno));
+				error_throw("bind error - parsing/Server.cpp", true);
 			}	
 		}
 		ret = listen(_socketfd, MAX_CO);
 		if (ret != 0) {
-			std::cerr << "listen error: ";
-			throw std::runtime_error(strerror(errno));
+			error_throw("listen error - parsing/Server.cpp", true);
 		}
 	}	
 	freeaddrinfo(_res);
@@ -133,7 +133,7 @@ void Server::p_listen(std::string const& line) {
 
 	int int_port = atoi(_port.c_str());
 	if (int_port < 1024 || int_port > 65535)
-		throw std::runtime_error("Ports must be set between 1024 and 65535");
+		error_throw("Ports must be set between 1024 and 65535 - config file", false);
 
 	uint16_t port = static_cast<uint16_t>(int_port);
 	_server_addr.sin_port = htons(port); // converts port in network byte order 
@@ -202,13 +202,13 @@ void Server::p_errorPage(std::string const& line) {
 			std::string temp = line.substr(pos, length);
 			int number = atoi(temp.c_str());
 			if (number < 300 || number > 599)
-				throw std::runtime_error("Value \"" + temp + "\" must be between 300 and 500");
+				throw error_throw("Value \"" + temp + "\" must be between 300 and 500", false);
 			else
 				_error_pages.push_back(number);
 			pos += length;
 		}
 		else if (line[pos] == ';') 
-			throw std::runtime_error("No location error page");
+			throw error_throw("No error page location - config file", false);
 		else { 
 			size_t length = 0;	
 			while (pos + length < line.size() && line[pos + length] != ';')

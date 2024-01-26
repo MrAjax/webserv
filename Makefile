@@ -1,6 +1,6 @@
 CC = c++
 CXXFLAGS = -MMD -g3 -Wall -Wextra -Werror -std=c++98
-NAME = test
+NAME = webserv 
 
 LOG_FILE = server/server.log
 

@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 12:43:31 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/25 16:13:53 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/26 08:34:01 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,15 @@ void countBrackets(int & bracket, std::string const& line)
 {
 	if (line.find("{") != std::string::npos) 
 		bracket++;
-	if (line.find("}") != std::string::npos)
+	if (line.find("}") != std::string::npos) {
+		if (line[0] != '}')
+	 		throw error_throw("invalid parameter \"" + line + "\" - config file", false);
+		else if (line.find_first_not_of(" \t\n\r\f\v", 1) != std::string::npos) 
+			throw error_throw("unknown directive \"" + line + "\" - config file", false);
 		bracket--;
-//	std::cout << "bracket =" << bracket << std::endl;	
+	}	
 	if (bracket < 0)
-		throw std::runtime_error("Config file Miss closed bracket - config file");
+		throw error_throw("Miss closed bracket - config file", false);
 }
 
 void chekLastchar(std::string & line) {
@@ -43,7 +47,7 @@ void chekLastchar(std::string & line) {
 		return;
 	if (line[line.length() - 1] != ';')
 	 	throw error_throw("invalid parameter \"" + line + "\" - config file", false);
-	line.erase(line.length() - 1); //suppr ;
+	line.erase(line.length() - 1); //suppr ';'
 	trimWhiteSpaces(line);
 }
 
