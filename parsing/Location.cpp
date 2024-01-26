@@ -3,7 +3,9 @@
 Location::Location(std::vector<std::string> config) 
 {
 	(void) config;
-//	std::cout << "CLASS CREATION" << config[0] << std::endl;
+	for (size_t i = 0; i < config.size(); i++) {
+		std::cout << config[i] << std::endl;
+	}	
 }
 
 Location::~Location(void) {}
