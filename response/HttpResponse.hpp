@@ -2,7 +2,7 @@
 # define HTTPRESPONSE_HPP
 
 #include "../inc/webserv.hpp"
-#include "../HttpRequest.hpp"
+#include "../request/HttpRequest.hpp"
 #include "../method/Method.hpp"
 #include "../method/Get.hpp"
 #include "../method/Post.hpp"
