@@ -18,6 +18,7 @@ SRC = 	main.cpp \
 		parsing/allocateSTL.cpp \
 		parsing/readConfigFile.cpp \
 		parsing/Server.cpp \
+		parsing/Location.cpp \
 		signal/signal.cpp \
 
 

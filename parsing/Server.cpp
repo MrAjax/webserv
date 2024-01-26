@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/26 09:13:11 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/26 13:22:57 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,21 +50,42 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 
 	void (Server::*ptr[PARAM])(std::string const&) =
 		{ &Server::p_listen, &Server::p_host, &Server::p_server_name, &Server::p_bodySize,
-			&Server::p_root, &Server::p_errorPage };
+			&Server::p_root, &Server::p_errorPage, &Server::p_index };
 	std::string keyword[] = {"listen", "host", "server_name", "client_max_body_size", "root",
-		"error_page"};
+		"error_page", "index"};
+
+	std::vector<std::string> block;
+	std::string tempLocation;
+	bool recording = false;
 
 	for (size_t i = 0; i < config.size() ; i++) {
+	//	std::cout << "line recorded = [" << config[i] << "]" << std::endl;
 		int j = 0;
-		while (j < PARAM) {
-			if (config[i].compare(0, keyword[j].length(), keyword[j]) == 0) {
-				(this->*ptr[j])(config[i]);
-				break;
-			}
-			j++;	
+		
+		if (recording == true && config[i][0] == '}') {
+			Location* tempPtr = new Location(block);
+			_locations.insert(std::make_pair(tempLocation, tempPtr));
+			block.clear();
+			recording = false;
 		}	
-	/*	if (j == PARAM) // no condition
-			throw error_throw("unknown directive \"" + config[i] + "\" - config file", false);*/
+		else if (config[i].compare(0, 8, "location") == 0) {
+			tempLocation = settempLocation(config[i]);
+			//std::cout << "Temp loc =" << tempLocation << std::endl;
+			recording = true;
+		}	
+		else if (recording == true)
+			block.push_back(config[i]);
+		else {	
+			while (j < PARAM) {
+				if (config[i].compare(0, keyword[j].length(), keyword[j]) == 0) {
+					(this->*ptr[j])(config[i]);
+					break;
+				}
+				j++;	
+			}	
+		}	
+		if (j == PARAM && config[i][0] != '}') // no condition
+			throw error_throw("unknown directive \"" + config[i] + "\" - config file", false);
 	}
 	server_log("Server " + int_to_str(_i + 1) + " parsed", INFO);
 	openSocket();	
@@ -72,7 +93,13 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 	server_log("Server " + int_to_str(_i + 1) + " set up and ready to listen", INFO);
 }
 
-Server::~Server(void) {}
+Server::~Server(void) {
+	
+//	std::map<std::string, Location*>::iterator it;
+//	for (it = _locations.begin(); it != _locations.end(); ++it) {
+//		delete it->second;
+//	}	
+}
 
 void Server::openSocket(void) { // 1st check if open socket is necessary (config ip bind exist) 
 
@@ -223,8 +250,29 @@ void Server::p_errorPage(std::string const& line) {
 	}
 	std:: cout << "Location: " << _location_error_page << std::endl;
 }
+
+void Server::p_index(std::string const& line) {
+
+	size_t pos = std::string("index").length();
+	while (pos < line.length() && std::isspace(line[pos])) {
+		++pos;
+	}
+	_index = line.substr(pos, line.length() - pos);
+	std::cout << "index = " << _index << std::endl;
+}	
 	
-	
+std::string Server::settempLocation(std::string line) {
+
+	size_t start = std::string("location").length();
+	while (start < line.length() && std::isspace(line[start])) {
+			++start;
+	}
+	size_t end = line.find_first_of(" {\t\n\r\f\v", start);
+	if (end == std::string::npos) 
+		error_throw(line + " unopened bracket", false);
+	return (line.substr(start, end - start));	
+}
+
 std::string Server::getIp(void) const {
 	return _ip;
 }
@@ -259,4 +307,8 @@ std::vector<int> Server::getErrorPages(void) const {
 
 std::string Server::getLocationErrorPage(void) const {
 	return _location_error_page;
+}	
+
+std::string Server::getIndex(void) const {
+	return _index;
 }	
