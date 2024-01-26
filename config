@@ -1,12 +1,11 @@
-# Deuxième serveur
 server{
-	listen 18004;
+	listen 18000;
 	host 127.0.0.1;
     server_name Zzewebsite;
 	client_max_body_size 1024;            
 
     root /var/www/monsite2;
-    index index/index.html;
+    index /index/index.html;
 
 	error_page 404 502 503 /errorpages;
     location / {
@@ -18,3 +17,42 @@ server{
         expires 30d;
     }
 }	
+# Deuxième serveur
+server{
+	listen 18001;
+	host 127.0.0.1;
+    server_name Hellooo;
+	client_max_body_size 1024;            
+
+    root /var/www/monsite2;
+    index /index.html;
+
+	error_page 404 502 503 /errorpages;
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Configuration pour les fichiers statiques
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+        expires 30d;
+    }
+}	
+server{
+	listen 18002;
+	host 127.0.0.1;
+    server_name news.com;
+	client_max_body_size 1024;            
+
+    root /var/www/monsite2;
+    index index.html;
+
+	error_page 404 502 503 /errorpages;
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Configuration pour les fichiers statiques
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+        expires 30d;
+    }
+}

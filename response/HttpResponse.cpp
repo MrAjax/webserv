@@ -22,7 +22,8 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 
 	if (_path == "/") {
 		server_log(std::string(WHITEE) + "Get Request for / --> replace by index.html", DEBUG);
-		_path = _server_name + "/index/index.html";
+		_path = _server_name + serv.getIndex();
+		//_path = _server_name + "/index/index.html";
 	}
 	else
 		_path = _server_name + _path;
