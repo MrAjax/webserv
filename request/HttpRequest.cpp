@@ -105,7 +105,7 @@ void	HttpRequest::recvfd(int & fd)
 
 int    HttpRequest::processingRequest(void)
 {
-	// clock_gettime(CLOCK_REALTIME, &_lastUpdate); // a chaque passage de processing le timer se reset pour le moment
+	clock_gettime(CLOCK_REALTIME, &_lastUpdate); // a chaque passage de processing le timer se reset pour le moment
 	// On peut rajouter un timer global à la création de la classe pour définir une durée max pour chaque requette
 	try
 	{
