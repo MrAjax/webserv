@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 12:43:31 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/25 16:13:53 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/26 08:32:46 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,15 @@ void countBrackets(int & bracket, std::string const& line)
 {
 	if (line.find("{") != std::string::npos) 
 		bracket++;
-	if (line.find("}") != std::string::npos)
+	if (line.find("}") != std::string::npos) {
+		if (line[0] != '}')
+	 		throw error_throw("invalid parameter \"" + line + "\" - config file", false);
+		else if (line.find_first_not_of(" \t\n\r\f\v", 1) != std::string::npos) 
+			throw error_throw("unknown directive \"" + line + "\" - config file", false);
 		bracket--;
-//	std::cout << "bracket =" << bracket << std::endl;	
+	}	
 	if (bracket < 0)
-		throw std::runtime_error("Config file Miss closed bracket - config file");
+		throw error_throw("Miss closed bracket - config file", false);
 }
 
 void chekLastchar(std::string & line) {
@@ -92,7 +96,7 @@ void readConfigFile (std::vector<Server> & servers, char const* file)
 		}
 		else if (line.find_first_not_of(" \t\n\r\f\v") != std::string::npos) 
 			throw error_throw("unknown directive \"" + line + "\" - config file", false);
-	//	std::cout << "line recorded = [" << line << "]" << std::endl;
+		std::cout << "line recorded = [" << line << "]" << std::endl;
 		countBrackets(bracket, line);
 		if (line[0] == '}' && bracket == 0 && recording == true) {
 			servers.push_back(Server(block, servers, i));
