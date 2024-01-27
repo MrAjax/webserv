@@ -9,22 +9,10 @@
 #include <sstream>
 #include <poll.h>
 #include <sys/types.h>
-
 #include <sys/socket.h>
-
 #include <limits>
 
-
-
-# define RESET	"\e[0m"
-# define RED	"\e[31m"
-# define GREEN	"\e[32m"
-# define YELLOW	"\e[33m"
-# define BLUE	"\e[34m"
-# define PURPLE	"\e[35m"
-# define CYAN	"\e[36m"
-
-
+#define KILL_ME -1
 #define NEW 0
 #define PROCESSING_HEADER 1
 #define DONE_HEADER 2
@@ -45,7 +33,7 @@ class HttpRequest
 		//------------OPERATOR------------------//
 
 		int     processingRequest(void); //on recupere le header et le boby + parsing
-		void	recvfd(int & fd); //on read buffer[MAXLINE -1] du fd
+		int		recvfd(int & fd); //on read buffer[MAXLINE -1] du fd
 
 		//------------UTIL----------------------
 		int			checkTimeout(void);
@@ -73,10 +61,7 @@ class HttpRequest
 		std::string getHeaderRequest();
 
 		int         getConnfd();
-		std::string getInput();
-
 		std::string getSaveString();
-
 		std::string getStrContentLength();
 
 		int         STATUS;
@@ -105,7 +90,6 @@ class HttpRequest
 		void setHeaderRequest(const std::string &value);
 
 		void setConnfd(const int &value);
-		void setInput(const std::string &value);
 
 		void setSaveString(const std::string & value);
 
@@ -133,12 +117,8 @@ class HttpRequest
 		std::string _headerRequest;
 		
 		int         _connfd;
-		std::string _input;
-
 		std::string saveString;
-
 		std::string _strContentLength;
-
 		struct timespec _lastUpdate;
 
 };
