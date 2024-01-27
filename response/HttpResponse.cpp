@@ -1,17 +1,5 @@
 #include "HttpResponse.hpp"
 
-void	check_rights(std::string path, int method_code) {
-	(void)path;
-	(void)method_code;
-	// TODO
-
-	// Check for the rights of the request	
-	// Not the right rights ? --> Send Status code 403 + associated page
-	// Check if the user is logged (user or admin)
-	// If the request wants to access a welcome page for example and there is no authentication
-	// then, send Status code 401 - Unauthorized
-}
-
 HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMethod()), \
 										_method_code(_method.length()), \
 										_path(req.getPath()), \
@@ -28,7 +16,6 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 	else
 		_path = _server_name + _path;
 
-	check_rights(_path, _method_code);	
 	if (_method_code == POST || _method_code == DELETE)
 		_body_request = req.getBodyRequest();
 

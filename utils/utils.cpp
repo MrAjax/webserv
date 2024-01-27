@@ -85,13 +85,13 @@ std::string	build_header(int status_code, std::string content_type, size_t body_
 			+ "\r\n";
 			// TODO --> Set the right date: Sat, 09 Oct 2010 14:28:02 GMT
 
-	if (body_len > 0) {
+	// if (body_len > 0) {
 		header 	+= "Content-Type: " \
 				+ content_type \
 				+ "\r\n" \
 				+ "Content-Length: " \
 				+ int_to_str(body_len);
-	}
+	// }
 	header += "\r\n\r\n";
 	server_log("Header ready", DEBUG);
 	return (header);

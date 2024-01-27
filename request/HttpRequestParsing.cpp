@@ -26,7 +26,9 @@ void    HttpRequestParsing::parsingHeader(void)
 		_request.getSaveString() = "";
 	parseAllAttributes(_request.getHeaderRequest());
     if (!_request.getStrContentLength().empty())
+	{
         _request.setContentLength(convert(_request.getStrContentLength()));
+	}
     _request.STATUS = DONE_HEADER;
 }
 
@@ -34,7 +36,7 @@ void    HttpRequestParsing::parsingBody(void)
 {
 	if (_request.STATUS == DONE_ALL || _request.STATUS < DONE_HEADER)
 		return ;
-	if (!_request.getStrContentLength().empty()) //TODO attention plutot regarder la version size_t
+	if (_request.getContentLength() == 0)
 	{
 		_request.STATUS = DONE_ALL;
 		return ;
@@ -46,7 +48,10 @@ void    HttpRequestParsing::parsingBody(void)
 		_request.STATUS = DONE_ALL;
 	}
 	else
+	{
+		_request.setBodyRequest(_request.getSaveString());
 		_request.STATUS = PROCESSING_BODY;
+	}
 }
 
 //-----------Utils----------------

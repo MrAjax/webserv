@@ -76,6 +76,7 @@ static	void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 		}
 		server_log("Request is valid", DEBUG);
 		server_log(request_header + "\n\n", DIALOG);
+		server_log(Req.getBodyRequest() + "\n\n", DIALOG);
 		server_log("Building Response...", DEBUG);
 
 		HttpResponse	Rep(Req, serv);
@@ -189,7 +190,9 @@ int main(int ac, char **av)
 							//std::cout << "server name: " << it->second->getServerName() << "\n";
 							server_log("other request on clientFD", DEBUG);
 							int status = clientMap[pollfds[i].fd].second->processingRequest();
-							clientMap[pollfds[i].fd].second->printAttribute();
+							// clientMap[pollfds[i].fd].second->printAttribute();
+							// std::cout << RED << "BODY["<< clientMap[pollfds[i].fd].second->getBodyRequest() << "]" RESET;
+
 							if (status == DONE_ALL)
 							{
 								send_response(pollfds[i].fd, *it->second, *clientMap[pollfds[i].fd].second);
