@@ -3,6 +3,7 @@
 #include "inc/webserv.hpp"
 #include "signal/signal.hpp"
 #include "inc/parsing.hpp"
+#include "utils/MainLoop.hpp"
 
 volatile int	g_sig;
 
@@ -133,7 +134,6 @@ int main(int ac, char **av)
 		std::vector<Server> servers;
 		std::vector<struct pollfd> pollfds;
 		std::map<int, Server*> serversMap;
-
 		std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > clientMap;
 
 	try {
@@ -178,19 +178,7 @@ int main(int ac, char **av)
 								std::cerr << "Accept error: " << strerror(errno) << std::endl;
 							}
 							else {
-								
-								HttpRequest *clientRequest = new HttpRequest(clientFd);
-
-								serversMap[clientFd] = it->second; // ?
-								std::cout << it->second->getSocketfd() << std::endl;
-
-								clientMap[clientFd] = std::make_pair(clientAddr, clientRequest); //add client information to map Client
-								struct pollfd newPfd;
-								newPfd.fd = clientFd;
-								newPfd.events = POLLIN;
-								pollfds.push_back(newPfd); // add new fd to monitoring
-								server_log("New connexion on fd " + int_to_str(clientFd) , DEBUG);
-								// send_response(clientFd, *it->second); pas ici
+								addingNewClient(clientFd, clientAddr, serversMap, it, clientMap, pollfds);
 							}	
 						}
 						else // socketfd aldready set c/p from HttpRequest
@@ -200,51 +188,20 @@ int main(int ac, char **av)
 
 							//std::cout << "server name: " << it->second->getServerName() << "\n";
 							server_log("other request on clientFD", DEBUG);
-							clientMap[pollfds[i].fd].second->processingRequest();
+							int status = clientMap[pollfds[i].fd].second->processingRequest();
 							std::cout << RED "PATH REQUEST= " << clientMap[pollfds[i].fd].second->getPath() << RESET << std::endl;
 							std::cout << RED "PATH METHODE= " << clientMap[pollfds[i].fd].second->getMethod() << RESET << std::endl;
-							send_response(pollfds[i].fd, *it->second, *clientMap[pollfds[i].fd].second);
-							clientMap[pollfds[i].fd].second->resetRequest();
-							
-							// delete clientMap[pollfds[i].fd].second; //on delete les request qui ne servent plus du tout
-							// clientMap.erase(pollfds[i].fd);
-							// std::cout << RED << pollfds[i].fd << " SUPPRESSION DE CE FD\n" RESET;
-							// pollfds[i].fd = -1;
-							// close(pollfds[i].fd);
-
-					//	close(pollfds[i].fd);
-					/*	u_int8_t recvline[MAXLINE + 1];
-						memset(recvline, 0, MAXLINE);
-						int numbytes;
-						numbytes = recv(pollfds[i].fd, recvline, MAXLINE - 1, 0);
-						if (numbytes == 0) { //connection close
-							std::map<int, struct sockaddr_in>::iterator it;
-							it = clientMap.find(pollfds[i].fd);
-							close(pollfds[i].fd);
-							clientMap.erase(it); //delete fd client side
-							pollfds.erase(pollfds.begin() + i); //delete fd monitoring side
-						}*/
-						}
-					}
-
-				}
-				std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >::iterator it = clientMap.begin();
-				for (;it != clientMap.end(); it++)
-				{
-					if (it->second.second->checkTimeout())
-					{
-						delete it->second.second;
-						for (std::size_t i = 0; i < pollfds.size() ; i++)
-						{
-							if (pollfds[i].fd == it->first)
+							if (status == DONE_ALL)
 							{
-								close(pollfds[i].fd);
-								pollfds.erase(pollfds.begin() + i);
+								send_response(pollfds[i].fd, *it->second, *clientMap[pollfds[i].fd].second);
+								clientMap[pollfds[i].fd].second->resetRequest();
 							}
+							else if (status == KILL_ME)
+								killRequest(clientMap, pollfds, i);
 						}
-						clientMap.erase(it->first);
 					}
 				}
+				removeTimeout(clientMap, pollfds);
 			}
 		}
 

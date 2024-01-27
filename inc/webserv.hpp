@@ -51,5 +51,13 @@ enum {NOLOG, ERROR, DIALOG, INFO, DEBUG};
 #define ENDD "\033[0m"
 // Signal handling
 extern volatile int	g_sig;
+// COLOR
+#define RESET	"\e[0m"
+#define RED     "\e[31m"
+#define GREEN	"\e[32m"
+#define YELLOW	"\e[33m"
+#define BLUE	"\e[34m"
+#define PURPLE	"\e[35m"
+#define CYAN	"\e[36m"
 // End
 #endif

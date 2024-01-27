@@ -10,7 +10,7 @@ HttpRequestParsing::~HttpRequestParsing() {}
 
 void    HttpRequestParsing::parsingHeader(void)
 {
-	if (_request.STATUS >= DONE_HEADER)
+	if (_request.STATUS >= DONE_HEADER || _request.STATUS == -1)
 		return ;
 	std::string delimiteur = "\r\n\r\n";
 	std::size_t pos = _request.getSaveString().find(delimiteur);

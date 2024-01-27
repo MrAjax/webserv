@@ -11,17 +11,16 @@ HttpRequest::HttpRequest(void) : STATUS(NEW)
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 }
 
-HttpRequest::HttpRequest(int connfd) : STATUS(NEW), _contentLength(0), _bodyRequest(""), _headerRequest(""), _connfd(connfd), saveString("")
+HttpRequest::HttpRequest(int connfd) : STATUS(NEW), _method(""), _path(""), _http(""),
+_host(""), _userAgent(""), _accept(""), _acceptLanguage(""), _acceptEncoding(""),
+_connection(""), _upInsecureRqst(""), _referer(""), _secFetchDest(""), _secFetchMode(""),
+_secFetchSite(""), _contentLength(0), _contentType(""),
+_bodyRequest(""), _headerRequest(""),
+_connfd(connfd), saveString(""), _strContentLength("")
 {
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
 }
-
-// HttpRequest::HttpRequest(HttpRequest const &copy) : STATUS(copy.STATUS), _connfd(copy._connfd)
-// {
-// 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
-// }
-
 
 HttpRequest::~HttpRequest(void){std::cout << BLUE << _connfd << " Destructor call\n" << RESET;}
 
@@ -60,7 +59,7 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
 
 void		HttpRequest::resetRequest(void)
 {
-	STATUS = 0;
+	STATUS = NEW;
 	_method = "";
 	_path = "";
 	_http = "";
@@ -77,6 +76,7 @@ void		HttpRequest::resetRequest(void)
 	_secFetchSite = "";
 	_contentLength = 0;
 	_contentType = "";
+
 	_bodyRequest = "";
 	_headerRequest = "";
 	
@@ -87,20 +87,16 @@ void		HttpRequest::resetRequest(void)
 
 //-----------Core functions----------
 
-void	HttpRequest::recvfd(int & fd)
+int	HttpRequest::recvfd(int & fd)
 {
 	u_int8_t recvline[MAXLINE + 1];
 	memset(recvline, 0, MAXLINE);
 	int numbytes;
-	// numbytes = recv(fd, recvline, MAXLINE - 1, 0);
-	numbytes = read(fd, recvline, MAXLINE - 1);
+	numbytes = recv(fd, recvline, MAXLINE - 1, 0);
 	saveString += reinterpret_cast< char * >(recvline); 
-	if (numbytes == 0)
-		throw std::runtime_error("ERROR: Nb bytes = 0\n");
 	if (numbytes < 0)
 		throw std::runtime_error("ERROR: Cannot read request\n");
-	if (saveString.empty())
-		throw std::runtime_error("ERROR: Request is empty\n");
+	return (numbytes);
 }
 
 int    HttpRequest::processingRequest(void)
@@ -109,8 +105,9 @@ int    HttpRequest::processingRequest(void)
 	// On peut rajouter un timer global à la création de la classe pour définir une durée max pour chaque requette
 	try
 	{
-		recvfd(_connfd);
-		if (STATUS < DONE_HEADER)
+		if (recvfd(_connfd) == 0)
+			STATUS = -1;
+		if (STATUS < DONE_HEADER )
 		{
 			HttpRequestParsing header(*this);
 			header.parsingHeader();
@@ -158,10 +155,9 @@ std::string HttpRequest::getBodyRequest()		{return (this->_bodyRequest);}
 std::string HttpRequest::getHeaderRequest()		{return (this->_headerRequest);}
 
 int			HttpRequest::getConnfd()			{return _connfd;}
-std::string	HttpRequest::getInput()				{return _input;}
 std::string HttpRequest::getSaveString()		{return (this->saveString);}
 
-std::string HttpRequest::getStrContentLength()		{return (this->_strContentLength);}
+std::string HttpRequest::getStrContentLength()	{return (this->_strContentLength);}
 
 
 //-------------------STETTEUR-------------------
@@ -187,7 +183,6 @@ void	HttpRequest::setBodyRequest(const std::string &value)		{_bodyRequest = valu
 void	HttpRequest::setHeaderRequest(const std::string &value)		{_headerRequest = value;}
 
 void	HttpRequest::setConnfd(const int &value)					{_connfd = value;}
-void	HttpRequest::setInput(const std::string &value)				{_input = value;}
 void	HttpRequest::setSaveString(const std::string &value)		{saveString = value;}
 
 void	HttpRequest::setStrContentLength(const std::string &value)	{_strContentLength = value;}
