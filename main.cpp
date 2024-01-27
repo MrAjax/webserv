@@ -76,6 +76,7 @@ static	void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 		}
 		server_log("Request is valid", DEBUG);
 		server_log(request_header + "\n\n", DIALOG);
+		server_log(Req.getBodyRequest() + "\n\n", DIALOG);
 		server_log("Building Response...", DEBUG);
 
 		HttpResponse	Rep(Req, serv);

@@ -31,8 +31,12 @@ void	Post::execute_method(Server &serv) {
 	}
 	post_file << this->get_body_request();
 	post_file.close();
-	set_statuscode(200);
-	set_header(build_header(get_status_code(), \
-							"text/plain", \
-							get_body().length()));
+	set_statuscode(303);
+	set_header(" " \
+	+ int_to_str(get_status_code()) \
+	+ " " \
+	+ HttpStatusCode::get_error_msg(get_status_code()) \
+	+ "\r\n" \
+	+ "Location: " + this->get_path().substr(serv.getServerName().length(), this->get_path().length() - serv.getServerName().length()) \
+	+ "\r\n\r\n");
 }
