@@ -155,7 +155,7 @@ int main(int ac, char **av)
 			if (poll_count == -1) 
 				std::cerr << "poll error: " << strerror(errno) << std::endl;
 
-			std::cout << YELLOW "Number of pollfd= " RESET << size << std::endl;			
+			//std::cout << YELLOW "Number of pollfd= " RESET << size << std::endl;			
 
 			for(size_t i = 0; i < size; i++)
 			{

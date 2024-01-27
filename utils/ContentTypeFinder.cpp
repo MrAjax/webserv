@@ -45,27 +45,23 @@ std::string	ContentTypeFinder::get_content_type(std::string path) {
 		extension_pos = path.find('.', extension_pos + 1);
 
 	if (extension_pos >= path.size()) {
-		server_log("Content type not supported for file: " + path, INFO);
-		return "";
+		server_log(std::string(WHITEE) + path + " content type: " + type, DEBUG);
+		return "text/plain";
 	}
 	extension = path.substr(extension_pos, path.size());
 	server_log(std::string(WHITEE) + "File extension: " + extension, DEBUG);
 
-	for (std::map<std::string, std::string>::iterator it = type_map.begin(); it != type_map.end(); ++it) {
+/* 	for (std::map<std::string, std::string>::iterator it = type_map.begin(); it != type_map.end(); ++it) {
 		if (it->first == extension) {
 			server_log(std::string(WHITEE) + "Map key: " + it->first + ", Map value: " + it->second, DEBUG);
 			break;
 		}
-	}
-
+	} */
 	content_type = type_map.find(extension);
-	if (content_type != type_map.end()) {
+	if (content_type != type_map.end())
 		type = content_type->second;
-		server_log(std::string(WHITEE) + path + " content type: " + type, DEBUG);
-	}
-	else {
-		type = "";
-		server_log("Content type not supported for file: " + path, INFO);
-	}
+	else
+		type = "text/plain";
+	server_log(std::string(WHITEE) + path + " content type: " + type, DEBUG);
 	return type;
 }
