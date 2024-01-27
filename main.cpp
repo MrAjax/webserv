@@ -156,7 +156,7 @@ int main(int ac, char **av)
 			if (poll_count == -1) 
 				std::cerr << "poll error: " << strerror(errno) << std::endl;
 
-			//std::cout << YELLOW "Number of pollfd= " RESET << size << std::endl;			
+			std::cout << YELLOW "Number of pollfd= " RESET << size << std::endl;			
 
 			for(size_t i = 0; i < size; i++)
 			{
@@ -190,8 +190,9 @@ int main(int ac, char **av)
 							//std::cout << "server name: " << it->second->getServerName() << "\n";
 							server_log("other request on clientFD", DEBUG);
 							int status = clientMap[pollfds[i].fd].second->processingRequest();
-							std::cout << RED "PATH REQUEST= " << clientMap[pollfds[i].fd].second->getPath() << RESET << std::endl;
-							std::cout << RED "PATH METHODE= " << clientMap[pollfds[i].fd].second->getMethod() << RESET << std::endl;
+							clientMap[pollfds[i].fd].second->printAttribute();
+							// std::cout << RED "PATH REQUEST= " << clientMap[pollfds[i].fd].second->getPath() << RESET << std::endl;
+							// std::cout << RED "PATH METHODE= " << clientMap[pollfds[i].fd].second->getMethod() << RESET << std::endl;
 							if (status == DONE_ALL)
 							{
 								send_response(pollfds[i].fd, *it->second, *clientMap[pollfds[i].fd].second);
