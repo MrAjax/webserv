@@ -95,3 +95,9 @@ int HttpRequestError::maxSize(void)
         return (2);
     return (0);
 }
+
+int HttpRequestError::findServer(std::vector<Server> &servers)
+{
+    std::vector<Server>::iterator it = servers.begin();
+    for (; it != servers.end(); it++)
+}
