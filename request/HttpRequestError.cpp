@@ -95,3 +95,23 @@ int HttpRequestError::maxSize(void)
         return (2);
     return (0);
 }
+
+int HttpRequestError::socketfdServers(std::vector<Server> &servers)
+{
+    std::vector<Server>::iterator it = servers.begin();
+    for (; it != servers.end(); it++)
+        if (it->getSocketfd() == _request.getConnfd())
+            return (1);
+    return (0);
+}
+
+int HttpRequestError::findServer(std::vector<Server> &servers)
+{
+    std::vector<Server>::iterator it = servers.begin();
+    for (; it != servers.end(); it++)
+    {
+        std::cout << YELLOW << it->getIp() << RESET << std::endl;
+        std::cout << YELLOW << it->getPort() << RESET << std::endl;
+    }
+    return (0);
+}

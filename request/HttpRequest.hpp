@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <limits>
+#include "../parsing/Server.hpp"
 
 #define KILL_ME -1
 #define NEW 0
@@ -25,7 +26,7 @@ class HttpRequest
 
 		HttpRequest(void);
 		HttpRequest(int connfd);
-		HttpRequest(struct pollfd request); //TEST
+		HttpRequest(int connfd, std::vector<Server> &servers);
 
 		HttpRequest(int connfd, std::string contentType, std::string input);
 		HttpRequest(HttpRequest const &copy);
@@ -120,6 +121,8 @@ class HttpRequest
 		std::string saveString;
 		std::string _strContentLength;
 		struct timespec _lastUpdate;
+
+		std::vector<Server> &_servers;
 
 };
 

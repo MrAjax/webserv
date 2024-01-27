@@ -4,19 +4,14 @@
 
 //throw StatusSender::send_status(500, serv); quand le server et la requete n'est pas conforme il faut envoyer ca et pas un autre truc avec erreur 500 le server ne doit pas s arreter
 #define TIMEOUT_REQUEST 10 // en seconds
-#define MAXLINE 4960
 
-HttpRequest::HttpRequest(void) : STATUS(NEW)
-{
-	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
-}
-
-HttpRequest::HttpRequest(int connfd) : STATUS(NEW), _method(""), _path(""), _http(""),
+HttpRequest::HttpRequest(int connfd, std::vector<Server> &servers) : STATUS(NEW), _method(""), _path(""), _http(""),
 _host(""), _userAgent(""), _accept(""), _acceptLanguage(""), _acceptEncoding(""),
 _connection(""), _upInsecureRqst(""), _referer(""), _secFetchDest(""), _secFetchMode(""),
 _secFetchSite(""), _contentLength(0), _contentType(""),
 _bodyRequest(""), _headerRequest(""),
-_connfd(connfd), saveString(""), _strContentLength("")
+_connfd(connfd), saveString(""), _strContentLength(""),
+_servers(servers)
 {
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
@@ -116,6 +111,7 @@ int    HttpRequest::processingRequest(void)
 		{
 			HttpRequestError checkError(*this);
 			checkError.Method();
+			checkError.findServer(_servers);
 		}
 		if (STATUS != DONE_ALL && STATUS >= DONE_HEADER)
 		{
