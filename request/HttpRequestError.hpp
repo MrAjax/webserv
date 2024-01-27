@@ -46,7 +46,9 @@ class HttpRequestError
         int         Path();
         int         maxSize();
 
-        int         findServer(std::vector<Server> &_servers);
+        int         socketfdServers(std::vector<Server> &servers);
+
+        int         findServer(std::vector<Server> &servers);
 
         private:
             HttpRequest &_request;

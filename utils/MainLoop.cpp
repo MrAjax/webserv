@@ -29,17 +29,16 @@ void    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >
 	pollfds.erase(pollfds.begin() + i);
 }
 
-void    addingNewClient(int &clientFd, struct sockaddr_in &clientAddr, 
+void    addingNewClient(HttpRequest **clientRequest, struct sockaddr_in &clientAddr, 
     std::map<int, Server*> &serversMap, std::map<int, Server*>::iterator &it,
     std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
 {
-    HttpRequest *clientRequest = new HttpRequest(clientFd);
-	serversMap[clientFd] = it->second;
+	serversMap[(*clientRequest)->getConnfd()] = it->second;
 	std::cout << it->second->getSocketfd() << std::endl;
-	clientMap[clientFd] = std::make_pair(clientAddr, clientRequest); //add client information to map Client
+	clientMap[(*clientRequest)->getConnfd()] = std::make_pair(clientAddr, *clientRequest); //add client information to map Client
 	struct pollfd newPfd;
-	newPfd.fd = clientFd;
+	newPfd.fd = (*clientRequest)->getConnfd();
 	newPfd.events = POLLIN;
 	pollfds.push_back(newPfd); // add new fd to monitoring
-	server_log("New connexion on fd " + int_to_str(clientFd) , DEBUG);
+	server_log("New connexion on fd " + int_to_str((*clientRequest)->getConnfd()) , DEBUG);
 }

@@ -17,19 +17,6 @@ _servers(servers)
 	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
 }
 
-// HttpRequest::HttpRequest(int connfd) : STATUS(NEW), _method(""), _path(""), _http(""),
-// _host(""), _userAgent(""), _accept(""), _acceptLanguage(""), _acceptEncoding(""),
-// _connection(""), _upInsecureRqst(""), _referer(""), _secFetchDest(""), _secFetchMode(""),
-// _secFetchSite(""), _contentLength(0), _contentType(""),
-// _bodyRequest(""), _headerRequest(""),
-// _connfd(connfd), saveString(""), _strContentLength("")
-// {
-// 	std::vector<Server> vec;
-// 	_servers = vec;
-// 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
-// 	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
-// }
-
 HttpRequest::~HttpRequest(void){std::cout << BLUE << _connfd << " Destructor call\n" << RESET;}
 
 //-----------UTILS------------------
@@ -124,6 +111,7 @@ int    HttpRequest::processingRequest(void)
 		{
 			HttpRequestError checkError(*this);
 			checkError.Method();
+			checkError.findServer(_servers);
 		}
 		if (STATUS != DONE_ALL && STATUS >= DONE_HEADER)
 		{
