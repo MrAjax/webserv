@@ -12,6 +12,9 @@ server {
     location / {
         try_files $uri $uri/ =404;
 		allow_methods GET POST;
+		return www.example2.com;
+		autoindex on;
+		index index.lol;
     }
 
 	location cgi-bin {
