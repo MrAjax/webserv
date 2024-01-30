@@ -5,7 +5,9 @@ NAME = webserv
 LOG_FILE = server/server.log
 
 SRC = 	main.cpp \
-		HttpRequest.cpp \
+		request/HttpRequest.cpp \
+		request/HttpRequestError.cpp \
+		request/HttpRequestParsing.cpp \
 		method/Delete.cpp \
 		method/Get.cpp \
 		method/Method.cpp \
@@ -14,6 +16,7 @@ SRC = 	main.cpp \
 		response/StatusSender.cpp \
 		utils/ContentTypeFinder.cpp \
 		utils/HttpStatusCode.cpp \
+		utils/MainLoop.cpp \
 		utils/utils.cpp \
 		parsing/allocateSTL.cpp \
 		parsing/readConfigFile.cpp \
