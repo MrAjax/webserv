@@ -29,7 +29,7 @@ void	Post::execute_method(Server &serv) {
 		server_log("Cannot open post file - Post.cpp", ERROR);
 		throw StatusSender::send_status(500, serv);
 	}
-	post_file << this->get_body_request();
+	post_file << this->get_body_request() << "\n";
 	post_file.close();
 	set_statuscode(303);
 	set_header(" " \
@@ -37,6 +37,7 @@ void	Post::execute_method(Server &serv) {
 	+ " " \
 	+ HttpStatusCode::get_error_msg(get_status_code()) \
 	+ "\r\n" \
-	+ "Location: " + this->get_path().substr(serv.getServerName().length(), this->get_path().length() - serv.getServerName().length()) \
+	+ "Location: " + this->get_path().substr(serv.getRoot().length(), this->get_path().length() - serv.getRoot().length()) \
+	+ "\r\nContent-Length: 0" \
 	+ "\r\n\r\n");
 }
