@@ -111,7 +111,9 @@ int    HttpRequest::processingRequest(void)
 		{
 			HttpRequestError checkError(*this);
 			checkError.Method();
-			checkError.findServer(_servers);
+			Server *find = checkError.findServer(_servers);
+			if (find == NULL)
+				std::cout << RED "SERVER NOT FIND" RESET << std::endl;
 		}
 		if (STATUS != DONE_ALL && STATUS >= DONE_HEADER)
 		{

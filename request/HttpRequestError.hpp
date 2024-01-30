@@ -48,7 +48,11 @@ class HttpRequestError
 
         int         socketfdServers(std::vector<Server> &servers);
 
-        int         findServer(std::vector<Server> &servers);
+        Server      *findServer(std::vector<Server> &servers);
+
+        int         checkPortIP(Server &servers);
+
+        int        modifiePath(Server &server);
 
         private:
             HttpRequest &_request;

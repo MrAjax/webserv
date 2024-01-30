@@ -4,7 +4,7 @@ server{
     server_name Zzewebsite;
 	client_max_body_size 1024;            
 
-    root /var/www/monsite2;
+    root /Zzewebsite;
     index /index/index.html;
 
 	error_page 404 502 503 /errorpages;

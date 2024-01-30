@@ -96,6 +96,8 @@ int HttpRequestError::maxSize(void)
     return (0);
 }
 
+
+
 int HttpRequestError::socketfdServers(std::vector<Server> &servers)
 {
     std::vector<Server>::iterator it = servers.begin();
@@ -105,13 +107,61 @@ int HttpRequestError::socketfdServers(std::vector<Server> &servers)
     return (0);
 }
 
-int HttpRequestError::findServer(std::vector<Server> &servers)
+int HttpRequestError::checkPortIP(Server &server)
 {
-    std::vector<Server>::iterator it = servers.begin();
-    for (; it != servers.end(); it++)
-    {
-        std::cout << YELLOW << it->getIp() << RESET << std::endl;
-        std::cout << YELLOW << it->getPort() << RESET << std::endl;
-    }
+    std::size_t pos = _request.getHost().find(":");
+    if (pos == std::string::npos)
+        return (0);
+    std::string ip = _request.getHost().substr(0, pos);
+    std::string port = _request.getHost().substr(1 + pos);
+    std::string convertIP = server.getIp();
+    if (convertIP == "127.0.0.1")
+        convertIP = "localhost";
+    if (ip == convertIP && port == server.getPort())
+        return (1);
     return (0);
+}
+
+Server  *HttpRequestError::findServer(std::vector<Server> &servers)
+{
+    Server  *findServer = NULL;
+
+    std::vector<Server>::reverse_iterator it = servers.rbegin();
+    for (; it != servers.rend(); it++)
+    {
+        if (checkPortIP(*it))
+        {
+            findServer = &(*it);
+        }
+    }
+    return (findServer);
+}
+
+int HttpRequestError::modifiePath(Server &server)
+{
+    std::string path;
+    std::string index;
+    std::stringstream ss;
+    ss << server.getIndex();
+    if (_request.getPath() == "/")
+    {
+        while (ss >> index)
+        {
+            path = server.getRoot() + index;
+            if (access(path.c_str(), F_OK) >= 0)
+            {
+                _request.setPath(path);
+                return (1);
+            }
+        }
+        return (0);
+    }
+    else
+    {
+        path = server.getRoot() + _request.getPath();
+        if (access(path.c_str(), F_OK) >= 0)
+            return (1);
+        return (0);
+    }
+
 }
