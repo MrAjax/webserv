@@ -39,8 +39,8 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
 		const char* key;                  // La clé
     	std::string (HttpRequest::*getter)();  // Pointeur vers le getter
 	};
-	std::size_t	nbParam = 16;
-	struct _tab tab[nbParam] = {{"Method:", &HttpRequest::getMethod}, {"Path:", &HttpRequest::getPath},
+//	std::size_t	nbParam = 16;
+	struct _tab tab[NBPARAM] = {{"Method:", &HttpRequest::getMethod}, {"Path:", &HttpRequest::getPath},
 		{"Protocol:", &HttpRequest::getHttp},{"Host:", &HttpRequest::getHost}, {"User-Agent:", &HttpRequest::getUserAgent},
 		{"Accept:", &HttpRequest::getAccept}, {"Accept-Language:", &HttpRequest::getAcceptLanguage},
 		{"Accept-Encoding:", &HttpRequest::getAcceptEncoding}, {"Connection:", &HttpRequest::getConnection},
@@ -48,7 +48,7 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
 		{"Sec-Fetch-Dest:", &HttpRequest::getSecFetchDest}, {"Sec-Fetch-Mode:", &HttpRequest::getSecFetchMode},
 		{"Sec-Fetch-Site:", &HttpRequest::getSecFetchSite}, {"Content-Length:", &HttpRequest::getStrContentLength},
 		{"Content-Type:", &HttpRequest::getContentType}};
-	for (std::size_t i = 0; i < nbParam; i++)
+	for (std::size_t i = 0; i < NBPARAM; i++)
 		std::cout << YELLOW << tab[i].key << RESET << (this->*(tab[i].getter))() << std::endl;
 }
 

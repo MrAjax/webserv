@@ -20,6 +20,8 @@
 #define PROCESSING_BODY 3
 #define DONE_ALL 4
 
+#define NBPARAM 16
+
 class HttpRequest
 {
 	public:
