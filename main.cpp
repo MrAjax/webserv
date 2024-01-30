@@ -191,7 +191,7 @@ int main(int ac, char **av)
 							//std::cout << "server name: " << it->second->getServerName() << "\n";
 							server_log("other request on clientFD", DEBUG);
 							int status = clientMap[pollfds[i].fd].second->processingRequest();
-							clientMap[pollfds[i].fd].second->printAttribute();
+							// clientMap[pollfds[i].fd].second->printAttribute();
 							if (status == DONE_ALL)
 							{
 								send_response(pollfds[i].fd, *it->second, *clientMap[pollfds[i].fd].second);
