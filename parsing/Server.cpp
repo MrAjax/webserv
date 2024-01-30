@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/26 15:59:06 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/30 11:15:35 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,10 @@
 #include "Location.hpp"
 
 Server::Server(std::vector<std::string> config, std::vector<Server> const& servers, int i)
-	: _i(i), _socketfd(-1), _max_body_size(1024), _error_pages(1, 404), _servers(servers), _ip(""), _port(""), _server_name(""), _root(""), _location_error_page("/default"), _socketIsSet(false) {
+	: _i(i), _socketfd(-1), _max_body_size(1024), _ipv_type(0), _error_pages(1, 404), _servers(servers), _ip(""), _port(""), _server_name(""), _root(""), _location_error_page("/default"), _socketIsSet(false) {
 
-	memset(&_server_addr, 0, sizeof(_server_addr));
+	memset(&_server_addr_ipv4, 0, sizeof(_server_addr_ipv4));
+	memset(&_server_addr_ipv6, 0, sizeof(_server_addr_ipv6));
 	memset(&_res, 0, sizeof(_res));
 
 	void (Server::*ptr[PARAM])(std::string const&) =
@@ -111,13 +112,16 @@ void Server::openSocket(void) { // 1st check if open socket is necessary (config
 			return;
 		}
 	}
-	_socketfd = socket(AF_INET, SOCK_STREAM, 0); 
+	_socketfd = socket(AF_INET6, SOCK_STREAM, 0); 
 		if (_socketfd == -1) {
 			error_throw("Socket error - parsing/Server.cpp", true);
 		}
 	int yes = 1;	
 	if (setsockopt(_socketfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
-		error_throw("setsockopt error - parsing/Server.cpp", true);
+		error_throw("setsockopt error during SO_REUSEADDR config - parsing/Server.cpp", true);
+	yes = 0; //to accept ipv4 connexion on ipv6 socket	
+	if (setsockopt(_socketfd, IPPROTO_IPV6, IPV6_V6ONLY, &yes, sizeof(int)) == -1) 
+		error_throw("setsockopt error during IPV6_V6ONLY config - parsing/Server.cpp", true);
 }	
 
 void Server::configServer(void) {
@@ -126,7 +130,7 @@ void Server::configServer(void) {
 	struct addrinfo* current;
 
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = _server_addr.sin_family; // = AF_INET = IPV4 for now AF_UNSPEC then?
+	hints.ai_family = AF_UNSPEC; // can be IPV4 or IPV6
 	hints.ai_socktype = SOCK_STREAM;
 
 	int ret = getaddrinfo(_ip.c_str(), _port.c_str(), &hints, &_res);
@@ -151,6 +155,7 @@ void Server::configServer(void) {
 	freeaddrinfo(_res);
 }	
 
+/* since listen is the first param, you have to config IPV4 and IPV6*/
 void Server::p_listen(std::string const& line) {
 
 	size_t pos = std::string("listen").length();
@@ -164,11 +169,13 @@ void Server::p_listen(std::string const& line) {
 		error_throw("Ports must be set between 1024 and 65535 - config file", false);
 
 	uint16_t port = static_cast<uint16_t>(int_port);
-	_server_addr.sin_port = htons(port); // converts port in network byte order 
-	_server_addr.sin_family = AF_INET; // for IPV4
+	_server_addr_ipv4.sin_port = htons(port); // converts port in network byte order 
+	_server_addr_ipv6.sin6_port = htons(port); // converts port in network byte order 
+	_server_addr_ipv4.sin_family = AF_INET; // for IPV4
+	_server_addr_ipv6.sin6_family = AF_INET6; // for IPV6
 
 	std::cout << "port = " << _port << std::endl;
-}	
+}
 
 void Server::p_host(std::string const& line) {
 	
@@ -177,7 +184,8 @@ void Server::p_host(std::string const& line) {
 		++pos;
 	}
 	_ip = line.substr(pos, line.length() - pos);
-	_server_addr.sin_addr.s_addr = htonl(INADDR_ANY); //i should specify address?
+	_server_addr_ipv4.sin_addr.s_addr = htonl(INADDR_ANY); // accept any address
+	_server_addr_ipv6.sin6_addr = in6addr_any;
 	if (_ip == "localhost")
 		_ip = "127.0.0.1";
 
@@ -287,7 +295,7 @@ int Server::getSocketfd(void) const {
 }	
 
 sockaddr_in Server::getclientAddr(void) const {
-	return _server_addr;
+	return _server_addr_ipv4;;
 }	
 
 std::string Server::getServerName(void) const {
