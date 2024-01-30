@@ -12,7 +12,8 @@ class HttpResponse {
 	std::string		_method;
 	int				_method_code;
 	std::string		_path;
-	std::string		_server_name;
+	std::string		_server_path;
+	std::string		_index_list;
 /*		For post and delete methods		*/
 	std::string		_body_request;
 /*		Not set in the consructor		*/
@@ -22,7 +23,9 @@ class HttpResponse {
 	std::string		_header;
 	std::string		_body;
 	std::string		_response;
-	Method	*_execute_method(int method_code, Server &serv);
+	
+	std::string	_find_index_path(Server &serv);
+	Method		*_execute_method(int method_code, Server &serv);
 public:
 	HttpResponse(HttpRequest &req, Server &serv);
 
