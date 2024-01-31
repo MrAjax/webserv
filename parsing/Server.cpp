@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/30 11:15:35 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/31 15:47:49 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 					break;
 				}
 				j++;	
-			}	
+			}
 		}	
 		if (j == PARAM && config[i][0] != '}') // no condition
 			throw error_throw("unknown directive \"" + config[i] + "\" - config file", false);
