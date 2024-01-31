@@ -11,13 +11,13 @@ _connection(""), _upInsecureRqst(""), _referer(""), _secFetchDest(""), _secFetch
 _secFetchSite(""), _contentLength(0), _contentType(""),
 _bodyRequest(""), _headerRequest(""),
 _connfd(connfd), saveString(""), _strContentLength(""),
-_servers(servers)
+_servers(servers), _myServer(NULL)
 {
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
 }
 
-HttpRequest::~HttpRequest(void){std::cout << BLUE << _connfd << " Destructor call\n" << RESET;}
+HttpRequest::~HttpRequest(void)	{std::cout << BLUE << _connfd << " Destructor call\n" << RESET;}
 
 //-----------UTILS------------------
 
@@ -28,6 +28,7 @@ int			HttpRequest::checkTimeout(void) // permet de check si on doit kill la requ
 	int timeSec = end.tv_sec - _lastUpdate.tv_sec;
 	if (timeSec > TIMEOUT_REQUEST)
 		return (1);
+
 	else
 		return (0);
 }
@@ -77,6 +78,8 @@ void		HttpRequest::resetRequest(void)
 	
 	saveString = "";
 	_strContentLength = "";
+
+	_myServer = NULL;
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 }
 
@@ -96,13 +99,13 @@ int	HttpRequest::recvfd(int & fd)
 
 int    HttpRequest::processingRequest(void)
 {
-	clock_gettime(CLOCK_REALTIME, &_lastUpdate); // a chaque passage de processing le timer se reset pour le moment
-	// On peut rajouter un timer global à la création de la classe pour définir une durée max pour chaque requette
+	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
+
 	try
 	{
 		if (recvfd(_connfd) == 0)
 			STATUS = -1;
-		if (STATUS < DONE_HEADER )
+		if (STATUS < DONE_HEADER && STATUS != -1)
 		{
 			HttpRequestParsing header(*this);
 			header.parsingHeader();
@@ -111,9 +114,13 @@ int    HttpRequest::processingRequest(void)
 		{
 			HttpRequestError checkError(*this);
 			checkError.Method();
-			Server *find = checkError.findServer(_servers);
-			if (find == NULL)
+			_myServer = checkError.findMyServer(_servers);
+			if (_myServer == NULL)
 				std::cout << RED "SERVER NOT FIND" RESET << std::endl;
+			std::string test = checkError.getFinalPath(*_myServer, _path);
+			std::cout << RED << test << RESET << std::endl;
+
+			
 		}
 		if (STATUS != DONE_ALL && STATUS >= DONE_HEADER)
 		{

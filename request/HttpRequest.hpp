@@ -125,6 +125,7 @@ class HttpRequest
 		struct timespec _lastUpdate;
 
 		std::vector<Server> &_servers;
+		Server				*_myServer;
 
 };
 
