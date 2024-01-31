@@ -41,10 +41,10 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 	if (_status_code != 202)
 		throw StatusSender::send_status(_status_code, serv);
 
-	if (_path == "/")
-		_path = _find_index_path(serv);
-	else
-		_path = _server_path + _path;
+	// if (_path == "/")
+	// 	_path = _find_index_path(serv);
+	// else
+	// 	_path = _server_path + _path;
 
 	if (_method_code == POST || _method_code == DELETE)
 		_body_request = req.getBodyRequest();

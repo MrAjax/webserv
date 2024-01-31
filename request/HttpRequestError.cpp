@@ -174,6 +174,17 @@ void	preparing(std::string &index)
 		index = "/" + index;
 }
 
+void	preparingRoot(std::string &index)
+{
+	if (index.size() == 0)
+		return ;
+	if (index.size() > 1 && index.rfind("./", 0) != std::string::npos)
+		index = index.substr(2);
+	else if (index[0] == '/')
+		index = index.substr(1);
+		
+}
+
 std::string HttpRequestError::getFinalPath(Server &server, std::string str)
 {
 	std::string finalPath;
@@ -197,6 +208,9 @@ std::string HttpRequestError::getFinalPath(Server &server, std::string str)
 		if (isGoodPath(finalPath))
 			return (finalPath);
 	}
+	int status = access(finalPath.c_str(), R_OK);
+	std::cout << errno << " errno and status " << status << "\n";
+	server_log(std::string(GREENN) + "finalpath : " + finalPath, DEBUG);
 	return ("");
 }
 

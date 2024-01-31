@@ -117,8 +117,8 @@ int    HttpRequest::processingRequest(void)
 			_myServer = checkError.findMyServer(_servers);
 			if (_myServer == NULL)
 				std::cout << RED "SERVER NOT FIND" RESET << std::endl;
-			std::string test = checkError.getFinalPath(*_myServer, _path);
-			std::cout << RED << test << RESET << std::endl;
+			_path = checkError.getFinalPath(*_myServer, _path);
+			server_log(std::string(GREENN) + "New path : " + _path , DEBUG);
 
 			
 		}
