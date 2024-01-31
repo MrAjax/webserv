@@ -96,8 +96,6 @@ int HttpRequestError::maxSize(void)
     return (0);
 }
 
-
-
 int HttpRequestError::socketfdServers(std::vector<Server> &servers)
 {
     std::vector<Server>::iterator it = servers.begin();
