@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 12:43:31 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/01 14:31:08 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/01 16:02:04 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,6 @@ void readConfigFile (std::vector<Server> & servers, char const* file)
 		countBrackets(bracket, line);
 		if (line[0] == '}' && bracket == 0 && recording == true) {
 			servers.push_back(Server(block, servers, i));
-			std::cout << "LAA" << std::endl;
 			block.clear();
 			recording = false;
 			i++;

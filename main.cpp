@@ -158,6 +158,10 @@ int main(int ac, char **av)
 
 			std::cout << YELLOW "Number of pollfd= " RESET << sizePollfds << std::endl;			
 
+			Location* temp = servers[1].getLocation("cgi_path");
+			std::vector<std::string> tempstring = temp->getCgi_path();
+			std::cout << "cgi-ext" << tempstring[0] << std::endl;
+
 			for(size_t i = 0; i < sizePollfds; i++)
 			{
 				if (pollfds[i].revents & POLLIN) //EVENT!
