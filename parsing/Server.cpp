@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/31 15:47:49 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/01 11:57:17 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,6 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 			throw error_throw("unknown directive \"" + config[i] + "\" - config file", false);
 	}
 	server_log("Server " + int_to_str(_i + 1) + " parsed", INFO);
-	openSocket();	
 	configServer();
 	server_log("Server " + int_to_str(_i + 1) + " set up and ready to listen", INFO);
 }
@@ -112,16 +111,18 @@ void Server::openSocket(void) { // 1st check if open socket is necessary (config
 			return;
 		}
 	}
-	_socketfd = socket(AF_INET6, SOCK_STREAM, 0); 
+	//_socketfd = socket(AF_INET, SOCK_STREAM, 0); 
+//	std::cout << "ai_family=" << _res->ai_family << " ai_socktype= " << _res->ai_socktype << " ai_prococotol= " <<  _res->ai_protocol << std::endl; 
+	_socketfd = socket(_res->ai_family, _res->ai_socktype, _res->ai_protocol); 
 		if (_socketfd == -1) {
-			error_throw("Socket error - parsing/Server.cpp", true);
+			throw error_throw("Socket error - parsing/Server.cpp", true);
 		}
 	int yes = 1;	
 	if (setsockopt(_socketfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
-		error_throw("setsockopt error during SO_REUSEADDR config - parsing/Server.cpp", true);
-	yes = 0; //to accept ipv4 connexion on ipv6 socket	
-	if (setsockopt(_socketfd, IPPROTO_IPV6, IPV6_V6ONLY, &yes, sizeof(int)) == -1) 
-		error_throw("setsockopt error during IPV6_V6ONLY config - parsing/Server.cpp", true);
+		throw error_throw("setsockopt error during SO_REUSEADDR config - parsing/Server.cpp", true);
+//	yes = 0; //to accept ipv4 connexion on ipv6 socket	
+//	if (setsockopt(_socketfd, IPPROTO_IPV6, IPV6_V6ONLY, &yes, sizeof(int)) == -1) 
+//		throw error_throw("setsockopt error during IPV6_V6ONLY config - parsing/Server.cpp", true);
 }	
 
 void Server::configServer(void) {
@@ -138,18 +139,20 @@ void Server::configServer(void) {
 		server_log("getaddrinfo error - parsing/Server.cpp", ERROR);
 		throw std::runtime_error(gai_strerror(ret));
 	}
+	openSocket();
 	if (_socketIsSet == false) { // Port + ip not already binded and listen
 		for (current = _res; current != 0; current = current->ai_next) {
+//	std::cout << "ai_addr=" << current->ai_addr << " ai_socktype= " << current->ai_socktype << " ai_prococotol= " <<  current->ai_protocol << std::endl; 
 			if (bind(_socketfd, current->ai_addr, current->ai_addrlen) == 0) {
 				break;
 			} 
 			if (current->ai_next == 0) {
-				error_throw("bind error - parsing/Server.cpp", true);
+				throw error_throw("bind error - parsing/Server.cpp", true);
 			}	
 		}
 		ret = listen(_socketfd, MAX_CO);
 		if (ret != 0) {
-			error_throw("listen error - parsing/Server.cpp", true);
+			throw error_throw("listen error - parsing/Server.cpp", true);
 		}
 	}	
 	freeaddrinfo(_res);
@@ -166,7 +169,7 @@ void Server::p_listen(std::string const& line) {
 
 	int int_port = atoi(_port.c_str());
 	if (int_port < 1024 || int_port > 65535)
-		error_throw("Ports must be set between 1024 and 65535 - config file", false);
+		throw error_throw("Ports must be set between 1024 and 65535 - config file", false);
 
 	uint16_t port = static_cast<uint16_t>(int_port);
 	_server_addr_ipv4.sin_port = htons(port); // converts port in network byte order 
@@ -278,7 +281,7 @@ std::string Server::settempLocation(std::string line) {
 	}
 	size_t end = line.find_first_of(" {\t\n\r\f\v", start);
 	if (end == std::string::npos) 
-		error_throw(line + " unopened bracket", false);
+		throw error_throw(line + " unopened bracket", false);
 	return (line.substr(start, end - start));	
 }
 
