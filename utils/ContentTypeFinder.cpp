@@ -49,7 +49,6 @@ std::string	ContentTypeFinder::get_content_type(std::string path) {
 		return "text/plain";
 	}
 	extension = path.substr(extension_pos, path.size());
-	server_log(std::string(WHITEE) + "File extension: " + extension, DEBUG);
 
 /* 	for (std::map<std::string, std::string>::iterator it = type_map.begin(); it != type_map.end(); ++it) {
 		if (it->first == extension) {

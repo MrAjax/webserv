@@ -63,3 +63,4 @@
 .mpeg	video/mpeg
 .ogv	video/ogg
 .webm	video/webm
+.cgi	cgi
