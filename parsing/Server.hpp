@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/30 07:50:11 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/01 13:17:03 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ public:
 	std::string getRoot( void ) const;
 	std::string getLocationErrorPage( void ) const;
 	std::string getIndex( void )const;
-	struct sockaddr_in getclientAddr( void ) const;
+//	struct sockaddr_in getclientAddr( void ) const;
 	int	getMaxBodySize( void ) const;
 	int	getSocketfd( void ) const;
 	std::vector<int> getErrorPages( void ) const;

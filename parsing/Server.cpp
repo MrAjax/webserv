@@ -6,37 +6,9 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/01 11:57:17 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/01 13:29:33 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-/*
-       The addrinfo structure used by getaddrinfo() contains the following fields:
-
-           struct addrinfo {
-               int              ai_flags;
-               int              ai_family;
-               int              ai_socktype;
-               int              ai_protocol;
-               socklen_t        ai_addrlen;
-               struct sockaddr *ai_addr;
-               char            *ai_canonname;
-               struct addrinfo *ai_next;
-           };
- 			struct sockaddr {
-          		 sa_family_t     sa_family;      Address family 
-           		char            sa_data[];       Socket address 
-    	  	 };
- 			struct sockaddr_in {
-        	   sa_family_t     sin_family;      AF_INET 
-          		 in_port_t       sin_port;        Port number 
-          		struct in_addr  sin_addr;        IPv4 address 
-       		};
-	   		 struct in_addr {
-           		in_addr_t s_addr;
-       		};
-	1st config sockaddr_in then cast in sockaddr
-*/
 
 #include "Server.hpp"
 #include "../inc/parsing.hpp"
@@ -62,7 +34,6 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 	bool recording = false;
 
 	for (size_t i = 0; i < config.size() ; i++) {
-	//	std::cout << "line recorded = [" << config[i] << "]" << std::endl;
 		int j = 0;
 		
 		if (recording == true && config[i][0] == '}') {
@@ -102,7 +73,7 @@ Server::~Server(void) {
 //	}	
 }
 
-void Server::openSocket(void) { // 1st check if open socket is necessary (config ip bind exist) 
+void Server::openSocket(void) { 
 
 	for (size_t i = 0; i < _servers.size(); i++) {
 		if (_servers[i].getIp() == _ip && _servers[i].getPort() == _port) {
@@ -142,7 +113,7 @@ void Server::configServer(void) {
 	openSocket();
 	if (_socketIsSet == false) { // Port + ip not already binded and listen
 		for (current = _res; current != 0; current = current->ai_next) {
-//	std::cout << "ai_addr=" << current->ai_addr << " ai_socktype= " << current->ai_socktype << " ai_prococotol= " <<  current->ai_protocol << std::endl; 
+//	std::cout << "ai_family=" << current->ai_family << " ai_socktype= " << current->ai_socktype << " ai_prococotol= " <<  current->ai_protocol << " addr= " << current->ai_addr << std::endl; 
 			if (bind(_socketfd, current->ai_addr, current->ai_addrlen) == 0) {
 				break;
 			} 
@@ -172,6 +143,8 @@ void Server::p_listen(std::string const& line) {
 		throw error_throw("Ports must be set between 1024 and 65535 - config file", false);
 
 	uint16_t port = static_cast<uint16_t>(int_port);
+
+	/*maybe useless*/
 	_server_addr_ipv4.sin_port = htons(port); // converts port in network byte order 
 	_server_addr_ipv6.sin6_port = htons(port); // converts port in network byte order 
 	_server_addr_ipv4.sin_family = AF_INET; // for IPV4
@@ -296,11 +269,11 @@ std::string Server::getPort(void) const {
 int Server::getSocketfd(void) const {
 	return _socketfd;
 }	
-
+/*
 sockaddr_in Server::getclientAddr(void) const {
 	return _server_addr_ipv4;;
 }	
-
+*/
 std::string Server::getServerName(void) const {
 	return _server_name;
 }	
