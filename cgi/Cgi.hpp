@@ -4,9 +4,11 @@
 #include "../inc/webserv.hpp"
 
 class Cgi {
-public:
 	Cgi();
 	~Cgi();
+	std::ifstream	_cgi_file;
+public:
+	static	int	exec_cgi(std::string path);
 };
 
 #endif

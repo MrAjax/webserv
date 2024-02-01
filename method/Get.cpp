@@ -18,11 +18,15 @@ void	Get::execute_method(Server &serv) {
 	std::ifstream		file_requested(file_name.c_str());
 	std::stringstream	file_content;
 
-	if (!file_requested.is_open()) {
+	if (is_cgi(file_name)) {
+		server_log("Found CGI", DEBUG);
+		file_name.resize(file_name.size() - EXT_SIZE);
+		set_statuscode(Cgi::exec_cgi(file_name));
+	}
+	else if (!file_requested.is_open()) {
 		server_log("Cannot open " + file_name, ERROR);
 		throw	StatusSender::send_status(404, serv);
 	}
-	else if (is_cgi(file_name)) {server_log("Found CGI", DEBUG);}
 	else {
 		server_log("Server successfully found " + file_name, DEBUG);
 		file_content << file_requested.rdbuf();

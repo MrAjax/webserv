@@ -23,6 +23,7 @@ SRC = 	main.cpp \
 		parsing/Server.cpp \
 		parsing/Location.cpp \
 		signal/signal.cpp \
+		cgi/Cgi.cpp
 
 
 OBJ = $(SRC:.cpp=.o)

@@ -1,13 +1,14 @@
 #include "Cgi.hpp"
 
-Cgi::Cgi() {}
+Cgi::Cgi() {
 
-Cgi::~Cgi() {}
+}
 
-/*
-PLAN D'ATTAQUE
+Cgi::~Cgi() {_cgi_file.close();}
 
- - Regarder si extension termine en .cgi -> content type finder
- - S
-
-*/
+int	Cgi::exec_cgi(std::string path) {
+// check si le fichier existe reellement dans le cgi-bin
+// executer
+	(void)path;
+	return 0;
+}
