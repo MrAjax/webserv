@@ -13,7 +13,7 @@ class StatusSender {
 	std::string		_header;
 	std::string		_body;
 	std::string		_response;
-	std::string		_server_name;
+	std::string		_server_path;
 	std::string		_error_pages;
 
 	StatusSender(int err, Server &serv);

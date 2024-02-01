@@ -2,7 +2,7 @@
 
 // rediriger vers les pages d'erreur si besoin
 
-StatusSender::StatusSender(int err, Server &serv): _server_name(serv.getServerName()), _error_pages(serv.getLocationErrorPage()) {
+StatusSender::StatusSender(int err, Server &serv): _server_path(serv.getRoot()), _error_pages(serv.getLocationErrorPage()) {
 	switch (err)
 	{
 	case 400:
@@ -31,8 +31,7 @@ StatusSender::StatusSender(int err, Server &serv): _server_name(serv.getServerNa
 StatusSender::~StatusSender() {}
 
 std::string StatusSender::_error_400() {
-    //std::string file_path(website("/errorpages/400.html"));
-    std::string	file_path(_server_name + _error_pages + "/" + "400.html");
+    std::string	file_path(_server_path + _error_pages + "/" + "400.html");
 	std::stringstream file_content;
     std::ifstream error_file(file_path.c_str());
 
@@ -55,8 +54,7 @@ std::string StatusSender::_error_400() {
 }
 
 std::string StatusSender::_error_401() {
-	//std::string file_path(website("/errorpages/401.html"));
-    std::string	file_path(_server_name + _error_pages + "/" + "401.html");
+    std::string	file_path(_server_path + _error_pages + "/" + "401.html");
 	std::stringstream file_content;
 	std::ifstream error_file(file_path.c_str());
 
@@ -80,8 +78,7 @@ std::string StatusSender::_error_401() {
 
 
 std::string	StatusSender::_error_403() {
-	//std::string file_path(website("/errorpages/403.html"));
-    std::string	file_path(_server_name + _error_pages + "/" + "403.html");
+    std::string	file_path(_server_path + _error_pages + "/" + "403.html");
 	std::stringstream	file_content;
 	std::ifstream		error_file(file_path.c_str());
 
@@ -105,8 +102,7 @@ std::string	StatusSender::_error_403() {
 }
 
 std::string	StatusSender::_error_404() {
-	//std::string file_path(website("/errorpages/404.html"));
-    std::string	file_path(_server_name + _error_pages + "/" + "404.html");
+    std::string	file_path(_server_path + _error_pages + "/" + "404.html");
 	std::stringstream	file_content;
 	std::ifstream		error_file(file_path.c_str());
 
@@ -133,8 +129,7 @@ std::string	StatusSender::_error_404() {
 }
 
 std::string	StatusSender::_error_500() {
-	//std::string file_path(website("/errorpages/500.html"));
-    std::string	file_path(_server_name + _error_pages + "/" + "500.html");
+    std::string	file_path(_server_path + _error_pages + "/" + "500.html");
 	std::stringstream	file_content;
 	std::ifstream		error_file(file_path.c_str());
 
