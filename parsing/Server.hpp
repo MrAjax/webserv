@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/01 13:17:03 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/01 15:35:36 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ typedef void (*FuncPtr)(std::string const&);
 
 public:
 
-	Server(std::vector<std::string> config, std::vector<Server> const& servers, int i);
+	Server( std::vector<std::string> config, std::vector<Server> const& servers, int i );
+	Server& operator = ( Server const& a);
+	Server( Server const& a);
 	~Server( void );
 
 	std::string getIp( void ) const;
@@ -66,8 +68,8 @@ private:
 	std::vector<int>	_error_pages;
 	std::vector<Server> _servers;
 	struct addrinfo*	_res;
-	struct sockaddr_in	_server_addr_ipv4;
-	struct sockaddr_in6	_server_addr_ipv6;	
+//	struct sockaddr_in	_server_addr_ipv4;
+//	struct sockaddr_in6	_server_addr_ipv6;	
 	std::string 		_ip;
 	std::string 		_port;
 	std::string			_server_name;

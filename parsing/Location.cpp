@@ -23,6 +23,27 @@ Location::Location(std::vector<std::string> config) : _autoindex(false)
 	}
 }
 
+Location::Location( Location const& a) {
+
+	_root = a._root;
+	_return = a._return;
+	_index = a._index;
+	_allow_methods = a._allow_methods;
+	_autoindex = a._autoindex;
+}
+
+Location& Location::operator= (Location const& a) {
+
+	if (this != &a) {
+		_root = a._root;
+		_return = a._return;
+		_index = a._index;
+		_allow_methods = a._allow_methods;
+		_autoindex = a._autoindex;
+	}
+	return *this;
+}	
+		
 Location::~Location(void) {}
 
 void Location::p_root(std::string const& line) {

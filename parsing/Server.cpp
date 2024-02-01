@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/01 13:29:33 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/01 15:38:51 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@
 Server::Server(std::vector<std::string> config, std::vector<Server> const& servers, int i)
 	: _i(i), _socketfd(-1), _max_body_size(1024), _ipv_type(0), _error_pages(1, 404), _servers(servers), _ip(""), _port(""), _server_name(""), _root(""), _location_error_page("/default"), _socketIsSet(false) {
 
-	memset(&_server_addr_ipv4, 0, sizeof(_server_addr_ipv4));
-	memset(&_server_addr_ipv6, 0, sizeof(_server_addr_ipv6));
+//	memset(&_server_addr_ipv4, 0, sizeof(_server_addr_ipv4));
+//	memset(&_server_addr_ipv6, 0, sizeof(_server_addr_ipv6));
 	memset(&_res, 0, sizeof(_res));
 
 	void (Server::*ptr[PARAM])(std::string const&) =
@@ -65,13 +65,61 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 	server_log("Server " + int_to_str(_i + 1) + " set up and ready to listen", INFO);
 }
 
-Server::~Server(void) {
+Server& Server::operator = (Server const& a) {
+	std::cout << "assignment operator = called" << std::endl;
+	if (this != &a) {
+
+	_i = a._i;
+	_socketfd = a._socketfd;
+	_max_body_size = a._max_body_size;
+	_ipv_type = a._ipv_type;
+	_error_pages = a._error_pages;
+	_res = a._res;
+	_ip = a._ip;
+	_port = a._port;
+	_server_name = a._server_name;
+	_root = a._root;
+	_location_error_page = a._location_error_page;
+	_index = a._index;	
+	_socketIsSet = a._socketIsSet;
 	
-//	std::map<std::string, Location*>::iterator it;
-//	for (it = _locations.begin(); it != _locations.end(); ++it) {
-//		delete it->second;
-//	}	
+	std::map<std::string, Location*>::const_iterator it;
+		for (it = a._locations.begin(); it != a._locations.end(); ++it) {
+			_locations[it->first] = new Location(*(it->second));
+		}	
+	}
+	return *this;
 }
+
+Server::Server(Server const& a) {
+
+	_i = a._i;
+	_socketfd = a._socketfd;
+	_max_body_size = a._max_body_size;
+	_ipv_type = a._ipv_type;
+	_error_pages = a._error_pages;
+	_res = a._res;
+	_ip = a._ip;
+	_port = a._port;
+	_server_name = a._server_name;
+	_root = a._root;
+	_location_error_page = a._location_error_page;
+	_index = a._index;	
+	_socketIsSet = a._socketIsSet;
+	
+	std::map<std::string, Location*>::const_iterator it;
+		for (it = a._locations.begin(); it != a._locations.end(); ++it) {
+			_locations[it->first] = new Location(*(it->second));
+		}	
+}
+
+Server::~Server(void) {
+
+	std::map<std::string, Location*>::iterator it;
+		for (it = _locations.begin(); it != _locations.end(); ++it) {
+			delete it->second;
+		}	
+	}
 
 void Server::openSocket(void) { 
 
@@ -142,13 +190,13 @@ void Server::p_listen(std::string const& line) {
 	if (int_port < 1024 || int_port > 65535)
 		throw error_throw("Ports must be set between 1024 and 65535 - config file", false);
 
-	uint16_t port = static_cast<uint16_t>(int_port);
+//	uint16_t port = static_cast<uint16_t>(int_port);
 
 	/*maybe useless*/
-	_server_addr_ipv4.sin_port = htons(port); // converts port in network byte order 
-	_server_addr_ipv6.sin6_port = htons(port); // converts port in network byte order 
-	_server_addr_ipv4.sin_family = AF_INET; // for IPV4
-	_server_addr_ipv6.sin6_family = AF_INET6; // for IPV6
+//	_server_addr_ipv4.sin_port = htons(port); // converts port in network byte order 
+//	_server_addr_ipv6.sin6_port = htons(port); // converts port in network byte order 
+//	_server_addr_ipv4.sin_family = AF_INET; // for IPV4
+//	_server_addr_ipv6.sin6_family = AF_INET6; // for IPV6
 
 	std::cout << "port = " << _port << std::endl;
 }
@@ -160,8 +208,8 @@ void Server::p_host(std::string const& line) {
 		++pos;
 	}
 	_ip = line.substr(pos, line.length() - pos);
-	_server_addr_ipv4.sin_addr.s_addr = htonl(INADDR_ANY); // accept any address
-	_server_addr_ipv6.sin6_addr = in6addr_any;
+	//_server_addr_ipv4.sin_addr.s_addr = htonl(INADDR_ANY); // accept any address
+	//_server_addr_ipv6.sin6_addr = in6addr_any;
 	if (_ip == "localhost")
 		_ip = "127.0.0.1";
 

@@ -10,7 +10,9 @@ class Location {
 
 public:
 
-	Location(std::vector<std::string> config);
+	Location( std::vector<std::string> config );
+	Location( Location const& a);
+	Location& operator=( Location const& a);
 	~Location(void);
 
 	std::string getRoot( void ) const;
