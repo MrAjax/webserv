@@ -93,37 +93,40 @@ int	HttpRequest::recvfd(int & fd)
 	numbytes = recv(fd, recvline, MAXLINE - 1, 0);
 	saveString += reinterpret_cast< char * >(recvline); 
 	if (numbytes < 0)
-		throw std::runtime_error("ERROR: Cannot read request\n");
+		throw error_throw("recv error in request", true);
 	return (numbytes);
 }
 
 int    HttpRequest::processingRequest(void)
 {
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
-
+	std::stringstream ss;
+	ss << _connfd;
 	try
 	{
 		if (recvfd(_connfd) == 0)
 			STATUS = -1;
 		if (STATUS < DONE_HEADER && STATUS != -1)
 		{
+			server_log(std::string(GREENN) + "Request fd " + ss.str() + " getHeader in process", DEBUG);
 			HttpRequestParsing header(*this);
 			header.parsingHeader();
 		}
 		if (STATUS == DONE_HEADER)
 		{
+			server_log(std::string(GREENN) + "Request fd " + ss.str() + " getHeader succesfuly done", DEBUG);
 			HttpRequestError checkError(*this);
+			if (checkError.isGoodProtocol() == false)
+				throw error_throw("Request fd " + ss.str() + " invalid HTTP :" + _http, false);
 			checkError.Method();
 			_myServer = checkError.findMyServer(_servers);
 			if (_myServer == NULL)
-				std::cout << RED "SERVER NOT FIND" RESET << std::endl;
+				throw error_throw("Request fd " + ss.str() + " server not found", false);
 			_path = checkError.getFinalPath(*_myServer, _path);
-			server_log(std::string(GREENN) + "New path : " + _path , DEBUG);
-
-			
 		}
 		if (STATUS != DONE_ALL && STATUS >= DONE_HEADER)
 		{
+			server_log(std::string(GREENN) + "Request fd " + ss.str() + " succesfuly find final path : " + _path , DEBUG);
 			HttpRequestParsing body(*this);
 			body.parsingBody();
 		}
@@ -132,8 +135,6 @@ int    HttpRequest::processingRequest(void)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-	// std::cout << YELLOW  "STATUS after BODY " << STATUS << RESET << std::endl;
-	// printAttribute();
 	return (STATUS);
 }
 

@@ -20,8 +20,8 @@ int HttpRequestError::GET(void)
 	//     std::cout << "ACCESSSSS TESSSSSSSSST\n";
 	//     return (1);
 	// }
-	if (protocol() > 0)
-		return (4);
+	// if (protocol() > 0)
+	// 	return (4);
 	return (0);
 }
 
@@ -34,8 +34,8 @@ int HttpRequestError::POST(void)
 	int status = access(_request.getPath().c_str(), F_OK);
 	if (status < 0)
 		return (3);
-	if (protocol() > 0)
-		return (4);
+	// if (protocol() > 0)
+	// 	return (4);
 	return (0);   
 }
 
@@ -46,8 +46,8 @@ int HttpRequestError::DELETE(void)
 	int status = access(_request.getPath().c_str(), F_OK);
 	if (status < 0)
 		return (3);
-	if (protocol() > 0)
-		return (4);
+	// if (protocol() > 0)
+	// 	return (4);
 	return (1);
 }
 
@@ -80,11 +80,12 @@ int HttpRequestError::Method(void)
 	return (0);
 }
 
-int HttpRequestError::protocol(void)
+bool HttpRequestError::isGoodProtocol(void)
 {
-	if (_request.getHttp() != "HTTP/1.1")
-		return (1);
-	return (0);
+	if (_request.getHttp() == "HTTP/1.1")
+		return (true);
+    else
+	    return (false);
 }
 
 int HttpRequestError::maxSize(void)
@@ -164,25 +165,27 @@ int HttpRequestError::modifiePath(Server &server)
 
 }
 
-void	preparing(std::string &index)
-{
-	if (index.size() == 0)
-		return ;
-	if (index.size() > 2 && index.rfind("./", 0) != std::string::npos)
-		index = index.substr(1);
-	else if (index[0] != '/')
-		index = "/" + index;
-}
+// void	preparing(std::string &index)
+// {
+// 	if (index.size() == 0)
+// 		return ;
+// 	if (index.size() > 2 && index.rfind("./", 0) != std::string::npos)
+// 		index = index.substr(1);
+// 	else if (index[0] != '/')
+// 		index = "/" + index;
+// }
 
-void	preparingRoot(std::string &index)
+void	trimBeginStr(std::string &str, std::string const &toTrim)
 {
-	if (index.size() == 0)
+	if (str.size() == 0 || toTrim.size() == 0 || str.size() < toTrim.size())
 		return ;
-	if (index.size() > 1 && index.rfind("./", 0) != std::string::npos)
-		index = index.substr(2);
-	else if (index[0] == '/')
-		index = index.substr(1);
-		
+    for (std::size_t i = 0; i < toTrim.size(); i++)
+        if (str[i] != toTrim[i])
+            return ;
+    if (str.size() == toTrim.size())
+        str = "";
+    else
+        str = str.substr(toTrim.size());
 }
 
 std::string HttpRequestError::getFinalPath(Server &server, std::string str)
@@ -194,8 +197,9 @@ std::string HttpRequestError::getFinalPath(Server &server, std::string str)
 		ss << server.getIndex();
 		while (ss >> str)
 		{
-			preparing(str);
-			finalPath = server.getRoot() + str;
+			trimBeginStr(str, "/");
+			finalPath = server.getRoot() + "/" + str;
+            trimBeginStr(finalPath, "/");
 			if (isGoodPath(finalPath))
 				return (finalPath);
 		}
@@ -203,26 +207,27 @@ std::string HttpRequestError::getFinalPath(Server &server, std::string str)
 	else
 	{
 		str = _request.getPath();
-		preparing(str);
-		finalPath = server.getRoot() + str;
+		trimBeginStr(str, "/");
+		finalPath = server.getRoot() + "/" + str;
+        trimBeginStr(finalPath, "/");
 		if (isGoodPath(finalPath))
 			return (finalPath);
 	}
-	int status = access(finalPath.c_str(), R_OK);
-	std::cout << errno << " errno and status " << status << "\n";
-	server_log(std::string(GREENN) + "finalpath : " + finalPath, DEBUG);
+    std::stringstream ss;
+	ss << _request.getConnfd();
+	throw error_throw("Request fd " + ss.str() + " cannot access path : " + finalPath, true);
 	return ("");
 }
 
 bool	HttpRequestError::isGoodPath(std::string &str)
 {
-	// if (access(str.c_str(), F_OK) < 0)
-	// 	throw std::runtime_error("Error: File don't exist\n");
 	std::string tabMethod[3] = {"GET", "POST", "DELETE"};
 	int choice = 0;
 	for (;choice < 3; choice++)
 		if (tabMethod[choice] == _request.getMethod())
 			break ;
+    std::stringstream ss;
+	ss << _request.getConnfd();
 	switch (choice)
 	{
 		case 0:
@@ -232,8 +237,8 @@ bool	HttpRequestError::isGoodPath(std::string &str)
 		case 2:
 			return (hasReadPermission(str) && hasWritePermission(str) && hasExecutePermission(str));
 		case 3:
-			throw std::runtime_error("Error: No good method, try GET POST or DELETE\n");
-			return (false);
+				throw error_throw("Request fd " + ss.str() + " method not supported", false);
+				return (false);
 	}
 	return (false);
 }

@@ -38,7 +38,7 @@ class HttpRequestError
 		int         GET();
 		int         POST();
 		int         DELETE();
-		int         protocol();
+		bool        isGoodProtocol();
 
 		int         Method();
 		int         Path();
