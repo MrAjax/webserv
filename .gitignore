@@ -4,6 +4,7 @@ test
 http/main.cpp
 #http/Makefile
 file
+webserv
 **.vscode
 test_pierre
 test_newclass

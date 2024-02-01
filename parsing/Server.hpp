@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/26 13:21:21 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/01 13:17:03 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,10 @@
 
 #include "../inc/parsing.hpp"
 #include "Location.hpp"
+
+#define IPV4 4
+#define IPV6 6
+
 
 class Server {
 
@@ -31,10 +35,11 @@ public:
 	std::string getRoot( void ) const;
 	std::string getLocationErrorPage( void ) const;
 	std::string getIndex( void )const;
-	struct sockaddr_in getclientAddr( void ) const;
+//	struct sockaddr_in getclientAddr( void ) const;
 	int	getMaxBodySize( void ) const;
 	int	getSocketfd( void ) const;
 	std::vector<int> getErrorPages( void ) const;
+	Location *getLocation( std::string type ) const;
 	
 private:
 
@@ -57,10 +62,12 @@ private:
 	int					_i; // number of Server 0 is the first etc...
 	int				 	_socketfd;
 	int					_max_body_size;
+	int					_ipv_type;
 	std::vector<int>	_error_pages;
 	std::vector<Server> _servers;
 	struct addrinfo*	_res;
-	struct sockaddr_in	_server_addr;
+	struct sockaddr_in	_server_addr_ipv4;
+	struct sockaddr_in6	_server_addr_ipv6;	
 	std::string 		_ip;
 	std::string 		_port;
 	std::string			_server_name;

@@ -15,7 +15,6 @@
 #include <limits>
 #include "HttpRequest.hpp"
 
-
 # define RESET	"\e[0m"
 # define RED	"\e[31m"
 # define GREEN	"\e[32m"
@@ -23,7 +22,6 @@
 # define BLUE	"\e[34m"
 # define PURPLE	"\e[35m"
 # define CYAN	"\e[36m"
-
 
 class HttpRequestError
 {
@@ -37,25 +35,35 @@ class HttpRequestError
 		//---------check error---------------------
 		void        checkError();
 
-        int         GET();
-        int         POST();
-        int         DELETE();
-        int         protocol();
+		int         GET();
+		int         POST();
+		int         DELETE();
+		bool        isGoodProtocol();
 
-        int         Method();
-        int         Path();
-        int         maxSize();
+		int         Method();
+		int         Path();
+		int         maxSize();
 
-        int         socketfdServers(std::vector<Server> &servers);
+		int         socketfdServers(std::vector<Server> &servers);
 
-        Server      *findServer(std::vector<Server> &servers);
+		Server      *findMyServer(std::vector<Server> &servers);
 
-        int         checkPortIP(Server &servers);
+		int         checkPortIP(Server &servers);
 
-        int        modifiePath(Server &server);
+		int        modifiePath(Server &server);
 
-        private:
-            HttpRequest &_request;
+		std::string	getFinalPath(Server &server, std::string str);
+
+
+
+		bool		isGoodPath(std::string &str);
+
+		bool       hasReadPermission(std::string &str);
+		bool       hasWritePermission(std::string &str);
+		bool       hasExecutePermission(std::string &str);
+
+		private:
+			HttpRequest &_request;
 
 
 

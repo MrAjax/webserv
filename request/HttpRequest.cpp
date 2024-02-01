@@ -11,13 +11,13 @@ _connection(""), _upInsecureRqst(""), _referer(""), _secFetchDest(""), _secFetch
 _secFetchSite(""), _contentLength(0), _contentType(""),
 _bodyRequest(""), _headerRequest(""),
 _connfd(connfd), saveString(""), _strContentLength(""),
-_servers(servers)
+_servers(servers), _myServer(NULL)
 {
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
 }
 
-HttpRequest::~HttpRequest(void){std::cout << BLUE << _connfd << " Destructor call\n" << RESET;}
+HttpRequest::~HttpRequest(void)	{std::cout << BLUE << _connfd << " Destructor call\n" << RESET;}
 
 //-----------UTILS------------------
 
@@ -28,6 +28,7 @@ int			HttpRequest::checkTimeout(void) // permet de check si on doit kill la requ
 	int timeSec = end.tv_sec - _lastUpdate.tv_sec;
 	if (timeSec > TIMEOUT_REQUEST)
 		return (1);
+
 	else
 		return (0);
 }
@@ -77,6 +78,8 @@ void		HttpRequest::resetRequest(void)
 	
 	saveString = "";
 	_strContentLength = "";
+
+	_myServer = NULL;
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 }
 
@@ -90,33 +93,40 @@ int	HttpRequest::recvfd(int & fd)
 	numbytes = recv(fd, recvline, MAXLINE - 1, 0);
 	saveString += reinterpret_cast< char * >(recvline); 
 	if (numbytes < 0)
-		throw std::runtime_error("ERROR: Cannot read request\n");
+		throw error_throw("recv error in request", true);
 	return (numbytes);
 }
 
 int    HttpRequest::processingRequest(void)
 {
-	clock_gettime(CLOCK_REALTIME, &_lastUpdate); // a chaque passage de processing le timer se reset pour le moment
-	// On peut rajouter un timer global à la création de la classe pour définir une durée max pour chaque requette
+	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
+	std::stringstream ss;
+	ss << _connfd;
 	try
 	{
 		if (recvfd(_connfd) == 0)
 			STATUS = -1;
-		if (STATUS < DONE_HEADER )
+		if (STATUS < DONE_HEADER && STATUS != -1)
 		{
+			server_log(std::string(GREENN) + "Request fd " + ss.str() + " getHeader in process", DEBUG);
 			HttpRequestParsing header(*this);
 			header.parsingHeader();
 		}
 		if (STATUS == DONE_HEADER)
 		{
+			server_log(std::string(GREENN) + "Request fd " + ss.str() + " getHeader succesfuly done", DEBUG);
 			HttpRequestError checkError(*this);
+			if (checkError.isGoodProtocol() == false)
+				throw error_throw("Request fd " + ss.str() + " invalid HTTP :" + _http, false);
 			checkError.Method();
-			Server *find = checkError.findServer(_servers);
-			if (find == NULL)
-				std::cout << RED "SERVER NOT FIND" RESET << std::endl;
+			_myServer = checkError.findMyServer(_servers);
+			if (_myServer == NULL)
+				throw error_throw("Request fd " + ss.str() + " server not found", false);
+			_path = checkError.getFinalPath(*_myServer, _path);
 		}
 		if (STATUS != DONE_ALL && STATUS >= DONE_HEADER)
 		{
+			server_log(std::string(GREENN) + "Request fd " + ss.str() + " succesfuly find final path : " + _path , DEBUG);
 			HttpRequestParsing body(*this);
 			body.parsingBody();
 		}
@@ -125,8 +135,6 @@ int    HttpRequest::processingRequest(void)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-	// std::cout << YELLOW  "STATUS after BODY " << STATUS << RESET << std::endl;
-	// printAttribute();
 	return (STATUS);
 }
 

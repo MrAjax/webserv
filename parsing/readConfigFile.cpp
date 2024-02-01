@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 12:43:31 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/26 12:43:02 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/01/26 15:53:59 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,5 +105,7 @@ void readConfigFile (std::vector<Server> & servers, char const* file)
 			i++;
 		}
 	}
+	if (bracket != 0)
+		throw error_throw("unclosed bracket - config file" , false);
 	ifs.close();
 }
