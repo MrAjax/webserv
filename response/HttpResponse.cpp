@@ -1,39 +1,5 @@
 #include "HttpResponse.hpp"
 
-std::string	HttpResponse::_find_index_path(Server &serv) {
-/*	std::string	index_path;
-	size_t 		i;
-	size_t 		j;
-
-	server_log("Get Request for / --> replace by index.html", DEBUG);
-	server_log(std::string(WHITEE) + "Index list: " + _index_list, DEBUG);
-	for (i = 0; i < _index_list.size(); i++) {
-		server_log(std::string(WHITEE) + "Searching index...", DEBUG);
-		while (i < _index_list.size() && _index_list[i] == ' ')
-			i++;
-		j = 0;
-		while (j + i < _index_list.size() && _index_list[j + i] != ' ')
-			j++;
-		std::string		file_to_test(_server_path + _index_list.substr(i, j));
-		std::ifstream	index_file(file_to_test.c_str());
-		server_log(std::string(WHITEE) + "Trying file: " + file_to_test, DEBUG);
-		if (index_file.is_open()) {
-			index_path = _server_path + _index_list.substr(i, j);
-			index_file.close();
-			break;
-		}
-		i += j;
-	}
-	if (i >= _index_list.size()) {
-		server_log("Index file not found", ERROR);
-		throw StatusSender::send_status(404, serv);
-	}
-	server_log("Found index file: " + index_path, DEBUG);
-	return index_path;*/
-	(void) serv;
-	return "";
-}
-
 HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMethod()), \
 										_method_code(_method.length()), \
 										_path(req.getPath()), \
@@ -43,13 +9,14 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 	if (_status_code != 202)
 		throw StatusSender::send_status(_status_code, serv);
 
-	// if (_path == "/")
-	// 	_path = _find_index_path(serv);
-	// else
-	// 	_path = _server_path + _path;
-
 	if (_method_code == POST || _method_code == DELETE)
 		_body_request = req.getBodyRequest();
+	if (is_cgi(_path)) {
+		server_log("Found CGI", DEBUG);
+		_path.resize(_path.size() - EXT_SIZE);
+		_status_code = Cgi::exec_cgi(_path);
+		throw StatusSender::send_status(_status_code, serv);
+	}
 
 	server_log(std::string(WHITEE) + "method = " + _method, DEBUG);
 	server_log(std::string(WHITEE) + "method code = " + int_to_str(_method_code), DEBUG);

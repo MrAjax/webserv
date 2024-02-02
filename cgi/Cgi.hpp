@@ -2,11 +2,13 @@
 # define CGI_HPP
 
 #include "../inc/webserv.hpp"
+#include "../utils/utils.hpp"
 
 class Cgi {
-public:
 	Cgi();
 	~Cgi();
+public:
+	static	int	exec_cgi(std::string path);
 };
 
 #endif

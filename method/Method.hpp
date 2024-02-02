@@ -4,6 +4,7 @@
 #include "../inc/webserv.hpp"
 #include "../utils/utils.hpp"
 #include "../response/StatusSender.hpp"
+#include "../cgi/Cgi.hpp"
 
 enum {ZERO, ONE, TWO, GET, POST, FIVE, DELETE};
 
