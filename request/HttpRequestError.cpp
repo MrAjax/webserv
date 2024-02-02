@@ -5,75 +5,63 @@
 
 HttpRequestError::HttpRequestError(HttpRequest &request) : _request(request)
 {
-	
+	std::stringstream ss;
+	ss << _request.getConnfd();
+	_strFd = ss.str();
 }
 
 HttpRequestError::~HttpRequestError() {}
 
 int HttpRequestError::GET(void)
 {
-	// if (_request.getPath() == "/")
-	//     _request.getPath() = ROOT;
-	// int status = access(_request.getPath().c_str(), F_OK);
-	// if (status < 0)
-	// {
-	//     std::cout << "ACCESSSSS TESSSSSSSSST\n";
-	//     return (1);
-	// }
-	// if (protocol() > 0)
-	// 	return (4);
 	return (0);
 }
 
 int HttpRequestError::POST(void)
 {
 	if (_request.getContentType().empty())
+	{
+		server_log(std::string(REDD) + "Reqest fd " + _strFd + " method POST whitout content type", ERROR);
 		return (1);
+	}
 	if (_request.getContentLength() == 0)
+	{
+		server_log(std::string(REDD) + "Reqest fd " + _strFd + " method POST whitout content lenght", ERROR);
 		return (2);
-	int status = access(_request.getPath().c_str(), F_OK);
-	if (status < 0)
-		return (3);
-	// if (protocol() > 0)
-	// 	return (4);
+	}
 	return (0);   
 }
 
 int HttpRequestError::DELETE(void)
 {
-	if (_request.getPath().rfind("/monsite/", 0) == std::string::npos)
-		return (2);
-	int status = access(_request.getPath().c_str(), F_OK);
-	if (status < 0)
-		return (3);
-	// if (protocol() > 0)
-	// 	return (4);
-	return (1);
+	return (0);
 }
 
 int HttpRequestError::Method(void)
 {
+	// if (_request.getMyserver() == NULL)
+	// 	return (false);
 	int         (HttpRequestError::*f[3])(void) = {&HttpRequestError::GET, &HttpRequestError::POST, &HttpRequestError::DELETE};
 	std::string tabMethod[3] = {"GET", "POST", "DELETE"};
 	int choice = 0;
 	for (;choice < 3; choice++)
-	{
 		if (tabMethod[choice] == _request.getMethod())
 			break ;
-	}
 	switch (choice)
 	{
 		case 0:
 			(this->*f[0])();
 			break;
 		case 1:
-			(this->*f[1])();
+			if ((this->*f[1])() != 0)
+				server_log(std::string(REDD) + "Passage " + _strFd + " cannot find any valide path root/index", ERROR);
 			break;
 		case 2:
 			(this->*f[2])();
 			break;
 		case 3:
-			throw std::runtime_error("Error: No good method, try GET POST or DELETE\n");
+			server_log(std::string(REDD) + "Request fd " + _strFd + "method not allowed", ERROR);
+			_request.setStatusCode(405);
 			return (1);
 			break;
 	}
@@ -134,6 +122,67 @@ Server  *HttpRequestError::findMyServer(std::vector<Server> &servers)
 		}
 	}
 	return (findServer);
+}
+
+bool HttpRequestError::findRootPath()
+{
+	if (_request.getPath() != "/")
+		return (false);
+	int status = -1;
+	std::string finalPath;
+	std::vector<std::string> temp = _request.getMyserver()->getIndex();
+	std::vector<std::string>::iterator it = temp.begin();
+	for (;it != temp.end(); it++)
+	{
+		std::string tempStr = trimString(*it, "/", START);
+		finalPath = trimString(_request.getMyserver()->getRoot() + "/" + tempStr, "/", START);
+		int check = isGoodPath(finalPath);
+		if (check == true)
+		{
+			_request.setPath(finalPath);
+			return (true);
+		}
+		else if (check == 0)
+			status = 0;
+	}
+	if (status == -1)
+	{
+		_request.setStatusCode(404);
+		server_log(std::string(REDD) + "Request fd " + _strFd + " cannot find any valide path root/index", ERROR);
+	}
+	if (status == 0)
+	{
+		_request.setStatusCode(403);
+		server_log(std::string(REDD) + "Request fd " + _strFd + " cannot access any path root/index", ERROR);
+	}
+	return (false);
+}
+
+bool HttpRequestError::findOtherPath()
+{
+	if (_request.getPath() == "/")
+		return (false);
+	std::string tempStr = trimString(_request.getPath(), "/", START);
+	std::string finalPath;
+	finalPath = trimString(_request.getMyserver()->getRoot() + "/" + tempStr, "/", START);
+	int status = isGoodPath(finalPath);
+	if (status == true)
+	{
+		_request.setPath(finalPath);
+		return (true);
+	}
+	else if (status == -1)
+	{
+		_request.setStatusCode(404);
+		server_log(std::string(REDD) + "Request fd " + _strFd + " cannot find the path : " + finalPath, ERROR);
+	}
+	else if (status == 0)
+	{
+		_request.setStatusCode(403);
+		server_log(std::string(REDD) + "Request fd " + _strFd + " cannot access path : " + finalPath, ERROR);
+	}
+	return (false);
+	
 }
 
 bool HttpRequestError::getFinalPath(void)
@@ -206,8 +255,6 @@ int	HttpRequestError::isGoodPath(std::string &str)
 	for (;choice < 3; choice++)
 		if (tabMethod[choice] == _request.getMethod())
 			break ;
-    std::stringstream ss;
-	ss << _request.getConnfd();
 	switch (choice)
 	{
 		case 0:
@@ -217,8 +264,8 @@ int	HttpRequestError::isGoodPath(std::string &str)
 		case 2:
 			return (hasReadPermission(str) && hasWritePermission(str) && hasExecutePermission(str));
 		case 3:
-				throw error_throw("Request fd " + ss.str() + " method not supported", false);
-				return (false);
+			throw error_throw("Request fd " + _strFd + " method not allowed", false); //TODO 
+			return (false);
 	}
 	return (false);
 }

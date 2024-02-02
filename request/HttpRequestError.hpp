@@ -54,6 +54,9 @@ class HttpRequestError
 
 		bool		getFinalPath(void);
 
+		bool 		findRootPath();
+		bool 		findOtherPath();
+
 
 
 		int			isGoodPath(std::string &str);
@@ -64,6 +67,7 @@ class HttpRequestError
 
 		private:
 			HttpRequest &_request;
+			std::string _strFd;
 
 
 
