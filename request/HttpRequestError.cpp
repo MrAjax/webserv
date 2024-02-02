@@ -173,21 +173,38 @@ Server  *HttpRequestError::findMyServer(std::vector<Server> &servers)
 // 		index = "/" + index;
 // }
 
-void	trimBeginStr(std::string &str, std::string const &toTrim)
+#define START  		0
+#define END 		1
+
+std::string	trimString(std::string str, std::string const &toTrim, int STARTorEND)
 {
 	if (str.size() == 0 || toTrim.size() == 0 || str.size() < toTrim.size())
-		return ;
-    for (std::size_t i = 0; i < toTrim.size(); i++)
-        if (str[i] != toTrim[i])
-            return ;
-    if (str.size() == toTrim.size())
-        str = "";
-    else
-        str = str.substr(toTrim.size());
+		return (str);
+	if (str == toTrim)
+		return ("");
+	if (STARTorEND == START){
+		for (std::size_t i = 0; i < toTrim.size(); i++)
+			if (str[i] != toTrim[i])
+				return (str);
+		return (str.substr(toTrim.size()));
+	}
+	if (STARTorEND == END){
+		std::size_t lenStr = str.size();
+		lenStr--;
+		std::size_t lenToTrim = toTrim.size();
+		lenToTrim--;
+		for (std::size_t i = 0; i < toTrim.size(); i++)
+			if (str[lenStr--] != toTrim[lenToTrim--])
+				return (str);
+		return (str.substr(0, (str.size() - toTrim.size())));
+	}
+	return (str);
 }
 
-bool HttpRequestError::getFinalPath(Server &server)
+bool HttpRequestError::getFinalPath(void)
 {
+	if (_request.getMyserver() == NULL)
+		return (false);
 	int status = -1;
 	std::stringstream ss;
 	ss << _request.getConnfd();
@@ -195,14 +212,12 @@ bool HttpRequestError::getFinalPath(Server &server)
 	std::string tempStr;
 	if (_request.getPath() == "/")
 	{
-		std::vector<std::string> temp = server.getIndex();
+		std::vector<std::string> temp = _request.getMyserver()->getIndex();
 		std::vector<std::string>::iterator it = temp.begin();
 		for (;it != temp.end(); it++)
 		{
-			tempStr = *it;
-			trimBeginStr(tempStr, "/");
-			finalPath = server.getRoot() + "/" + tempStr;
-            trimBeginStr(finalPath, "/");
+			tempStr = trimString(*it, "/", START);
+			finalPath = trimString(_request.getMyserver()->getRoot() + "/" + tempStr, "/", START);
 			int check = isGoodPath(finalPath);
 			if (check == true)
 			{
@@ -221,10 +236,8 @@ bool HttpRequestError::getFinalPath(Server &server)
 	}
 	else
 	{
-		tempStr = _request.getPath();
-		trimBeginStr(tempStr, "/");
-		finalPath = server.getRoot() + "/" + tempStr;
-        trimBeginStr(finalPath, "/");
+		tempStr = trimString(_request.getPath(), "/", START);
+		finalPath = trimString(_request.getMyserver()->getRoot() + "/" + tempStr, "/", START);
 		status = isGoodPath(finalPath);
 		if (status == true)
 		{

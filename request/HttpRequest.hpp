@@ -70,6 +70,9 @@ class HttpRequest
 		std::string getStrContentLength();
 
 		int			getStatusCode();
+		bool		getIsCgi();
+
+		Server		*getMyserver();
 
 		
 		// ----------------------Setter--------------
@@ -101,6 +104,8 @@ class HttpRequest
 		void setStrContentLength(const std::string &value);
 
 		void	setStatusCode(const int &value);
+		void	setIsCgi(const bool &value);
+
 
 	private:
 		std::string _method;
@@ -133,7 +138,7 @@ class HttpRequest
 
 		int         		_statusCode;
 
-		bool				
+		bool				_isCgi;
 
 };
 

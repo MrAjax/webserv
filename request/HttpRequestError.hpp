@@ -52,7 +52,7 @@ class HttpRequestError
 
 		int        modifiePath(Server &server);
 
-		bool		getFinalPath(Server &server);
+		bool		getFinalPath(void);
 
 
 

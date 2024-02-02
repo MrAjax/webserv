@@ -12,7 +12,7 @@ _secFetchSite(""), _contentLength(0), _contentType(""),
 _bodyRequest(""), _headerRequest(""),
 _connfd(connfd), saveString(""), _strContentLength(""),
 _servers(servers), _myServer(NULL),
-_statusCode(NEW)
+_statusCode(NEW), _isCgi(false)
 {
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
@@ -81,6 +81,7 @@ void		HttpRequest::resetRequest(void)
 	_strContentLength = "";
 
 	_myServer = NULL;
+	_isCgi = false;
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 }
 
@@ -123,8 +124,7 @@ int    HttpRequest::processingRequest(void)
 			_myServer = checkError.findMyServer(_servers);
 			if (_myServer == NULL)
 				throw error_throw("Request fd " + ss.str() + " server not found", false);
-
-			if (checkError.getFinalPath(*_myServer) == false)
+			if (checkError.getFinalPath() == false)
 				throw error_throw("Request fd " + ss.str() + " path not good", false);
 		}
 		if (_statusCode != DONE_ALL && _statusCode >= DONE_HEADER)
@@ -168,6 +168,10 @@ std::string HttpRequest::getSaveString()		{return (this->saveString);}
 
 std::string HttpRequest::getStrContentLength()	{return (this->_strContentLength);}
 int			HttpRequest::getStatusCode()		{return (this->_statusCode);}
+Server		*HttpRequest::getMyserver()			{return (this->_myServer);}
+
+bool		HttpRequest::getIsCgi()				{return (this->_isCgi);}
+
 
 
 //-------------------STETTEUR-------------------
@@ -197,4 +201,6 @@ void	HttpRequest::setSaveString(const std::string &value)		{saveString = value;}
 
 void	HttpRequest::setStrContentLength(const std::string &value)	{_strContentLength = value;}
 void	HttpRequest::setStatusCode(const int &value)				{_statusCode = value;}
+
+void	HttpRequest::setIsCgi(const bool &value)					{_isCgi = value;}
 
