@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/02 10:45:40 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/02 11:31:55 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include "Location.hpp"
 
 Server::Server(std::vector<std::string> config, std::vector<Server> const& servers, int i)
-	: _i(i), _socketfd(-1), _max_body_size(1024), _ipv_type(0), _error_pages(1, 404), _servers(servers), _ip(""), _port(""), _server_name(""), _root(""), _location_error_page("/default"), _socketIsSet(false) {
+	: _i(i), _socketfd(-1), _max_body_size(1024), _ipv_type(0), _error_pages(1, 404), _servers(servers), _ip(""), _port("18000"), _server_name(""), _root(""), _location_error_page("/default"), _socketIsSet(false) {
 	std::cout << BLUE <<  "Server " << _i << " constructor called" << RESET << std::endl;
 //	memset(&_server_addr_ipv4, 0, sizeof(_server_addr_ipv4));
 //	memset(&_server_addr_ipv6, 0, sizeof(_server_addr_ipv6));
@@ -133,8 +133,9 @@ void Server::openSocket(void) {
 		}
 	}
 	//_socketfd = socket(AF_INET, SOCK_STREAM, 0); 
-//	std::cout << "ai_family=" << _res->ai_family << " ai_socktype= " << _res->ai_socktype << " ai_prococotol= " <<  _res->ai_protocol << std::endl; 
+	std::cout << "ai_family=" << _res->ai_family << " ai_socktype= " << _res->ai_socktype << " ai_prococotol= " <<  _res->ai_protocol << std::endl; 
 	_socketfd = socket(_res->ai_family, _res->ai_socktype, _res->ai_protocol); 
+	std::cout << _socketfd << std::endl;
 		if (_socketfd == -1) {
 			throw error_throw("Socket error - parsing/Server.cpp", true);
 		}
@@ -154,7 +155,7 @@ void Server::configServer(void) {
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC; // can be IPV4 or IPV6
 	hints.ai_socktype = SOCK_STREAM;
-
+	std::cout << "PORT " << _port.c_str() << std::endl;
 	int ret = getaddrinfo(_ip.c_str(), _port.c_str(), &hints, &_res);
 	if (ret != 0) {
 		server_log("getaddrinfo error - parsing/Server.cpp", ERROR);
@@ -289,11 +290,22 @@ void Server::p_errorPage(std::string const& line) {
 void Server::p_index(std::string const& line) {
 
 	size_t pos = std::string("index").length();
-	while (pos < line.length() && std::isspace(line[pos])) {
-		++pos;
+
+	while (pos < line.length()) {
+		while (pos < line.length() && std::isspace(line[pos])) {
+			++pos;
+		}
+		size_t end = line.find_first_of(" \t\n\r\f\v", pos);
+		if (end == std::string::npos)
+			_index.push_back(line.substr(pos, line.length() - pos));
+		else
+			_index.push_back(line.substr(pos, end - pos));
+		pos = end;	
 	}
-	_index = line.substr(pos, line.length() - pos);
-	std::cout << "index = " << _index << std::endl;
+
+		for(size_t i = 0; i < _index.size(); ++i) {
+		std::cout << "[" << _index[i] << "]}";
+	}	
 }	
 	
 std::string Server::settempLocation(std::string line) {
@@ -344,7 +356,7 @@ std::string Server::getLocationErrorPage(void) const {
 	return _location_error_page;
 }	
 
-std::string Server::getIndex(void) const {
+std::vector<std::string> Server::getIndex(void) const {
 	return _index;
 }	
 

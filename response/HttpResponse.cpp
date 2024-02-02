@@ -1,7 +1,7 @@
 #include "HttpResponse.hpp"
 
 std::string	HttpResponse::_find_index_path(Server &serv) {
-	std::string	index_path;
+/*	std::string	index_path;
 	size_t 		i;
 	size_t 		j;
 
@@ -29,7 +29,9 @@ std::string	HttpResponse::_find_index_path(Server &serv) {
 		throw StatusSender::send_status(404, serv);
 	}
 	server_log("Found index file: " + index_path, DEBUG);
-	return index_path;
+	return index_path;*/
+	(void) serv;
+	return "";
 }
 
 HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMethod()), \

@@ -139,19 +139,18 @@ Server  *HttpRequestError::findMyServer(std::vector<Server> &servers)
 int HttpRequestError::modifiePath(Server &server)
 {
 	std::string path;
-	std::string index;
-	std::stringstream ss;
-	ss << server.getIndex();
 	if (_request.getPath() == "/")
 	{
-		while (ss >> index)
+		std::vector<std::string>::iterator it = server.getIndex().begin();
+		while (it != server.getIndex().end())
 		{
-			path = server.getRoot() + index;
+			path = server.getRoot() + *it;
 			if (access(path.c_str(), F_OK) >= 0)
 			{
 				_request.setPath(path);
 				return (1);
 			}
+			it++;
 		}
 		return (0);
 	}
@@ -193,15 +192,16 @@ std::string HttpRequestError::getFinalPath(Server &server, std::string str)
 	std::string finalPath;
 	if (str == "/")
 	{
-		std::stringstream ss;
-		ss << server.getIndex();
-		while (ss >> str)
+		std::vector<std::string>::iterator it = server.getIndex().begin();
+		while (it != server.getIndex().end())
 		{
+			str = *it;
 			trimBeginStr(str, "/");
 			finalPath = server.getRoot() + "/" + str;
             trimBeginStr(finalPath, "/");
 			if (isGoodPath(finalPath))
 				return (finalPath);
+			it++;
 		}
 	}
 	else
