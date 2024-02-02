@@ -125,6 +125,7 @@ bool isListener(int fd, std::vector<Server> servers) {
 	}
 	return false;
 }
+
 int main(int ac, char **av)
 {
 	if (ac != 2) {
@@ -148,19 +149,15 @@ int main(int ac, char **av)
 		return 1;
 	}
 	try {
-
+		
 		while (g_sig == 0) { /* Here is the main loop */
 			std::size_t sizePollfds = pollfds.size();
-
+		
 			int poll_count = poll(&pollfds[0], sizePollfds, 1000);
 			if (poll_count == -1) 
 				std::cerr << "poll error: " << strerror(errno) << std::endl;
 
 			std::cout << YELLOW "Number of pollfd= " RESET << sizePollfds << std::endl;			
-
-			Location* temp = servers[1].getLocation("cgi_path");
-			std::vector<std::string> tempstring = temp->getCgi_path();
-			std::cout << "cgi-ext" << tempstring[0] << std::endl;
 
 			for(size_t i = 0; i < sizePollfds; i++)
 			{

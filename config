@@ -1,7 +1,7 @@
 # Deuxième serveur
 server {
 	listen 18001;
-	host ::1;
+	host localhost;
     server_name Zzewebsite;
 	client_max_body_size 1024;            
 

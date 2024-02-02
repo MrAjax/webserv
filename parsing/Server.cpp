@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/01 15:38:51 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/02 10:45:40 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 Server::Server(std::vector<std::string> config, std::vector<Server> const& servers, int i)
 	: _i(i), _socketfd(-1), _max_body_size(1024), _ipv_type(0), _error_pages(1, 404), _servers(servers), _ip(""), _port(""), _server_name(""), _root(""), _location_error_page("/default"), _socketIsSet(false) {
-
+	std::cout << BLUE <<  "Server " << _i << " constructor called" << RESET << std::endl;
 //	memset(&_server_addr_ipv4, 0, sizeof(_server_addr_ipv4));
 //	memset(&_server_addr_ipv6, 0, sizeof(_server_addr_ipv6));
 	memset(&_res, 0, sizeof(_res));
@@ -66,7 +66,6 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 }
 
 Server& Server::operator = (Server const& a) {
-	std::cout << "assignment operator = called" << std::endl;
 	if (this != &a) {
 
 	_i = a._i;
@@ -88,6 +87,7 @@ Server& Server::operator = (Server const& a) {
 			_locations[it->first] = new Location(*(it->second));
 		}	
 	}
+	std::cout << BLUE << "Server " << _i << " assignment operator = called" << RESET << std::endl;
 	return *this;
 }
 
@@ -111,10 +111,12 @@ Server::Server(Server const& a) {
 		for (it = a._locations.begin(); it != a._locations.end(); ++it) {
 			_locations[it->first] = new Location(*(it->second));
 		}	
+	std::cout << BLUE << "Server " << _i << " copy constructor called" << RESET << std::endl;
 }
 
 Server::~Server(void) {
 
+	std::cout << BLUE << "Server " << _i << " destructor called" << RESET << std::endl;
 	std::map<std::string, Location*>::iterator it;
 		for (it = _locations.begin(); it != _locations.end(); ++it) {
 			delete it->second;

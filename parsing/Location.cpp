@@ -131,8 +131,14 @@ void Location::p_cgi_path(std::string const& line) {
 		else
 			_cgi_path.push_back(line.substr(pos, end - pos));
 		pos = end;	
-	}
-}	
+		}
+		std::cout << "cgi_path";
+		for (size_t i = 0; i < _cgi_path.size(); i++) {
+			std::cout << "|" << _cgi_path[i] << "|";
+		}
+		std::cout << std::endl;
+}		
+
 
 void Location::p_cgi_ext(std::string const& line) {
 
@@ -148,6 +154,11 @@ void Location::p_cgi_ext(std::string const& line) {
 			_cgi_ext.push_back(line.substr(pos, end - pos));
 		pos = end;	
 	}
+		std::cout << "cgi_ext";
+		for (size_t i = 0; i < _cgi_ext.size(); i++) {
+			std::cout << "|" << _cgi_ext[i] << "|";
+		}
+		std::cout << std::endl;
 }	
 
 std::vector<std::string> Location::getallow_methods(void) const {
