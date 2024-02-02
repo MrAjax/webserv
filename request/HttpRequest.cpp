@@ -163,7 +163,7 @@ std::string	HttpRequest::getContentType()		{return (this->_contentType);}
 std::string HttpRequest::getBodyRequest()		{return (this->_bodyRequest);}
 std::string HttpRequest::getHeaderRequest()		{return (this->_headerRequest);}
 
-int			HttpRequest::getConnfd()			{return _connfd;}
+int			HttpRequest::getConnfd()			{return (this->_connfd);}
 std::string HttpRequest::getSaveString()		{return (this->saveString);}
 
 std::string HttpRequest::getStrContentLength()	{return (this->_strContentLength);}

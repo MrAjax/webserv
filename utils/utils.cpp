@@ -125,3 +125,28 @@ bool	is_cgi(std::string file_name) {
 		return (false);
 	return (true);
 }
+
+std::string	trimString(std::string str, std::string const &toTrim, int STARTorEND)
+{
+	if (str.size() == 0 || toTrim.size() == 0 || str.size() < toTrim.size())
+		return (str);
+	if (str == toTrim)
+		return ("");
+	if (STARTorEND == START){
+		for (std::size_t i = 0; i < toTrim.size(); i++)
+			if (str[i] != toTrim[i])
+				return (str);
+		return (str.substr(toTrim.size()));
+	}
+	if (STARTorEND == END){
+		std::size_t lenStr = str.size();
+		lenStr--;
+		std::size_t lenToTrim = toTrim.size();
+		lenToTrim--;
+		for (std::size_t i = 0; i < toTrim.size(); i++)
+			if (str[lenStr--] != toTrim[lenToTrim--])
+				return (str);
+		return (str.substr(0, (str.size() - toTrim.size())));
+	}
+	return (str);
+}
