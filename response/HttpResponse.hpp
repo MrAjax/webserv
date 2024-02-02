@@ -13,7 +13,7 @@ class HttpResponse {
 	int				_method_code;
 	std::string		_path;
 	std::string		_server_path;
-	std::string		_index_list;
+	std::vector<std::string> _index_list;
 /*		For post and delete methods		*/
 	std::string		_body_request;
 /*		Not set in the consructor		*/

@@ -1,7 +1,7 @@
 # Deuxième serveur
 server {
 	listen 18001;
-	host ::1;
+	host localhost;
     server_name Zzewebsite;
 	client_max_body_size 1024;            
 
@@ -20,7 +20,7 @@ server {
 }	
 # Deuxième serveur
 server{
-	listen 18003;
+	listen 18000;
 	host 127.0.0.1;
     server_name Hellooo;
 	client_max_body_size 1024;            

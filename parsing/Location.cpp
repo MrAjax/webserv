@@ -5,8 +5,8 @@ Location::Location(std::vector<std::string> config) : _autoindex(false)
 {
 	void (Location::*ptr[PARAM_LOC])(std::string const&) =
 		{&Location::p_allow_methods, &Location::p_httpRedirection, &Location::p_root, &Location::p_autoindex,
-			&Location::p_index	};
-	std::string keyword[] = {"allow_methods", "return", "root", "autoindex", "index"};
+			&Location::p_index, &Location::p_cgi_path, &Location::p_cgi_ext	};
+	std::string keyword[] = {"allow_methods", "return", "root", "autoindex", "index", "cgi_path", "cgi_ext"};
 
 	for (size_t i = 0; i < config.size() ; i++) {
 	//	std::cout << "line recorded = [" << config[i] << "]" << std::endl;
@@ -23,6 +23,31 @@ Location::Location(std::vector<std::string> config) : _autoindex(false)
 	}
 }
 
+Location::Location( Location const& a) {
+
+	_root = a._root;
+	_return = a._return;
+	_index = a._index;
+	_allow_methods = a._allow_methods;
+	_autoindex = a._autoindex;
+	_cgi_path = a._cgi_path;
+	_cgi_ext = a._cgi_ext;
+}
+
+Location& Location::operator= (Location const& a) {
+
+	if (this != &a) {
+		_root = a._root;
+		_return = a._return;
+		_index = a._index;
+		_allow_methods = a._allow_methods;
+		_autoindex = a._autoindex;
+		_cgi_path = a._cgi_path;
+		_cgi_ext = a._cgi_ext;
+	}
+	return *this;
+}	
+		
 Location::~Location(void) {}
 
 void Location::p_root(std::string const& line) {
@@ -93,8 +118,59 @@ void Location::p_index(std::string const& line) {
 	std::cout << "index = " << _index << std::endl;
 }	
 
+void Location::p_cgi_path(std::string const& line) {
+
+	size_t pos = std::string("cgi_path").length();
+	while (pos < line.length()) {
+		while (pos < line.length() && std::isspace(line[pos])) {
+			++pos;
+		}
+		size_t end = line.find_first_of(" \t\n\r\f\v", pos);
+		if (end == std::string::npos)
+			_cgi_path.push_back(line.substr(pos, line.length() - pos));
+		else
+			_cgi_path.push_back(line.substr(pos, end - pos));
+		pos = end;	
+		}
+		std::cout << "cgi_path";
+		for (size_t i = 0; i < _cgi_path.size(); i++) {
+			std::cout << "|" << _cgi_path[i] << "|";
+		}
+		std::cout << std::endl;
+}		
+
+
+void Location::p_cgi_ext(std::string const& line) {
+
+	size_t pos = std::string("cgi_ext").length();
+	while (pos < line.length()) {
+		while (pos < line.length() && std::isspace(line[pos])) {
+			++pos;
+		}
+		size_t end = line.find_first_of(" \t\n\r\f\v", pos);
+		if (end == std::string::npos)
+			_cgi_ext.push_back(line.substr(pos, line.length() - pos));
+		else
+			_cgi_ext.push_back(line.substr(pos, end - pos));
+		pos = end;	
+	}
+		std::cout << "cgi_ext";
+		for (size_t i = 0; i < _cgi_ext.size(); i++) {
+			std::cout << "|" << _cgi_ext[i] << "|";
+		}
+		std::cout << std::endl;
+}	
+
 std::vector<std::string> Location::getallow_methods(void) const {
 	return _allow_methods;
+}
+
+std::vector<std::string> Location::getCgi_path(void) const {
+	return _cgi_path;
+}
+
+std::vector<std::string> Location::getCgi_ext(void) const {
+	return _cgi_ext;
 }
 
 std::string Location::getRoot(void) const {

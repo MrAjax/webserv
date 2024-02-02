@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/01 13:17:03 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/02 11:32:12 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ typedef void (*FuncPtr)(std::string const&);
 
 public:
 
-	Server(std::vector<std::string> config, std::vector<Server> const& servers, int i);
+	Server( std::vector<std::string> config, std::vector<Server> const& servers, int i );
+	Server& operator = ( Server const& a);
+	Server( Server const& a);
 	~Server( void );
 
 	std::string getIp( void ) const;
@@ -34,7 +36,7 @@ public:
 	std::string getServerName( void ) const; 
 	std::string getRoot( void ) const;
 	std::string getLocationErrorPage( void ) const;
-	std::string getIndex( void )const;
+	std::vector<std::string> getIndex( void )const;
 //	struct sockaddr_in getclientAddr( void ) const;
 	int	getMaxBodySize( void ) const;
 	int	getSocketfd( void ) const;
@@ -66,14 +68,14 @@ private:
 	std::vector<int>	_error_pages;
 	std::vector<Server> _servers;
 	struct addrinfo*	_res;
-	struct sockaddr_in	_server_addr_ipv4;
-	struct sockaddr_in6	_server_addr_ipv6;	
+//	struct sockaddr_in	_server_addr_ipv4;
+//	struct sockaddr_in6	_server_addr_ipv6;	
 	std::string 		_ip;
 	std::string 		_port;
 	std::string			_server_name;
 	std::string			_root;
 	std::string			_location_error_page;
-	std::string			_index;	
+	std::vector<std::string> _index;	
 	bool				_socketIsSet;
 	std::map<std::string, Location*> _locations;
 
