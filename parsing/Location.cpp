@@ -9,7 +9,6 @@ Location::Location(std::vector<std::string> config) : _autoindex(false)
 	std::string keyword[] = {"allow_methods", "return", "root", "autoindex", "index", "cgi_path", "cgi_ext"};
 
 	for (size_t i = 0; i < config.size() ; i++) {
-	//	std::cout << "line recorded = [" << config[i] << "]" << std::endl;
 		int j = 0;
 		while (j < PARAM_LOC) {
 			if (config[i].compare(0, keyword[j].length(), keyword[j]) == 0) {
@@ -52,15 +51,22 @@ Location::~Location(void) {}
 
 void Location::p_root(std::string const& line) {
 
+	if (_root.empty() == false) {
+		throw error_throw ("On server Location root setup twice", false);
+	}
+
 	size_t pos = std::string("root").length();
 	while (pos < line.length() && std::isspace(line[pos])) {
 		++pos;
 	}
 	_root = line.substr(pos, line.length() - pos);
-	std::cout << "root = " << _root << std::endl;
 }
 
 void Location::p_allow_methods(std::string const& line) {
+
+	if (_allow_methods.empty() == false) {
+		throw error_throw ("On server Location allow_methods setup twice", false);
+	}
 
 	size_t pos = std::string("allow_methods").length();
 	while (pos < line.length()) {
@@ -74,51 +80,58 @@ void Location::p_allow_methods(std::string const& line) {
 			_allow_methods.push_back(line.substr(pos, end - pos));
 		pos = end;	
 	}
-
-		for(size_t i = 0; i < _allow_methods.size(); ++i) {
-		std::cout << "[" << _allow_methods[i] << "]}";
-	}	
-	std::cout << "END" << std::endl;
 }	
 
 void Location::p_httpRedirection(std::string const& line) {
+
+	if (_return.empty() == false) {
+		throw error_throw ("On server Location return setup twice", false);
+	}
 
 	size_t pos = std::string("return").length();
 	while (pos < line.length() && std::isspace(line[pos])) {
 		++pos;
 	}
 	_return = line.substr(pos, line.length() - pos);
-	std::cout << "http redirection = " << _return << std::endl;
 }	
 
 void Location::p_autoindex(std::string const& line ) {
+
+	if (_autoindex == true) {
+		throw error_throw ("On server Location autoindex setup twice", false);
+	}
 
 	size_t pos = std::string("autoindex").length();
 	while (pos < line.length() && std::isspace(line[pos])) {
 		++pos;
 	}
 	std::string temp = line.substr(pos, line.length() - pos);
-	std::cout << "temp [" << temp << "]" << std::endl;
 	if (temp == "on")
 		_autoindex = true;
 	else if (temp == "off")
 		_autoindex = false;
 	else
 		throw error_throw("invalid value " + temp + "in autoindex directive - config file", false);
-	std::cout << "autoindex = " << _autoindex << std::endl;
 }	
 
 void Location::p_index(std::string const& line) {
+
+	if (_index.empty() == false) {
+		throw error_throw ("On server Location index setup twice", false);
+	}
 
 	size_t pos = std::string("index").length();
 	while (pos < line.length() && std::isspace(line[pos])) {
 		++pos;
 	}
 	_index = line.substr(pos, line.length() - pos);
-	std::cout << "index = " << _index << std::endl;
 }	
 
 void Location::p_cgi_path(std::string const& line) {
+
+	if (_cgi_path.empty() == false) {
+		throw error_throw ("On server Location cgi_path setup twice", false);
+	}
 
 	size_t pos = std::string("cgi_path").length();
 	while (pos < line.length()) {
@@ -131,16 +144,14 @@ void Location::p_cgi_path(std::string const& line) {
 		else
 			_cgi_path.push_back(line.substr(pos, end - pos));
 		pos = end;	
-		}
-		std::cout << "cgi_path";
-		for (size_t i = 0; i < _cgi_path.size(); i++) {
-			std::cout << "|" << _cgi_path[i] << "|";
-		}
-		std::cout << std::endl;
+	}
 }		
 
-
 void Location::p_cgi_ext(std::string const& line) {
+
+	if (_cgi_ext.empty() == false) {
+		throw error_throw ("On server Location cgi_ext setup twice", false);
+	}
 
 	size_t pos = std::string("cgi_ext").length();
 	while (pos < line.length()) {
@@ -154,11 +165,6 @@ void Location::p_cgi_ext(std::string const& line) {
 			_cgi_ext.push_back(line.substr(pos, end - pos));
 		pos = end;	
 	}
-		std::cout << "cgi_ext";
-		for (size_t i = 0; i < _cgi_ext.size(); i++) {
-			std::cout << "|" << _cgi_ext[i] << "|";
-		}
-		std::cout << std::endl;
 }	
 
 std::vector<std::string> Location::getallow_methods(void) const {

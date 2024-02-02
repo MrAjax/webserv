@@ -116,3 +116,12 @@ std::string basic_page(std::string title, std::string p) {
             "</html>\n";
 	return page;
 }
+
+bool	is_cgi(std::string file_name) {
+	std::string	type;
+
+	type = ContentTypeFinder::get_content_type(file_name);
+	if (type != "cgi")
+		return (false);
+	return (true);
+}
