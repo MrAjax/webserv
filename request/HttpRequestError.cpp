@@ -136,33 +136,32 @@ Server  *HttpRequestError::findMyServer(std::vector<Server> &servers)
 	return (findServer);
 }
 
-int HttpRequestError::modifiePath(Server &server)
-{
-	std::string path;
-	if (_request.getPath() == "/")
-	{
-		std::vector<std::string>::iterator it = server.getIndex().begin();
-		while (it != server.getIndex().end())
-		{
-			path = server.getRoot() + *it;
-			if (access(path.c_str(), F_OK) >= 0)
-			{
-				_request.setPath(path);
-				return (1);
-			}
-			it++;
-		}
-		return (0);
-	}
-	else
-	{
-		path = server.getRoot() + _request.getPath();
-		if (access(path.c_str(), F_OK) >= 0)
-			return (1);
-		return (0);
-	}
-
-}
+// int HttpRequestError::modifiePath(Server &server)
+// {
+// 	std::string path;
+// 	if (_request.getPath() == "/")
+// 	{
+// 		std::vector<std::string>::iterator it = server.getIndex().begin();
+// 		while (it != server.getIndex().end())
+// 		{
+// 			path = server.getRoot() + *it;
+// 			if (access(path.c_str(), F_OK) >= 0)
+// 			{
+// 				_request.setPath(path);
+// 				return (1);
+// 			}
+// 			it++;
+// 		}
+// 		return (0);
+// 	}
+// 	else
+// 	{
+// 		path = server.getRoot() + _request.getPath();
+// 		if (access(path.c_str(), F_OK) >= 0)
+// 			return (1);
+// 		return (0);
+// 	}
+// }
 
 // void	preparing(std::string &index)
 // {
@@ -192,8 +191,9 @@ std::string HttpRequestError::getFinalPath(Server &server, std::string str)
 	std::string finalPath;
 	if (str == "/")
 	{
-		std::vector<std::string>::iterator it = server.getIndex().begin();
-		while (it != server.getIndex().end())
+		std::vector<std::string> temp = server.getIndex();
+		std::vector<std::string>::iterator it = temp.begin();
+		while (it != temp.end())
 		{
 			str = *it;
 			trimBeginStr(str, "/");
@@ -215,7 +215,9 @@ std::string HttpRequestError::getFinalPath(Server &server, std::string str)
 	}
     std::stringstream ss;
 	ss << _request.getConnfd();
+
 	throw error_throw("Request fd " + ss.str() + " cannot access path : " + finalPath, true);
+
 	return ("");
 }
 
