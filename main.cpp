@@ -180,9 +180,9 @@ int main(int ac, char **av)
 								std::cerr << "Accept error: " << strerror(errno) << std::endl;
 							}
 							else {
-								HttpRequest *clientRequest = new HttpRequest(clientFd, servers);
+								HttpRequest *clientRequest = new HttpRequest(clientFd, servers, pollfds[i].fd);
 								addingNewClient(&clientRequest, clientAddr, serversMap, it, clientMap, pollfds);
-							}	
+							}
 						}
 						else // socketfd aldready set c/p from HttpRequest
 						{

@@ -1,18 +1,18 @@
 #include "HttpRequest.hpp"
-#include "HttpRequestError.hpp"
+#include "HttpRequestChecking.hpp"
 #include "HttpRequestParsing.hpp"
 
 //throw StatusSender::send_status(500, serv); quand le server et la requete n'est pas conforme il faut envoyer ca et pas un autre truc avec erreur 500 le server ne doit pas s arreter
 #define TIMEOUT_REQUEST 10 // en seconds
 
-HttpRequest::HttpRequest(int connfd, std::vector<Server> &servers) : _method(""), _path(""), _http(""),
+HttpRequest::HttpRequest(int connfd, std::vector<Server> &servers, int listenFd) : _method(""), _path(""), _http(""),
 _host(""), _userAgent(""), _accept(""), _acceptLanguage(""), _acceptEncoding(""),
 _connection(""), _upInsecureRqst(""), _referer(""), _secFetchDest(""), _secFetchMode(""),
 _secFetchSite(""), _contentLength(0), _contentType(""),
 _bodyRequest(""), _headerRequest(""),
 _connfd(connfd), saveString(""), _strContentLength(""),
 _servers(servers), _myServer(NULL),
-_statusCode(NEW), _isCgi(false)
+_statusCode(NEW), _isCgi(false), _listenFd(listenFd)
 {
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
@@ -117,19 +117,16 @@ int    HttpRequest::processingRequest(void)
 		if (_statusCode == DONE_HEADER)
 		{
 			server_log(std::string(GREENN) + "Request fd " + ss.str() + " getHeader succesfuly done", DEBUG);
-			HttpRequestError checkError(*this);
-			if (checkError.isGoodProtocol() == false)
-				throw error_throw("Request fd " + ss.str() + " invalid HTTP :" + _http, false);
-			checkError.Method();
+			HttpRequestChecking checkError(*this);
 			_myServer = checkError.findMyServer(_servers);
 			if (_myServer == NULL)
 				throw error_throw("Request fd " + ss.str() + " server not found", false);
-			if (checkError.getFinalPath() == false)
+			if (checkError.BuildAndCheckHeader() != 0)
 				throw error_throw("Request fd " + ss.str() + " path not good", false);
 		}
 		if (_statusCode != DONE_ALL && _statusCode >= DONE_HEADER)
 		{
-			server_log(std::string(GREENN) + "Request fd " + ss.str() + " succesfuly find final path : " + _path , DEBUG);
+			server_log(std::string(GREENN) + "Request fd " + ss.str() + " succesfuly check header and find final path : " + _path , DEBUG);
 			HttpRequestParsing body(*this);
 			body.parsingBody();
 		}
@@ -171,6 +168,8 @@ int			HttpRequest::getStatusCode()		{return (this->_statusCode);}
 Server		*HttpRequest::getMyserver()			{return (this->_myServer);}
 
 bool		HttpRequest::getIsCgi()				{return (this->_isCgi);}
+
+int			HttpRequest::getListenFd()			{return (this->_listenFd);}
 
 
 

@@ -1,47 +1,61 @@
-#include "HttpRequestError.hpp"
+#include "HttpRequestChecking.hpp"
 
-#define ROOT "/Zzewebsite/index/chien.jpeg"
 #define MAXSIZE 100000
 
-HttpRequestError::HttpRequestError(HttpRequest &request) : _request(request)
+HttpRequestChecking::HttpRequestChecking(HttpRequest &request) : _request(request)
 {
 	std::stringstream ss;
 	ss << _request.getConnfd();
 	_strFd = ss.str();
 }
 
-HttpRequestError::~HttpRequestError() {}
+HttpRequestChecking::~HttpRequestChecking() {}
 
-int HttpRequestError::GET(void)
+int HttpRequestChecking::GET(void)
 {
+	findCgi();
+	isGoodProtocol("HTTP/1.1");
+	if (!findRootPath() && !findOtherPath())
+		return (1);
 	return (0);
 }
 
-int HttpRequestError::POST(void)
+int HttpRequestChecking::POST(void)
 {
+	findCgi();
+	isGoodProtocol("HTTP/1.1");
 	if (_request.getContentType().empty())
 	{
 		server_log(std::string(REDD) + "Reqest fd " + _strFd + " method POST whitout content type", ERROR);
-		return (1);
+		_request.setStatusCode(411);
+		return (2);
 	}
 	if (_request.getContentLength() == 0)
 	{
 		server_log(std::string(REDD) + "Reqest fd " + _strFd + " method POST whitout content lenght", ERROR);
-		return (2);
+		_request.setStatusCode(411);
+		return (3);
 	}
+	if (!findRootPath() && !findOtherPath())
+		return (4);
 	return (0);   
 }
 
-int HttpRequestError::DELETE(void)
+int HttpRequestChecking::DELETE(void)
 {
+	findCgi();
+	isGoodProtocol("HTTP/1.1");
+	if (!findRootPath() && !findOtherPath())
+		return (5);
 	return (0);
 }
 
-int HttpRequestError::Method(void)
+int HttpRequestChecking::BuildAndCheckHeader(void)
 {
-	// if (_request.getMyserver() == NULL)
-	// 	return (false);
-	int         (HttpRequestError::*f[3])(void) = {&HttpRequestError::GET, &HttpRequestError::POST, &HttpRequestError::DELETE};
+	if (_request.getMyserver() == NULL)
+		return (6);
+	int		(HttpRequestChecking::*f[3])(void) = {&HttpRequestChecking::GET, 
+				&HttpRequestChecking::POST, &HttpRequestChecking::DELETE};
 	std::string tabMethod[3] = {"GET", "POST", "DELETE"};
 	int choice = 0;
 	for (;choice < 3; choice++)
@@ -50,33 +64,31 @@ int HttpRequestError::Method(void)
 	switch (choice)
 	{
 		case 0:
-			(this->*f[0])();
-			break;
+			return ((this->*f[0])());
 		case 1:
-			if ((this->*f[1])() != 0)
-				server_log(std::string(REDD) + "Passage " + _strFd + " cannot find any valide path root/index", ERROR);
-			break;
+			return ((this->*f[1])());
 		case 2:
-			(this->*f[2])();
-			break;
+			return ((this->*f[2])());
 		case 3:
-			server_log(std::string(REDD) + "Request fd " + _strFd + "method not allowed", ERROR);
+			server_log(std::string(REDD) + "Request fd " + _strFd + " method "
+				+ _request.getMethod() + " not allowed", ERROR);
 			_request.setStatusCode(405);
-			return (1);
-			break;
+			return (7);
 	}
-	return (0);
+	return (8);
 }
 
-bool HttpRequestError::isGoodProtocol(void)
+bool HttpRequestChecking::isGoodProtocol(std::string const &http)
 {
-	if (_request.getHttp() == "HTTP/1.1")
+	if (_request.getHttp() == http)
 		return (true);
-    else
-	    return (false);
+	server_log(std::string(REDD) + "Request fd " + _strFd + " protocol "
+		+ _request.getHttp() + " not allowed", ERROR);
+	_request.setStatusCode(400);
+	return (false);
 }
 
-int HttpRequestError::maxSize(void)
+int HttpRequestChecking::maxSize(void)
 {
 	if (_request.getSaveString().size() > MAXSIZE)
 		return (1);
@@ -85,7 +97,7 @@ int HttpRequestError::maxSize(void)
 	return (0);
 }
 
-int HttpRequestError::socketfdServers(std::vector<Server> &servers)
+int HttpRequestChecking::socketfdServers(std::vector<Server> &servers)
 {
 	std::vector<Server>::iterator it = servers.begin();
 	for (; it != servers.end(); it++)
@@ -94,7 +106,7 @@ int HttpRequestError::socketfdServers(std::vector<Server> &servers)
 	return (0);
 }
 
-int HttpRequestError::checkPortIP(Server &server)
+int HttpRequestChecking::checkSockfdPortIP(Server &server)
 {
 	std::size_t pos = _request.getHost().find(":");
 	if (pos == std::string::npos)
@@ -102,29 +114,39 @@ int HttpRequestError::checkPortIP(Server &server)
 	std::string ip = _request.getHost().substr(0, pos);
 	std::string port = _request.getHost().substr(1 + pos);
 	std::string convertIP = server.getIp();
-	if (convertIP == "127.0.0.1")
+	if (convertIP == "127.0.0.1" || convertIP == "::1")
 		convertIP = "localhost";
-	if (ip == convertIP && port == server.getPort())
+	if (ip == convertIP && port == server.getPort()
+		&& _request.getListenFd() == server.getSocketfd())
 		return (1);
 	return (0);
 }
 
-Server  *HttpRequestError::findMyServer(std::vector<Server> &servers)
+Server  *HttpRequestChecking::findMyServer(std::vector<Server> &servers)
 {
 	Server  *findServer = NULL;
 
 	std::vector<Server>::reverse_iterator it = servers.rbegin();
 	for (; it != servers.rend(); it++)
 	{
-		if (checkPortIP(*it))
-		{
+		if (checkSockfdPortIP(*it))
 			findServer = &(*it);
-		}
 	}
 	return (findServer);
 }
 
-bool HttpRequestError::findRootPath()
+bool HttpRequestChecking::findCgi()
+{
+	if (!is_cgi(_request.getPath()))
+		return (false);
+	_request.setIsCgi(true);
+	_request.setPath(trimString(_request.getPath(), ".cgi", END));
+	server_log(std::string(GREEN) + "Request fd " + _strFd + " find cgi", DEBUG);
+	return (true);
+	
+}
+
+bool HttpRequestChecking::findRootPath()
 {
 	if (_request.getPath() != "/")
 		return (false);
@@ -158,7 +180,7 @@ bool HttpRequestError::findRootPath()
 	return (false);
 }
 
-bool HttpRequestError::findOtherPath()
+bool HttpRequestChecking::findOtherPath()
 {
 	if (_request.getPath() == "/")
 		return (false);
@@ -182,70 +204,9 @@ bool HttpRequestError::findOtherPath()
 		server_log(std::string(REDD) + "Request fd " + _strFd + " cannot access path : " + finalPath, ERROR);
 	}
 	return (false);
-	
 }
 
-bool HttpRequestError::getFinalPath(void)
-{
-	if (_request.getMyserver() == NULL)
-		return (false);
-	if (is_cgi(_request.getPath()))
-	{
-		_request.setIsCgi(true);
-		_request.setPath(trimString(_request.getPath(), ".cgi", END));
-	}
-	int status = -1;
-	std::stringstream ss;
-	ss << _request.getConnfd();
-	std::string finalPath;
-	std::string tempStr;
-	if (_request.getPath() == "/")
-	{
-		std::vector<std::string> temp = _request.getMyserver()->getIndex();
-		std::vector<std::string>::iterator it = temp.begin();
-		for (;it != temp.end(); it++)
-		{
-			tempStr = trimString(*it, "/", START);
-			finalPath = trimString(_request.getMyserver()->getRoot() + "/" + tempStr, "/", START);
-			int check = isGoodPath(finalPath);
-			if (check == true)
-			{
-				_request.setPath(finalPath);
-				return (true);
-			}
-			else if (check == 0)
-				status = 0;
-			else if (check == -1 && status != 0)
-				status = -1;
-		}
-		if (status == -1)
-			server_log(std::string(REDD) + "Request fd " + ss.str() + " cannot find any valide path root/index", ERROR);
-		if (status == 0)
-			server_log(std::string(REDD) + "Request fd " + ss.str() + " cannot access any path root/index", ERROR);
-	}
-	else
-	{
-		tempStr = trimString(_request.getPath(), "/", START);
-		finalPath = trimString(_request.getMyserver()->getRoot() + "/" + tempStr, "/", START);
-		status = isGoodPath(finalPath);
-		if (status == true)
-		{
-			_request.setPath(finalPath);
-			return (true);
-		}
-		else if (status == -1)
-			server_log(std::string(REDD) + "Request fd " + ss.str() + " cannot find the path : " + finalPath, ERROR);
-		else
-			server_log(std::string(REDD) + "Request fd " + ss.str() + " cannot access path : " + finalPath, ERROR);
-	}
-	if (status == -1)
-		_request.setStatusCode(404);
-	if (status == 0)
-		_request.setStatusCode(403);
-	return (false);
-}
-
-int	HttpRequestError::isGoodPath(std::string &str)
+int	HttpRequestChecking::isGoodPath(std::string &str)
 {
 	int status = access(str.c_str(), R_OK);
 	if (status == -1)
@@ -270,7 +231,7 @@ int	HttpRequestError::isGoodPath(std::string &str)
 	return (false);
 }
 
-bool    HttpRequestError::hasReadPermission(std::string &str)
+bool    HttpRequestChecking::hasReadPermission(std::string &str)
 {
 	int status = access(str.c_str(), R_OK);
 	if (status < 0)
@@ -279,7 +240,7 @@ bool    HttpRequestError::hasReadPermission(std::string &str)
 		return (true);
 }
 
-bool    HttpRequestError::hasWritePermission(std::string &str)
+bool    HttpRequestChecking::hasWritePermission(std::string &str)
 {
 	int status = access(str.c_str(), W_OK);
 	if (status < 0)
@@ -288,7 +249,7 @@ bool    HttpRequestError::hasWritePermission(std::string &str)
 		return (true);
 }
 
-bool    HttpRequestError::hasExecutePermission(std::string &str)
+bool    HttpRequestChecking::hasExecutePermission(std::string &str)
 {
 	int status = access(str.c_str(), X_OK);
 	if (status < 0)

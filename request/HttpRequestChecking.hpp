@@ -1,5 +1,5 @@
-#ifndef HTTPREQUESTERROR_HPP
-# define HTTPREQUESTERROR_HPP
+#ifndef HTTPREQUESTCHECKING_HPP
+# define HTTPREQUESTCHECKING_HPP
 
 #include <iostream>
 #include <unistd.h>
@@ -23,13 +23,13 @@
 # define PURPLE	"\e[35m"
 # define CYAN	"\e[36m"
 
-class HttpRequestError
+class HttpRequestChecking
 {
 	public:
 
-		HttpRequestError(HttpRequest &request);
+		HttpRequestChecking(HttpRequest &request);
 
-		~HttpRequestError(void);
+		~HttpRequestChecking(void);
 		//------------OPERATOR------------------//
 
 		//---------check error---------------------
@@ -38,9 +38,9 @@ class HttpRequestError
 		int         GET();
 		int         POST();
 		int         DELETE();
-		bool        isGoodProtocol();
+		bool        isGoodProtocol(std::string const &http);
 
-		int         Method();
+		int         BuildAndCheckHeader();
 		int         Path();
 		int         maxSize();
 
@@ -48,7 +48,7 @@ class HttpRequestError
 
 		Server      *findMyServer(std::vector<Server> &servers);
 
-		int         checkPortIP(Server &servers);
+		int         checkSockfdPortIP(Server &servers);
 
 		int        modifiePath(Server &server);
 
@@ -57,7 +57,7 @@ class HttpRequestError
 		bool 		findRootPath();
 		bool 		findOtherPath();
 
-
+		bool		findCgi();
 
 		int			isGoodPath(std::string &str);
 

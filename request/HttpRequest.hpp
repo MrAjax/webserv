@@ -30,7 +30,7 @@ class HttpRequest
 
 		HttpRequest(void);
 		HttpRequest(int connfd);
-		HttpRequest(int connfd, std::vector<Server> &servers);
+		HttpRequest(int connfd, std::vector<Server> &servers, int listenFd);
 
 		HttpRequest(int connfd, std::string contentType, std::string input);
 		HttpRequest(HttpRequest const &copy);
@@ -74,6 +74,7 @@ class HttpRequest
 
 		Server		*getMyserver();
 
+		int			getListenFd();
 		
 		// ----------------------Setter--------------
 
@@ -139,6 +140,7 @@ class HttpRequest
 		int         		_statusCode;
 
 		bool				_isCgi;
+		int 				_listenFd;
 
 };
 
