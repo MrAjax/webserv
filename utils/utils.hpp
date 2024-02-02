@@ -11,5 +11,6 @@ void				server_log(std::string content, int log_level);
 std::runtime_error	error_throw(std::string description, bool errno_need);
 std::string			build_header(int status_code, std::string content_type, size_t body_len);
 std::string 		basic_page(std::string title, std::string p);
+bool				is_cgi(std::string file_name);
 
 #endif

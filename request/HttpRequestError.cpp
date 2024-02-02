@@ -188,6 +188,8 @@ void	trimBeginStr(std::string &str, std::string const &toTrim)
 
 std::string HttpRequestError::getFinalPath(Server &server, std::string str)
 {
+	std::stringstream ss;
+	ss << _request.getConnfd();
 	std::string finalPath;
 	if (str == "/")
 	{
@@ -210,19 +212,25 @@ std::string HttpRequestError::getFinalPath(Server &server, std::string str)
 		trimBeginStr(str, "/");
 		finalPath = server.getRoot() + "/" + str;
         trimBeginStr(finalPath, "/");
-		if (isGoodPath(finalPath))
+		if (int status = isGoodPath(finalPath))
 			return (finalPath);
+		else if (status == 0)
+			error_throw("Request fd " + ss.str() + " cannot access path : " + finalPath, true);
+		else
+			error_throw("Request fd " + ss.str() + " cannot find a path : " + finalPath, true);
 	}
-    std::stringstream ss;
-	ss << _request.getConnfd();
-
-	throw error_throw("Request fd " + ss.str() + " cannot access path : " + finalPath, true);
-
+    
+	error_throw("Request fd " + ss.str() + " cannot access path : " + finalPath, true); //plus de visibilite
+	server_log("Request fd " + ss.str() + " cannot access path : " + finalPath, DEBUG);
+	throw StatusSender::send_status(404, server);
 	return ("");
 }
 
-bool	HttpRequestError::isGoodPath(std::string &str)
+int	HttpRequestError::isGoodPath(std::string &str)
 {
+	int status = access(str.c_str(), R_OK);
+	if (status == -1)
+		return (-1);
 	std::string tabMethod[3] = {"GET", "POST", "DELETE"};
 	int choice = 0;
 	for (;choice < 3; choice++)

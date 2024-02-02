@@ -36,9 +36,9 @@
 // General
 #define SA struct sockaddr
 // Server config
-#define SERVER_PORT 18000
 #define MAXLINE 4096
-#define MYWEBSITE "Zzewebsite"
+// Other
+#define EXT_SIZE 4
 // Log file config
 #define LOG_FILE "server/server.log"
 enum {NOLOG, ERROR, DIALOG, INFO, DEBUG};
