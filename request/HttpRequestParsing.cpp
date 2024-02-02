@@ -10,13 +10,13 @@ HttpRequestParsing::~HttpRequestParsing() {}
 
 void    HttpRequestParsing::parsingHeader(void)
 {
-	if (_request.STATUS >= DONE_HEADER || _request.STATUS == -1)
+	if (_request.getStatusCode() >= DONE_HEADER || _request.getStatusCode() == -1)
 		return ;
 	std::string delimiteur = "\r\n\r\n";
 	std::size_t pos = _request.getSaveString().find(delimiteur);
 	if (pos == std::string::npos)
 	{
-		_request.STATUS = PROCESSING_HEADER;
+		_request.setStatusCode(PROCESSING_HEADER);
 		return ;
 	}
 	_request.setHeaderRequest(_request.getSaveString().substr(0, pos));
@@ -29,28 +29,28 @@ void    HttpRequestParsing::parsingHeader(void)
 	{
         _request.setContentLength(convert(_request.getStrContentLength()));
 	}
-    _request.STATUS = DONE_HEADER;
+    _request.setStatusCode(DONE_HEADER);
 }
 
 void    HttpRequestParsing::parsingBody(void)
 {
-	if (_request.STATUS == DONE_ALL || _request.STATUS < DONE_HEADER)
+	if (_request.getStatusCode() == DONE_ALL || _request.getStatusCode() < DONE_HEADER)
 		return ;
 	if (_request.getContentLength() == 0)
 	{
-		_request.STATUS = DONE_ALL;
+		_request.setStatusCode(DONE_ALL);
 		return ;
 	}
 	if (_request.getSaveString().size() >= _request.getContentLength())
 	{
 		_request.setBodyRequest(_request.getSaveString().substr(0, _request.getContentLength()));
 		_request.setSaveString("");
-		_request.STATUS = DONE_ALL;
+		_request.setStatusCode(DONE_ALL);
 	}
 	else
 	{
 		_request.setBodyRequest(_request.getSaveString());
-		_request.STATUS = PROCESSING_BODY;
+		_request.setStatusCode(PROCESSING_BODY);
 	}
 }
 

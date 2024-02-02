@@ -186,44 +186,61 @@ void	trimBeginStr(std::string &str, std::string const &toTrim)
         str = str.substr(toTrim.size());
 }
 
-std::string HttpRequestError::getFinalPath(Server &server, std::string str)
+bool HttpRequestError::getFinalPath(Server &server)
 {
+	int status = -1;
 	std::stringstream ss;
 	ss << _request.getConnfd();
 	std::string finalPath;
-	if (str == "/")
+	std::string tempStr;
+	if (_request.getPath() == "/")
 	{
 		std::vector<std::string> temp = server.getIndex();
 		std::vector<std::string>::iterator it = temp.begin();
-		while (it != temp.end())
+		for (;it != temp.end(); it++)
 		{
-			str = *it;
-			trimBeginStr(str, "/");
-			finalPath = server.getRoot() + "/" + str;
+			tempStr = *it;
+			trimBeginStr(tempStr, "/");
+			finalPath = server.getRoot() + "/" + tempStr;
             trimBeginStr(finalPath, "/");
-			if (isGoodPath(finalPath))
-				return (finalPath);
-			it++;
+			int check = isGoodPath(finalPath);
+			if (check == true)
+			{
+				_request.setPath(finalPath);
+				return (true);
+			}
+			else if (check == 0)
+				status = 0;
+			else if (check == -1 && status != 0)
+				status = -1;
 		}
+		if (status == -1)
+			server_log(std::string(REDD) + "Request fd " + ss.str() + " cannot find any valide path root/index", ERROR);
+		if (status == 0)
+			server_log(std::string(REDD) + "Request fd " + ss.str() + " cannot access any path root/index", ERROR);
 	}
 	else
 	{
-		str = _request.getPath();
-		trimBeginStr(str, "/");
-		finalPath = server.getRoot() + "/" + str;
+		tempStr = _request.getPath();
+		trimBeginStr(tempStr, "/");
+		finalPath = server.getRoot() + "/" + tempStr;
         trimBeginStr(finalPath, "/");
-		if (int status = isGoodPath(finalPath))
-			return (finalPath);
-		else if (status == 0)
-			error_throw("Request fd " + ss.str() + " cannot access path : " + finalPath, true);
+		status = isGoodPath(finalPath);
+		if (status == true)
+		{
+			_request.setPath(finalPath);
+			return (true);
+		}
+		else if (status == -1)
+			server_log(std::string(REDD) + "Request fd " + ss.str() + " cannot find the path : " + finalPath, ERROR);
 		else
-			error_throw("Request fd " + ss.str() + " cannot find a path : " + finalPath, true);
+			server_log(std::string(REDD) + "Request fd " + ss.str() + " cannot access path : " + finalPath, ERROR);
 	}
-    
-	error_throw("Request fd " + ss.str() + " cannot access path : " + finalPath, true); //plus de visibilite
-	server_log("Request fd " + ss.str() + " cannot access path : " + finalPath, DEBUG);
-	throw StatusSender::send_status(404, server);
-	return ("");
+	if (status == -1)
+		_request.setStatusCode(404);
+	if (status == 0)
+		_request.setStatusCode(403);
+	return (false);
 }
 
 int	HttpRequestError::isGoodPath(std::string &str)

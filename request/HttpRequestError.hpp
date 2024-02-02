@@ -52,7 +52,7 @@ class HttpRequestError
 
 		int        modifiePath(Server &server);
 
-		std::string	getFinalPath(Server &server, std::string str);
+		bool		getFinalPath(Server &server);
 
 
 

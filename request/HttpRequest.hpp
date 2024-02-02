@@ -69,9 +69,9 @@ class HttpRequest
 		std::string getSaveString();
 		std::string getStrContentLength();
 
-		int         STATUS;
+		int			getStatusCode();
 
-
+		
 		// ----------------------Setter--------------
 
 		void setMethod(const std::string &value);
@@ -99,6 +99,8 @@ class HttpRequest
 		void setSaveString(const std::string & value);
 
 		void setStrContentLength(const std::string &value);
+
+		void	setStatusCode(const int &value);
 
 	private:
 		std::string _method;
@@ -128,6 +130,10 @@ class HttpRequest
 
 		std::vector<Server> &_servers;
 		Server				*_myServer;
+
+		int         		_statusCode;
+
+		bool				
 
 };
 

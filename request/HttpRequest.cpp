@@ -5,13 +5,14 @@
 //throw StatusSender::send_status(500, serv); quand le server et la requete n'est pas conforme il faut envoyer ca et pas un autre truc avec erreur 500 le server ne doit pas s arreter
 #define TIMEOUT_REQUEST 10 // en seconds
 
-HttpRequest::HttpRequest(int connfd, std::vector<Server> &servers) : STATUS(NEW), _method(""), _path(""), _http(""),
+HttpRequest::HttpRequest(int connfd, std::vector<Server> &servers) : _method(""), _path(""), _http(""),
 _host(""), _userAgent(""), _accept(""), _acceptLanguage(""), _acceptEncoding(""),
 _connection(""), _upInsecureRqst(""), _referer(""), _secFetchDest(""), _secFetchMode(""),
 _secFetchSite(""), _contentLength(0), _contentType(""),
 _bodyRequest(""), _headerRequest(""),
 _connfd(connfd), saveString(""), _strContentLength(""),
-_servers(servers), _myServer(NULL)
+_servers(servers), _myServer(NULL),
+_statusCode(NEW)
 {
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
@@ -55,7 +56,7 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
 
 void		HttpRequest::resetRequest(void)
 {
-	STATUS = NEW;
+	_statusCode = NEW;
 	_method = "";
 	_path = "";
 	_http = "";
@@ -105,14 +106,14 @@ int    HttpRequest::processingRequest(void)
 	try
 	{
 		if (recvfd(_connfd) == 0)
-			STATUS = -1;
-		if (STATUS < DONE_HEADER && STATUS != -1)
+			_statusCode = -1;
+		if (_statusCode < DONE_HEADER && _statusCode != -1)
 		{
 			server_log(std::string(GREENN) + "Request fd " + ss.str() + " getHeader in process", DEBUG);
 			HttpRequestParsing header(*this);
 			header.parsingHeader();
 		}
-		if (STATUS == DONE_HEADER)
+		if (_statusCode == DONE_HEADER)
 		{
 			server_log(std::string(GREENN) + "Request fd " + ss.str() + " getHeader succesfuly done", DEBUG);
 			HttpRequestError checkError(*this);
@@ -122,9 +123,11 @@ int    HttpRequest::processingRequest(void)
 			_myServer = checkError.findMyServer(_servers);
 			if (_myServer == NULL)
 				throw error_throw("Request fd " + ss.str() + " server not found", false);
-			_path = checkError.getFinalPath(*_myServer, _path);
+
+			if (checkError.getFinalPath(*_myServer) == false)
+				throw error_throw("Request fd " + ss.str() + " path not good", false);
 		}
-		if (STATUS != DONE_ALL && STATUS >= DONE_HEADER)
+		if (_statusCode != DONE_ALL && _statusCode >= DONE_HEADER)
 		{
 			server_log(std::string(GREENN) + "Request fd " + ss.str() + " succesfuly find final path : " + _path , DEBUG);
 			HttpRequestParsing body(*this);
@@ -135,7 +138,7 @@ int    HttpRequest::processingRequest(void)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-	return (STATUS);
+	return (_statusCode);
 }
 
 // ---------------------GETTEUR---------------------------------
@@ -164,6 +167,7 @@ int			HttpRequest::getConnfd()			{return _connfd;}
 std::string HttpRequest::getSaveString()		{return (this->saveString);}
 
 std::string HttpRequest::getStrContentLength()	{return (this->_strContentLength);}
+int			HttpRequest::getStatusCode()		{return (this->_statusCode);}
 
 
 //-------------------STETTEUR-------------------
@@ -192,3 +196,5 @@ void	HttpRequest::setConnfd(const int &value)					{_connfd = value;}
 void	HttpRequest::setSaveString(const std::string &value)		{saveString = value;}
 
 void	HttpRequest::setStrContentLength(const std::string &value)	{_strContentLength = value;}
+void	HttpRequest::setStatusCode(const int &value)				{_statusCode = value;}
+
