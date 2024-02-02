@@ -13,6 +13,7 @@
 #include <limits>
 #include "../parsing/Server.hpp"
 #include "../utils/utils.hpp"
+#include "../response/StatusSender.hpp"
 
 #define KILL_ME -1
 #define NEW 0

@@ -56,7 +56,7 @@ class HttpRequestError
 
 
 
-		bool		isGoodPath(std::string &str);
+		int			isGoodPath(std::string &str);
 
 		bool       hasReadPermission(std::string &str);
 		bool       hasWritePermission(std::string &str);
