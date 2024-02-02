@@ -18,6 +18,7 @@ class HttpResponse {
 	std::string		_body_request;
 /*		Not set in the consructor		*/
 	int				_status_code;
+	int				_is_cgi;
 	std::string		_status_msg;
 	std::string		_contentType;
 	std::string		_header;

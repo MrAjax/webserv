@@ -37,7 +37,7 @@ void	Post::execute_method(Server &serv) {
 	+ " " \
 	+ HttpStatusCode::get_error_msg(get_status_code()) \
 	+ "\r\n" \
-	+ "Location: /" + this->get_path().substr(serv.getRoot().length(), this->get_path().length() - serv.getRoot().length()) \
+	+ "Location: " + this->get_path().substr(serv.getRoot().length(), this->get_path().length() - serv.getRoot().length()) \
 	+ "\r\nContent-Length: 0" \
 	+ "\r\n\r\n");
 }
