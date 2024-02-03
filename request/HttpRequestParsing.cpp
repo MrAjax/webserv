@@ -27,6 +27,7 @@ void    HttpRequestParsing::parsingHeader(void)
 	parseAllAttributes(_request.getHeaderRequest());
     if (!_request.getStrContentLength().empty())
 	{
+		// std::size_t contentLength;
         _request.setContentLength(convert(_request.getStrContentLength()));
 	}
     _request.setStatusCode(DONE_HEADER);
@@ -38,14 +39,14 @@ void    HttpRequestParsing::parsingBody(void)
 		return ;
 	if (_request.getContentLength() == 0)
 	{
-		_request.setStatusCode(DONE_ALL);
+		_request.setStatusCode(202);
 		return ;
 	}
 	if (_request.getSaveString().size() >= _request.getContentLength())
 	{
 		_request.setBodyRequest(_request.getSaveString().substr(0, _request.getContentLength()));
 		_request.setSaveString("");
-		_request.setStatusCode(DONE_ALL);
+		_request.setStatusCode(202);
 	}
 	else
 	{

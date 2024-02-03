@@ -1,6 +1,6 @@
 #include "HttpRequestChecking.hpp"
 
-#define MAXSIZE 100000
+#define MAX_HEADER_SIZE 1000
 
 HttpRequestChecking::HttpRequestChecking(HttpRequest &request) : _request(request)
 {
@@ -10,6 +10,7 @@ HttpRequestChecking::HttpRequestChecking(HttpRequest &request) : _request(reques
 }
 
 HttpRequestChecking::~HttpRequestChecking() {}
+
 
 int HttpRequestChecking::GET(void)
 {
@@ -54,6 +55,7 @@ int HttpRequestChecking::BuildAndCheckHeader(void)
 {
 	if (_request.getMyserver() == NULL)
 		return (6);
+	_request.setMaxBodySize(_request.getMyserver()->getMaxBodySize());
 	int		(HttpRequestChecking::*f[3])(void) = {&HttpRequestChecking::GET, 
 				&HttpRequestChecking::POST, &HttpRequestChecking::DELETE};
 	std::string tabMethod[3] = {"GET", "POST", "DELETE"};
@@ -90,9 +92,11 @@ bool HttpRequestChecking::isGoodProtocol(std::string const &http)
 
 int HttpRequestChecking::maxSize(void)
 {
-	if (_request.getSaveString().size() > MAXSIZE)
+	if (_request.getMyserver() == NULL)
+		return (3);
+	if (_request.getSaveString().size() + _request.getBodyRequest().size() > _request.getMaxBodySize())
 		return (1);
-	else if (_request.getHeaderRequest().size() + _request.getBodyRequest().size() > MAXSIZE)
+	if (_request.getHeaderRequest().size() > MAX_HEADER_SIZE)
 		return (2);
 	return (0);
 }
@@ -143,8 +147,9 @@ bool HttpRequestChecking::findCgi()
 	_request.setPath(trimString(_request.getPath(), ".cgi", END));
 	server_log(std::string(GREEN) + "Request fd " + _strFd + " find cgi", DEBUG);
 	return (true);
-	
 }
+
+//------------------ find PATHS -------------------------------
 
 bool HttpRequestChecking::findRootPath()
 {
@@ -205,6 +210,8 @@ bool HttpRequestChecking::findOtherPath()
 	}
 	return (false);
 }
+
+//----------------Checking PATHS ----------------------
 
 int	HttpRequestChecking::isGoodPath(std::string &str)
 {
