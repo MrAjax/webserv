@@ -1,13 +1,3 @@
-/*
-------------------------
-start with a clean slate
-------------------------
-
-based on Eric Meyer's CSS Reset 2.0 (http://meyerweb/eric/tools/css/reset/)
-   modified for easier implementation of REM font-sizing with default set to
-   62.5% or 10px on most browsers.  Media-queries adjust this base conversion.
-*/
-
 @media only screen and (max-width: 640px) {
 	:root {
 		font-size: 42.5%;
@@ -54,7 +44,6 @@ time, mark, audio, video {
 	vertical-align: baseline;
 }
 
-/* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
 	display: block;
@@ -77,15 +66,34 @@ q:before, q:after {
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
+	font-size: 2rem;
+    line-height: 3rem;
+    margin: 1rem 0;
+    text-align: center;
+	background-color:gainsboro;
 }
 
-/*
---------------------
-styles for this page
---------------------
-*/
+input {
+	font-size: 12px;
+  	border-radius: 4px;
+}
 
-/* define our fonts */
+button {
+	background-color: #04AA6D; /* Green */
+	border: none;
+	color: white;
+	padding: 7px 65px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	border-radius: 4px;
+}
+
+button:hover {
+	background-color:blueviolet;
+}
+
 @font-face {
 	font-family: 'Open Sans Condensed';
 	font-weight: bold;
@@ -98,7 +106,6 @@ styles for this page
 	src: url(/fonts/opensans-regular.ttf) format("truetype");
 }
 
-/* define variables */
 :root {
 --color-bg: #323232;
 --color-text: #9D9B9B;

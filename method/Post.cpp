@@ -20,17 +20,35 @@ std::string	set_post_path(std::string path) {
 	return post_path + "_data.csv";
 }
 
-void	Post::execute_method(Server &serv) {
-	// TODO generaliser le path du post file suivant le contexte
-	// TODO Status 200: A description of the result of the action is transmitted to the message body.
-	std::fstream	post_file(set_post_path(this->get_path()).c_str(), std::ios::out | std::ios::app);
+void	Post::fill_post_file(Server &serv, std::string query_string) {
+	std::fstream				post_file(set_post_path(this->get_path()).c_str(), std::ios::out | std::ios::app);
+	std::string					key, value, token;
+	std::istringstream			query_stream(query_string);
+	std::vector<std::string>	values;
 
 	if (!post_file.is_open()) {
 		server_log("Cannot open post file - Post.cpp", ERROR);
 		throw StatusSender::send_status(500, serv);
 	}
-	post_file << this->get_body_request() << "\n";
+	post_file << "\n";
+	while (getline(query_stream, token, '&')) {
+		std::istringstream	token_stream(token);
+		if (getline(token_stream, key, '=') && getline(token_stream, value))
+			values.push_back(value);
+	}
+	for (size_t i = 0; i < values.size(); i++) {
+		post_file << values[i];
+		if (i < values.size() - 1)
+			post_file << ",";
+	}
+	post_file << "\n";
 	post_file.close();
+}
+
+void	Post::execute_method(Server &serv) {
+	// TODO generaliser le path du post file suivant le contexte
+	// TODO Status 200: A description of the result of the action is transmitted to the message body.
+	fill_post_file(serv, this->get_body_request());
 	set_statuscode(303);
 	set_header(" " \
 	+ int_to_str(get_status_code()) \

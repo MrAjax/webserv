@@ -8,6 +8,7 @@ class Post: public Method {
 	public:
 	Post(std::string path, std::string content, std::string body_request);
 	~Post();
+	void	fill_post_file(Server &serv, std::string query_string);
 	void	execute_method(Server &serv);
 };
 

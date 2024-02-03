@@ -33,7 +33,7 @@ int	child_process(int *fd, std::string &path) {
 	return (500);
 }
 
-int	Cgi::exec_cgi(std::string &path, std::string &output) {
+int	Cgi::exec_cgi(std::string &path, std::string &output, std::string &input) {
 	server_log("Executing script...", DEBUG);
 	int	fd[2];
 	int	status = check_file_permission(path);
@@ -41,6 +41,11 @@ int	Cgi::exec_cgi(std::string &path, std::string &output) {
 		return (status);
 	if (pipe(fd) < 0) {
 		server_log("pipe error in cgi execution", ERROR);
+		return (500);
+	}
+	server_log("Add QUERY_STRING to environ", DEBUG);
+	if (setenv("QUERY_STRING", input.c_str(), 1)) {
+		server_log("setenv error in cgi management", ERROR);
 		return (500);
 	}
 	server_log("Fork process", DEBUG);
@@ -65,6 +70,7 @@ int	Cgi::exec_cgi(std::string &path, std::string &output) {
 		server_log("child finished", DEBUG);
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
 			server_log("Cgi script execution SUCCESS", DEBUG);
+			std::cout << "Output:\n" << output << "\n";
             return 200;
 		}
 		else {
@@ -73,4 +79,5 @@ int	Cgi::exec_cgi(std::string &path, std::string &output) {
         }
 	}
 	return 200;
+	// TODO --> Si output == "X" --> throw error(500)
 }
