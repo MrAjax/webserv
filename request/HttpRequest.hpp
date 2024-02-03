@@ -75,6 +75,8 @@ class HttpRequest
 		Server		*getMyserver();
 
 		int			getListenFd();
+
+		std::size_t			getMaxBodySize();
 		
 		// ----------------------Setter--------------
 
@@ -106,6 +108,8 @@ class HttpRequest
 
 		void	setStatusCode(const int &value);
 		void	setIsCgi(const bool &value);
+
+		void	setMaxBodySize(const std::size_t &value);
 
 
 	private:
@@ -141,6 +145,8 @@ class HttpRequest
 
 		bool				_isCgi;
 		int 				_listenFd;
+
+		std::size_t			_maxBodySize;
 
 };
 

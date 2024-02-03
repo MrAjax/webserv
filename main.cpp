@@ -184,7 +184,7 @@ int main(int ac, char **av)
 							server_log("other request on clientFD", DEBUG);
 							int status = clientMap[pollfds[i].fd].second->processingRequest();
 							clientMap[pollfds[i].fd].second->printAttribute();
-							if (status == DONE_ALL)
+							if (status > 200)
 							{
 								send_response(pollfds[i].fd, *it->second, *clientMap[pollfds[i].fd].second);
 								clientMap[pollfds[i].fd].second->resetRequest();
