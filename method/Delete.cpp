@@ -4,11 +4,29 @@ Delete::Delete(std::string path, std::string content): Method(path, content) {}
 
 Delete::~Delete() {}
 
-void	Delete::execute_method(Server &serv) {
+void	Delete::remove_file(Server &serv) {
+	(void)serv;
+	server_log("Remove entire file", DEBUG);
 	if (std::remove(this->get_path().c_str()) != 0) {
 		server_log("std::remove failed - Delete.cpp", ERROR);
 		throw StatusSender::send_status(500, serv);
 	}
+}
+
+void	Delete::remove_line(std::string arg, Server &serv) {
+	(void)serv;
+	server_log("Remove line: " + arg, DEBUG);
+	std::cout << "Remove line:  " << arg << "\n";
+}
+
+void	Delete::execute_method(Server &serv) {
+	server_log("Delete", DEBUG);
+	std::string	arg(this->get_body_request());
+
+	if (arg.empty())
+		remove_file(serv);
+	else
+		remove_line(arg, serv);
 	set_statuscode(200);
 	set_header(" " \
 	+ int_to_str(get_status_code()) \

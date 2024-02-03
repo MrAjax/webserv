@@ -7,7 +7,7 @@
     <title>Login</title>
     
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/admin/welcome/user_management.css"><link rel="stylesheet" href="/admin/welcome/styles.css">
+    <link rel="stylesheet" href="/admin/welcome/user_management.css">
 </head>
 <body>
    <div><h1>User Management</h1>
@@ -17,17 +17,11 @@
         <tr>
         <th>#</th>
         <th>Name</th>
-        <th>Action</th>
+        <th>Created</th>
         </tr>
         </thead>
         <tbody>
-        <tr>
-        <td>1</td>
-        <td>Michael Holz</td>
-        <td>
-        <a href="#">Delete</a>
-        </td>
-        </tr>
+        {rows}
         </tbody>
     </table>
     </div>
@@ -40,8 +34,47 @@
             <div>
                 <input type="password" name="password" placeholder="Password" required>
             </div>
-            <button type="submit">Add</button>
+            <button type="submit" class="add-button">Add</button>
         </form>
+    </div>
+    <div>
+        <p>Delete User</p>
+        <form id="deleteUserForm">
+            <div>
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            <button type="submit" class="delete-button">Ciao</button>
+        </form>
+        <script>
+            document.getElementById('deleteUserForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = this.querySelector('[name="username"]').value;
+            
+                // Send a DELETE request
+                fetch('/admin/welcome/delete.html', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username: username }),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok.');
+                })
+                .then(data => {
+                    console.log(data);
+                    // Handle success response
+                    // Maybe redirect or show a success message
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                    // Handle errors here
+                });
+            });
+            </script>            
     </div>
     <footer>
         <p><a href="/admin/welcome/admin_welcome.html">Welcome</a></p>

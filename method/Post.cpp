@@ -30,7 +30,7 @@ void	Post::fill_post_file(Server &serv, std::string query_string) {
 		server_log("Cannot open post file - Post.cpp", ERROR);
 		throw StatusSender::send_status(500, serv);
 	}
-	post_file << "\n";
+	//post_file << "\n";
 	while (getline(query_stream, token, '&')) {
 		std::istringstream	token_stream(token);
 		if (getline(token_stream, key, '=') && getline(token_stream, value))

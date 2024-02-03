@@ -10,8 +10,9 @@ def check_credentials(username, password, filename="website_exmpl/Zzewebsite/use
     with open(filename, newline='') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
-            if row[0] == username and row[1] == password:
-                return True
+            if row and row[0]:
+                if row[0] == username and row[1] == password:
+                    return True
     return False
 
 def print_html_page(username):

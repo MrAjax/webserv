@@ -78,7 +78,7 @@ input {
   	border-radius: 4px;
 }
 
-button {
+.add-button {
 	background-color: #04AA6D; /* Green */
 	border: none;
 	color: white;
@@ -90,8 +90,24 @@ button {
 	border-radius: 4px;
 }
 
-button:hover {
-	background-color:blueviolet;
+.add-button:hover {
+	background-color:yellowgreen;
+}
+
+.delete-button {
+	background-color:brown; /* Green */
+	border: none;
+	color: white;
+	padding: 7px 65px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	border-radius: 4px;
+}
+
+.delete-button:hover {
+	background-color:chocolate;
 }
 
 @font-face {

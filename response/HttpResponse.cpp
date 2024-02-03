@@ -55,7 +55,10 @@ std::string	HttpResponse::get_response(Server &serv) {
 		return _response;
 	}
 	Method *m;
-	_contentType = ContentTypeFinder::get_content_type(_path);
+	if (_method_code == DELETE)
+		_contentType = "text/html";
+	else
+		_contentType = ContentTypeFinder::get_content_type(_path);
 	if (_contentType.empty())
 		throw StatusSender::send_status(404, serv);
 	m = _execute_method(_method_code, serv);

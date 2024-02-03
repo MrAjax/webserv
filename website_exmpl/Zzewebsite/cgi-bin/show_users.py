@@ -6,18 +6,30 @@ import csv
 import html
 from urllib.parse import parse_qs
 
-def print_html_page(username):
+def generate_html_rows():
+    filename = 'website_exmpl/Zzewebsite/user/welcome/welcome_data.csv'
+    rows = ""
+    try:
+        with open(filename, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            for i, row in enumerate(reader, start=1):
+                rows += f'<tr><td>{i}</td><td>{row[0]}</td><td>{row[2]}</td></tr>\n'
+    except FileNotFoundError:
+        rows = ""
+    return(rows)
+
+def print_html_page():
     file_path = 'website_exmpl/Zzewebsite/admin/welcome/user_management.html'
     try:
         with open(file_path, 'r') as file:
-            for line in file:
-                print(line)
+            file_content = file.read()
+        data_rows = generate_html_rows()
+        if data_rows == "X":
+            output = "X"
+        else:
+            output = file_content.replace('{rows}', data_rows)
     except FileNotFoundError:
-        print("X")
+        output = "X"
+    return output
 
-query_string = os.environ.get("QUERY_STRING", "")
-params = parse_qs(query_string)
-username = params.get("username", [None])[0]
-password = params.get("password", [None])[0]
-
-print_html_page(username)
+print(print_html_page())
