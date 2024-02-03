@@ -12,7 +12,7 @@ _secFetchSite(""), _contentLength(0), _contentType(""),
 _bodyRequest(""), _headerRequest(""),
 _connfd(connfd), saveString(""), _strContentLength(""),
 _servers(servers), _myServer(NULL),
-_statusCode(NEW), _isCgi(false), _listenFd(listenFd)
+_statusCode(NEW), _isCgi(false), _listenFd(listenFd), _maxBodySize(0)
 {
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
@@ -104,6 +104,8 @@ int    HttpRequest::processingRequest(void)
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 	std::stringstream ss;
 	ss << _connfd;
+	if (_statusCode > 200 || _statusCode == -1)
+		return (_statusCode);
 	try
 	{
 		if (recvfd(_connfd) == 0)
@@ -124,7 +126,7 @@ int    HttpRequest::processingRequest(void)
 			if (checkError.BuildAndCheckHeader() != 0)
 				throw error_throw("Request fd " + ss.str() + " path not good", false);
 		}
-		if (_statusCode != DONE_ALL && _statusCode >= DONE_HEADER)
+		if (_statusCode != DONE_ALL && _statusCode >= DONE_HEADER && _statusCode < 200)
 		{
 			server_log(std::string(GREENN) + "Request fd " + ss.str() + " succesfuly check header and find final path : " + _path , DEBUG);
 			HttpRequestParsing body(*this);
@@ -171,6 +173,8 @@ bool		HttpRequest::getIsCgi()				{return (this->_isCgi);}
 
 int			HttpRequest::getListenFd()			{return (this->_listenFd);}
 
+std::size_t			HttpRequest::getMaxBodySize()			{return (this->_maxBodySize);}
+
 
 
 //-------------------STETTEUR-------------------
@@ -203,3 +207,4 @@ void	HttpRequest::setStatusCode(const int &value)				{_statusCode = value;}
 
 void	HttpRequest::setIsCgi(const bool &value)					{_isCgi = value;}
 
+void	HttpRequest::setMaxBodySize(const std::size_t &value)				{_maxBodySize = value;}
