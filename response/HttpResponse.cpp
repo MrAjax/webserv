@@ -5,13 +5,11 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 										_path(req.getPath()), \
 										_server_path(serv.getRoot()), \
 										_index_list(serv.getIndex()), \
-										_status_code(202 /* should take it from the req in case of an error */), \
+										_body_request(req.getBodyRequest()), \
+										_status_code(/* req.getStatusCode() */202), \
 										_is_cgi(0) {
 	if (_status_code != 202)
 		throw StatusSender::send_status(_status_code, serv);
-
-	if (_method_code == POST || _method_code == DELETE)
-		_body_request = req.getBodyRequest();
 	if (is_cgi(_path)) {
 		server_log("Found CGI", DEBUG);
 		_is_cgi = 1;
@@ -21,7 +19,6 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 		if (_status_code != 200)
 			throw StatusSender::send_status(_status_code, serv);
 	}
-
 	server_log(std::string(WHITEE) + "method = " + _method, DEBUG);
 	server_log(std::string(WHITEE) + "method code = " + int_to_str(_method_code), DEBUG);
 	server_log(std::string(WHITEE) + "path = " + _path, DEBUG);

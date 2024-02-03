@@ -108,15 +108,6 @@ void	init_server(void) {
 	init_log_file();
 	server_log("SERVER STARTED", INFO);
 }
-/*
-void	stop_server(t_server &server) {
-	close(server.listenfd);
-	close(server.connfd);
-	server_log("Connection closed", INFO);
-	server_log("SERVER STOPPED", INFO);
-	std::cout << std::string(GREENN) + "\nConnection closed - Bye!\n" + std::string(ENDD);
-}
-*/
 
 bool isListener(int fd, std::vector<Server> servers) {
 	for (size_t i = 0; i < servers.size(); i++) {
@@ -157,7 +148,7 @@ int main(int ac, char **av)
 			if (poll_count == -1) 
 				std::cerr << "poll error: " << strerror(errno) << std::endl;
 
-			std::cout << YELLOW "Number of pollfd= " RESET << sizePollfds << std::endl;			
+	//		std::cout << YELLOW "Number of pollfd= " RESET << sizePollfds << std::endl;			
 
 			for(size_t i = 0; i < sizePollfds; i++)
 			{
@@ -168,13 +159,13 @@ int main(int ac, char **av)
 					if (it != serversMap.end()) {
 						if (isListener(pollfds[i].fd, servers)) //socketfd is listener == 1st co
 						{
-							std::cout << "server name: " << it->second->getServerName() << "\n";
+			//				std::cout << "server name: " << it->second->getServerName() << "\n";
 							struct sockaddr_in clientAddr;
 							socklen_t tempAddrlen = sizeof(clientAddr);
 
-							std::cout << PURPLE "New connexion with listener socket fd= " RESET <<  pollfds[i].fd << std::endl;
+					//		std::cout << PURPLE "New connexion with listener socket fd= " RESET <<  pollfds[i].fd << std::endl;
 							int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
-							std::cout << PURPLE "New client fd= " RESET << clientFd << std::endl;
+					//		std::cout << PURPLE "New client fd= " RESET << clientFd << std::endl;
 
 							if (clientFd == -1) {
 								std::cerr << "Accept error: " << strerror(errno) << std::endl;
@@ -186,8 +177,8 @@ int main(int ac, char **av)
 						}
 						else // socketfd aldready set c/p from HttpRequest
 						{
-							std::cout << GREEN "pollfds.fd= " RESET << pollfds[i].fd << std::endl;
-							std::cout << GREEN "requestfd.fd= " RESET << clientMap[pollfds[i].fd].second->getConnfd() << std::endl;
+					//		std::cout << GREEN "pollfds.fd= " RESET << pollfds[i].fd << std::endl;
+					//		std::cout << GREEN "requestfd.fd= " RESET << clientMap[pollfds[i].fd].second->getConnfd() << std::endl;
 
 							//std::cout << "server name: " << it->second->getServerName() << "\n";
 							server_log("other request on clientFD", DEBUG);

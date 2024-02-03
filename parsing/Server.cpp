@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pgiraude <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/02 16:04:14 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/03 14:22:15 by mferracc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,12 +108,12 @@ Server::Server(Server const& a) {
 		for (it = a._locations.begin(); it != a._locations.end(); ++it) {
 			_locations[it->first] = new Location(*(it->second));
 		}	
-	std::cout << BLUE << "Server " << _i << " copy constructor called" << RESET << std::endl;
+//	std::cout << BLUE << "Server " << _i << " copy constructor called" << RESET << std::endl;
 }
 
 Server::~Server(void) {
 
-	std::cout << BLUE << "Server " << _i << " destructor called" << RESET << std::endl;
+//	std::cout << BLUE << "Server " << _i << " destructor called" << RESET << std::endl;
 	std::map<std::string, Location*>::iterator it;
 		for (it = _locations.begin(); it != _locations.end(); ++it) {
 			delete it->second;

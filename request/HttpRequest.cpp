@@ -15,10 +15,10 @@ _servers(servers), _myServer(NULL),
 _statusCode(NEW), _isCgi(false), _listenFd(listenFd)
 {
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
-	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
+	//std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
 }
 
-HttpRequest::~HttpRequest(void)	{std::cout << BLUE << _connfd << " Destructor call\n" << RESET;}
+HttpRequest::~HttpRequest(void)	{/* std::cout << BLUE << _connfd << " Destructor call\n" << RESET; */}
 
 //-----------UTILS------------------
 
@@ -42,7 +42,7 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
     	std::string (HttpRequest::*getter)();  // Pointeur vers le getter
 	};
 //	std::size_t	nbParam = 16;
-	struct _tab tab[NBPARAM] = {{"Method:", &HttpRequest::getMethod}, {"Path:", &HttpRequest::getPath},
+/* 	struct _tab tab[NBPARAM] = {{"Method:", &HttpRequest::getMethod}, {"Path:", &HttpRequest::getPath},
 		{"Protocol:", &HttpRequest::getHttp},{"Host:", &HttpRequest::getHost}, {"User-Agent:", &HttpRequest::getUserAgent},
 		{"Accept:", &HttpRequest::getAccept}, {"Accept-Language:", &HttpRequest::getAcceptLanguage},
 		{"Accept-Encoding:", &HttpRequest::getAcceptEncoding}, {"Connection:", &HttpRequest::getConnection},
@@ -51,7 +51,7 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
 		{"Sec-Fetch-Site:", &HttpRequest::getSecFetchSite}, {"Content-Length:", &HttpRequest::getStrContentLength},
 		{"Content-Type:", &HttpRequest::getContentType}};
 	for (std::size_t i = 0; i < NBPARAM; i++)
-		std::cout << YELLOW << tab[i].key << RESET << (this->*(tab[i].getter))() << std::endl;
+		std::cout << YELLOW << tab[i].key << RESET << (this->*(tab[i].getter))() << std::endl; */
 }
 
 void		HttpRequest::resetRequest(void)
