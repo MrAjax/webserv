@@ -24,6 +24,7 @@ class StatusSender {
 	std::string		_error_403();
 	std::string		_error_404();
 	std::string		_error_500();
+	std::string		_error_generic(int err);
 	std::string		_get_response();
 public:
 	static	std::string		send_status(int err, Server &serv);

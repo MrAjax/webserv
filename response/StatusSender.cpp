@@ -21,7 +21,7 @@ StatusSender::StatusSender(int err, Server &serv): _server_path(serv.getRoot()),
 		_response = _error_500();
 		break;
 	default:
-		_response = _error_500(); // TODO changer c'est pas erreur 500 l'erreur par defaut
+		_response = _error_generic(err); // TODO changer c'est pas erreur 500 l'erreur par defaut
 		break;
 	}
 	server_log("Response status is ready", DEBUG);
@@ -148,6 +148,12 @@ std::string	StatusSender::_error_500() {
 			error_throw("Server crashed", true);
 	}
 	_body = file_content.str();
+	_header = build_header(_status_code, "text/html", _body.length());
+	return _header + _body;
+}
+
+std::string	StatusSender::_error_generic(int err) {
+	_body = basic_page(int_to_str(err) + " " + HttpStatusCode::get_error_msg(err), "");
 	_header = build_header(_status_code, "text/html", _body.length());
 	return _header + _body;
 }

@@ -5,7 +5,8 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 										_path(req.getPath()), \
 										_server_path(serv.getRoot()), \
 										_index_list(serv.getIndex()), \
-										_status_code(202 /* should take it from the req in case of an error */) {
+										_status_code(202 /* should take it from the req in case of an error */), \
+										_is_cgi(0) {
 	if (_status_code != 202)
 		throw StatusSender::send_status(_status_code, serv);
 
@@ -13,9 +14,12 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 		_body_request = req.getBodyRequest();
 	if (is_cgi(_path)) {
 		server_log("Found CGI", DEBUG);
+		_is_cgi = 1;
 		_path.resize(_path.size() - EXT_SIZE);
-		_status_code = Cgi::exec_cgi(_path);
-		throw StatusSender::send_status(_status_code, serv);
+		server_log("Cgi file: " + _path, DEBUG);
+		_status_code = Cgi::exec_cgi(_path, _body);
+		if (_status_code != 200)
+			throw StatusSender::send_status(_status_code, serv);
 	}
 
 	server_log(std::string(WHITEE) + "method = " + _method, DEBUG);
@@ -48,6 +52,11 @@ Method	*HttpResponse::_execute_method(int method_code,Server &serv) {
 }
 
 std::string	HttpResponse::get_response(Server &serv) {
+	if (_is_cgi) {
+		_header = build_header(_status_code, "text/html", _body.size());
+		_response = _header + _body;
+		return _response;
+	}
 	Method *m;
 	_contentType = ContentTypeFinder::get_content_type(_path);
 	if (_contentType.empty())
