@@ -18,6 +18,8 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 		_path.resize(_path.size() - EXT_SIZE);
 		server_log("Cgi file: " + _path, DEBUG);
 		_status_code = Cgi::exec_cgi(_path, _body);
+		if (_status_code != 200)
+			throw StatusSender::send_status(_status_code, serv);
 	}
 
 	server_log(std::string(WHITEE) + "method = " + _method, DEBUG);
