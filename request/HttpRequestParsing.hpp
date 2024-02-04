@@ -25,14 +25,14 @@ class HttpRequestParsing
 		~HttpRequestParsing(void);
 		//------------OPERATOR------------------//
 
-		void    	parsingHeader(void);
+		bool    	parsingHeader(void);
 		void    	parsingBody(void);
 
 		void        splitHeaderBody(std::string &saveString);
-		void        parsingHeader(std::string &header);
-		void        parsingHeader_method_path_http(std::string &line);
-		std::string parsingHeader_rest(std::string &line, std::string const & keyWord);
-        void        parseAllAttributes(std::string header);
+		bool        parsingHeader(std::string &header);
+		bool        parsingHeader_method_path_http(std::string &line);
+		bool	parsingHeader_rest(std::string &line, std::string const & keyWord, std::string & output);
+        bool        parseAllAttributes(std::string header);
 
 		//---------Utils---------------------
 		std::size_t findLine(std::string &header, std::string &line, std::string &delimiteur);
@@ -46,6 +46,7 @@ class HttpRequestParsing
     			std::string (HttpRequest::*getter)();  // Pointeur vers le getter
     			void (HttpRequest::*setter)(const std::string&);  // Pointeur vers le setter
 			};
+			std::string	_strFd;
 
 
 };

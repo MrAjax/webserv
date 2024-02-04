@@ -3,34 +3,38 @@
 
 HttpRequestParsing::HttpRequestParsing(HttpRequest &request) : _request(request)
 {
-    
+    std::stringstream ss;
+	ss << _request.getConnfd();
+	_strFd = ss.str();
 }
 
 HttpRequestParsing::~HttpRequestParsing() {}
 
-void    HttpRequestParsing::parsingHeader(void)
+bool    HttpRequestParsing::parsingHeader(void)
 {
 	if (_request.getStatusCode() >= DONE_HEADER || _request.getStatusCode() == -1)
-		return ;
+		return (false);
 	std::string delimiteur = "\r\n\r\n";
 	std::size_t pos = _request.getSaveString().find(delimiteur);
 	if (pos == std::string::npos)
 	{
 		_request.setStatusCode(PROCESSING_HEADER);
-		return ;
+		return (false);
 	}
 	_request.setHeaderRequest(_request.getSaveString().substr(0, pos));
 	if (_request.getSaveString().size() > pos + delimiteur.size())
 		_request.setSaveString(_request.getSaveString().substr(pos + delimiteur.size()));
 	else
 		_request.getSaveString() = "";
-	parseAllAttributes(_request.getHeaderRequest());
+	if (parseAllAttributes(_request.getHeaderRequest()) == false)
+		return (false);
     if (!_request.getStrContentLength().empty())
 	{
-		// std::size_t contentLength;
+
         _request.setContentLength(convert(_request.getStrContentLength()));
 	}
     _request.setStatusCode(DONE_HEADER);
+	return (true);
 }
 
 void    HttpRequestParsing::parsingBody(void)
@@ -92,32 +96,38 @@ std::size_t HttpRequestParsing::convert(std::string const &toConvert)
 
 //-----------Header parser----------------
 
-void	HttpRequestParsing::parsingHeader_method_path_http(std::string &line)
+bool	HttpRequestParsing::parsingHeader_method_path_http(std::string &line)
 {
 	std::stringstream	ss(line);
 	std::string			output;
 	ss >> output;
-	if (output != "GET" && output != "POST" && output != "DELETE")
-		throw std::runtime_error("ERROR: Cannot find method in request\n");
-	else
-		_request.setMethod(output);
+	_request.setMethod(output);
 	ss >> output;
 	this->_request.setPath(output);
 	ss >> output;
 	this->_request.setHttp(output);
 	if (ss >> output)
-		throw std::runtime_error("ERROR: Bad request synthax in 1st line\n");
+	{
+		server_log(std::string(REDD) + "Request fd " + _strFd
+		+ " bad synthax : " + line, ERROR);
+		_request.setStatusCode(400);
+		return (false);
+	}
+	return (true);
 }
 
-std::string	HttpRequestParsing::parsingHeader_rest(std::string &line, std::string const & keyWord)
+bool	HttpRequestParsing::parsingHeader_rest(std::string &line, std::string const & keyWord, std::string &output)
 {
 	std::stringstream	ss(line);
 	std::string			token;
-	std::string			output;
 
 	ss >> token;
 	if (token != keyWord)
-		return (output);
+	{
+		server_log(std::string(REDD) + "Request fd " + _strFd + " bad synthax : " + line, ERROR);
+		_request.setStatusCode(400);
+		return (false);
+	}
 	else
 	{
 		while (ss >> token)
@@ -127,12 +137,12 @@ std::string	HttpRequestParsing::parsingHeader_rest(std::string &line, std::strin
 			output += token;
 		}
 	}
-	return (output);
+	return (true);
 }
 
-void    HttpRequestParsing::parseAllAttributes(std::string header)
+bool    HttpRequestParsing::parseAllAttributes(std::string header)
 {
-	std::size_t nbParam = 13;
+	std::size_t nbParam = 14;
 	std::size_t end_pos;
 	std::string delimiteur = "\r\n";
 	std::string	line;
@@ -143,10 +153,11 @@ void    HttpRequestParsing::parseAllAttributes(std::string header)
 		{"Upgrade-Insecure-Requests:", &HttpRequest::getUpInsecureRqst, &HttpRequest::setUpInsecureRqst}, {"Referer:", &HttpRequest::getReferer, &HttpRequest::setReferer},
 		{"Sec-Fetch-Dest:", &HttpRequest::getSecFetchDest, &HttpRequest::setSecFetchDest}, {"Sec-Fetch-Mode:", &HttpRequest::getSecFetchMode, &HttpRequest::setSecFetchMode},
 		{"Sec-Fetch-Site:", &HttpRequest::getSecFetchSite, &HttpRequest::setSecFetchSite}, {"Content-Length:", &HttpRequest::getStrContentLength, &HttpRequest::setStrContentLength},
-		{"Content-Type:", &HttpRequest::getContentType, &HttpRequest::setContentType}};
+		{"Content-Type:", &HttpRequest::getContentType, &HttpRequest::setContentType}, {"Cookie:", &HttpRequest::getCookie, &HttpRequest::setCookie}};
 	
 	end_pos = findLine(header, line, delimiteur);
-	parsingHeader_method_path_http(line);
+	if (parsingHeader_method_path_http(line) == false)
+		return (false);
 	while (end_pos != std::string::npos)
 	{
 		end_pos = findLine(header, line, delimiteur);
@@ -155,10 +166,19 @@ void    HttpRequestParsing::parseAllAttributes(std::string header)
 			if (line.find(tab[i].key) != std::string::npos)
 			{
 				if (!((_request.*(tab[i].getter))().empty()))
-					throw std::runtime_error("Error: Bad request synthax duplicate information");
-				(_request.*(tab[i].setter))(parsingHeader_rest(line, tab[i].key));
+				{
+					server_log(std::string(REDD) + "Request fd " + _strFd
+					+ " bad synthax double info", ERROR);
+					_request.setStatusCode(400);
+					return (false);
+				}
+				std::string output;
+				if (parsingHeader_rest(line, tab[i].key, output) == false)
+					return (false);
+				(_request.*(tab[i].setter))(output);
 				break ;
 			}
 		}
 	}
+	return (true);
 }
