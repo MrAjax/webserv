@@ -8,7 +8,7 @@ from urllib.parse import parse_qs
 from datetime import datetime
 
 def print_html_page(username):
-    file_path = 'website_exmpl/Zzewebsite/user/welcome/welcome.html'
+    file_path = 'website_exmpl/Zzewebsite/admin/welcome/created.html'
     try:
         with open(file_path, 'r') as file:
             for line in file:

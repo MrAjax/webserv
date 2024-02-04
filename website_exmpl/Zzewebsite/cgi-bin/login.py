@@ -24,6 +24,18 @@ def print_html_page(username):
     except FileNotFoundError:
         print("X")
 
+
+def print_login_page():
+    file_path = 'website_exmpl/Zzewebsite/user/login/login.html'
+    try:
+        with open(file_path, 'r') as file:
+            for line in file:
+                line = line.replace('<!-- <div id="error-message" style="color: red;">Invalid credentials</div> -->', '<div id="error-message" style="color: red;">Invalid credentials</div>')
+                line = line.replace('/user/login/login.jpg', '/user/login/error.jpg')
+                print(line)
+    except FileNotFoundError:
+        print("Xx")
+
 query_string = os.environ.get("QUERY_STRING", "")
 params = parse_qs(query_string)
 username = params.get("username", [None])[0]
@@ -33,6 +45,6 @@ if username and password:
     if check_credentials(username, password):
         print_html_page(username)
     else:
-        print("Invalid credentials")
+        print_login_page()
 else:
     print("X")

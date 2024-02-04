@@ -39,42 +39,12 @@
     </div>
     <div>
         <p>Delete User</p>
-        <form id="deleteUserForm">
+        <form action="/cgi-bin/delete_user.py.cgi" method="post">
             <div>
                 <input type="text" name="username" placeholder="Username" required>
             </div>
             <button type="submit" class="delete-button">Ciao</button>
         </form>
-        <script>
-            document.getElementById('deleteUserForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const username = this.querySelector('[name="username"]').value;
-            
-                // Send a DELETE request
-                fetch('/admin/welcome/delete.html', {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username: username }),
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error('Network response was not ok.');
-                })
-                .then(data => {
-                    console.log(data);
-                    // Handle success response
-                    // Maybe redirect or show a success message
-                })
-                .catch(error => {
-                    console.error('There has been a problem with your fetch operation:', error);
-                    // Handle errors here
-                });
-            });
-            </script>            
     </div>
     <footer>
         <p><a href="/admin/welcome/admin_welcome.html">Welcome</a></p>
