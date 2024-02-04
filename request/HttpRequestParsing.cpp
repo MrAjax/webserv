@@ -5,14 +5,35 @@ HttpRequestParsing::HttpRequestParsing(HttpRequest &request) : _request(request)
 {
     std::stringstream ss;
 	ss << _request.getConnfd();
-	_strFd = ss.str();
+	_debugFd = ss.str();
 }
 
 HttpRequestParsing::~HttpRequestParsing() {}
 
+bool	HttpRequestParsing::isMaxSize()
+{
+	if (_request.getSaveString().size() > MAX_HEADER_SIZE &&
+		(_request.getStatusCode() == PROCESSING_HEADER || _request.getStatusCode() == NEW))
+	{
+		server_log(std::string(REDD) + "Request fd " + _debugFd + " Header > max_size_header", ERROR);
+		_request.setStatusCode(400);
+		return (true);
+	}
+	if (_request.getMyserver() != NULL && _request.getSaveString().size() > _request.getMaxBodySize() &&
+		(_request.getStatusCode() == DONE_HEADER_CHECKING || _request.getStatusCode() == PROCESSING_BODY))
+	{
+		server_log(std::string(REDD) + "Request fd " + _debugFd + " Body > max_size", ERROR);
+		_request.setStatusCode(400);
+		return (true);
+	}
+	return (false);
+}
+
 bool    HttpRequestParsing::parsingHeader(void)
 {
-	if (_request.getStatusCode() >= DONE_HEADER || _request.getStatusCode() == -1)
+	if (_request.getStatusCode() != NEW && _request.getStatusCode() != PROCESSING_HEADER)
+		return (false);
+	if (isMaxSize() == true)
 		return (false);
 	std::string delimiteur = "\r\n\r\n";
 	std::size_t pos = _request.getSaveString().find(delimiteur);
@@ -30,33 +51,41 @@ bool    HttpRequestParsing::parsingHeader(void)
 		return (false);
     if (!_request.getStrContentLength().empty())
 	{
-
-        _request.setContentLength(convert(_request.getStrContentLength()));
+		try{
+        	_request.setContentLength(strToSize_t(_request.getStrContentLength()));
+		} catch (std::exception &e) {
+			server_log(std::string(REDD) + "Request fd " + _debugFd + " bad synthax content-length : "
+			+ _request.getStrContentLength(), ERROR);
+			_request.setStatusCode(400);
+			return (false);
+		}
 	}
     _request.setStatusCode(DONE_HEADER);
 	return (true);
 }
 
-void    HttpRequestParsing::parsingBody(void)
+bool    HttpRequestParsing::parsingBody(void)
 {
-	if (_request.getStatusCode() == DONE_ALL || _request.getStatusCode() < DONE_HEADER)
-		return ;
+	if (_request.getStatusCode() != DONE_HEADER_CHECKING && _request.getStatusCode() != PROCESSING_BODY)
+		return (false);
 	if (_request.getContentLength() == 0)
 	{
 		_request.setStatusCode(202);
-		return ;
+		server_log(std::string(GREENN) + "Request fd " + _debugFd + " succesful code 202", DEBUG);
+		return (true);
 	}
+	if (isMaxSize() == true)
+		return (false);
 	if (_request.getSaveString().size() >= _request.getContentLength())
 	{
 		_request.setBodyRequest(_request.getSaveString().substr(0, _request.getContentLength()));
 		_request.setSaveString("");
 		_request.setStatusCode(202);
+		server_log(std::string(GREENN) + "Request fd " + _debugFd + " succesful code 202", DEBUG);
+		return (true);
 	}
-	else
-	{
-		_request.setBodyRequest(_request.getSaveString());
-		_request.setStatusCode(PROCESSING_BODY);
-	}
+	_request.setStatusCode(PROCESSING_BODY);
+	return (false);
 }
 
 //-----------Utils----------------
@@ -74,26 +103,6 @@ std::size_t	HttpRequestParsing::findLine(std::string &header, std::string &line,
 	return (end_pos);
 }
 
-std::size_t HttpRequestParsing::convert(std::string const &toConvert)
-{
-	if (toConvert.empty())
-		throw std::runtime_error("ERROR: string to size_t convertor nothing to convert\n");
-	if (toConvert[0] == '0' && toConvert.size() > 1)
-		throw std::runtime_error("ERROR: string to size_t convertor bad synthax\n");
-	for (std::size_t i = 0; i < toConvert.size(); i++)
-	{
-		if (!std::isdigit(toConvert[i]))
-			throw std::runtime_error("ERROR: string to size_t convertor != digit\n");
-	}
-	std::stringstream ss;
-	ss << toConvert;
-	std::size_t	value;
-	ss >> value;
-	if (value == std::numeric_limits<std::size_t>::max())
-		throw std::runtime_error("ERROR: string to size_t convertor value >= size_t MAX\n");
-	return (value);
-}
-
 //-----------Header parser----------------
 
 bool	HttpRequestParsing::parsingHeader_method_path_http(std::string &line)
@@ -108,7 +117,7 @@ bool	HttpRequestParsing::parsingHeader_method_path_http(std::string &line)
 	this->_request.setHttp(output);
 	if (ss >> output)
 	{
-		server_log(std::string(REDD) + "Request fd " + _strFd
+		server_log(std::string(REDD) + "Request fd " + _debugFd
 		+ " bad synthax : " + line, ERROR);
 		_request.setStatusCode(400);
 		return (false);
@@ -124,7 +133,7 @@ bool	HttpRequestParsing::parsingHeader_rest(std::string &line, std::string const
 	ss >> token;
 	if (token != keyWord)
 	{
-		server_log(std::string(REDD) + "Request fd " + _strFd + " bad synthax : " + line, ERROR);
+		server_log(std::string(REDD) + "Request fd " + _debugFd + " bad synthax : " + line, ERROR);
 		_request.setStatusCode(400);
 		return (false);
 	}
@@ -167,7 +176,7 @@ bool    HttpRequestParsing::parseAllAttributes(std::string header)
 			{
 				if (!((_request.*(tab[i].getter))().empty()))
 				{
-					server_log(std::string(REDD) + "Request fd " + _strFd
+					server_log(std::string(REDD) + "Request fd " + _debugFd
 					+ " bad synthax double info", ERROR);
 					_request.setStatusCode(400);
 					return (false);

@@ -12,7 +12,6 @@
 
 #include <sys/socket.h>
 
-#include <limits>
 #include "HttpRequest.hpp"
 
 # define RESET	"\e[0m"
@@ -42,9 +41,7 @@ class HttpRequestChecking
 
 		int         BuildAndCheckHeader();
 		int         Path();
-		int         maxSize();
 
-		int         socketfdServers(std::vector<Server> &servers);
 
 		Server      *findMyServer(std::vector<Server> &servers);
 
@@ -67,7 +64,7 @@ class HttpRequestChecking
 
 		private:
 			HttpRequest &_request;
-			std::string _strFd;
+			std::string _debugFd;
 
 
 

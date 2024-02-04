@@ -16,5 +16,6 @@ std::string			build_header(int status_code, std::string content_type, size_t bod
 std::string 		basic_page(std::string title, std::string p);
 bool				is_cgi(std::string file_name);
 std::string	        trimString(std::string str, std::string const &toTrim, int STARTorEND);
+std::size_t         strToSize_t(std::string const &toConvert);
 
 #endif

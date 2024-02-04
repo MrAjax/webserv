@@ -33,6 +33,7 @@
 #include <vector>
 #include <fstream>
 #include <ctime>
+#include <limits>
 // General
 #define SA struct sockaddr
 // Server config
