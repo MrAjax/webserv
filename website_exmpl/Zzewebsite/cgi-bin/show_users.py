@@ -5,6 +5,27 @@ import cgi
 import csv
 import html
 from urllib.parse import parse_qs
+import email.utils
+
+def print_http_response(body):
+    if body[0] !=  'X':
+        http_date = email.utils.formatdate(usegmt=True)
+        server_name = "Webserv"
+        content_type = "text/html"
+        content_length = len(body.encode('utf-8'))
+        
+        headers = [
+        f"HTTP/1.1 200 OK",
+        f"Date: {http_date}",
+        f"Server: {server_name}",
+        f"Content-Type: {content_type}",
+        f"Content-Length: {content_length}",
+        ]
+        
+        http_response = "\r\n".join(headers) + "\r\n\r\n" + body
+        print(http_response)
+    else:
+        print("X")
 
 def generate_html_rows():
     filename = 'website_exmpl/Zzewebsite/user/welcome/welcome_data.csv'
@@ -32,4 +53,5 @@ def print_html_page():
         output = "X"
     return output
 
-print(print_html_page())
+body = print_html_page()
+print_http_response(body)

@@ -70,14 +70,13 @@ int	Cgi::exec_cgi(std::string &path, std::string &output, std::string &input) {
 		server_log("child finished", DEBUG);
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
 			server_log("Cgi script execution SUCCESS", DEBUG);
-			std::cout << "Output:\n" << output << "\n";
+			//std::cout << "Output:\n" << output << "\n";
             return 200;
 		}
 		else {
             server_log("CGI script execution failed: " + path, ERROR);
-            return 500;
+            return 400;
         }
 	}
 	return 200;
-	// TODO --> Si output == "X" --> throw error(500)
 }

@@ -13,11 +13,11 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 	if (_is_cgi) {
 		server_log("Found CGI", DEBUG);
 		server_log("Cgi file: " + _path, DEBUG);
-		_status_code = Cgi::exec_cgi(_path, _body, _body_request);
+		_status_code = Cgi::exec_cgi(_path, _response, _body_request);
 		if (_status_code != 200)
 			throw StatusSender::send_status(_status_code, serv);
-		else if (_body[0] == 'X')
-			throw StatusSender::send_status(500, serv);
+		else if (_response.empty() || _response[0] == 'X')
+			throw StatusSender::send_status(400, serv);
 	}
 	server_log(std::string(WHITEE) + "method = " + _method, DEBUG);
 	server_log(std::string(WHITEE) + "method code = " + int_to_str(_method_code), DEBUG);
@@ -49,11 +49,8 @@ Method	*HttpResponse::_execute_method(int method_code,Server &serv) {
 }
 
 std::string	HttpResponse::get_response(Server &serv) {
-	if (_is_cgi) { // TODO --> Rajouter un set_cookie field dans build header et une var _cookie dans la classe Rep
-		_header = build_header(_status_code, "text/html", _body.size());
-		_response = _header + _body;
+	if (_is_cgi)
 		return _response;
-	}
 	Method *m;
 	if (_method_code == DELETE)
 		_contentType = "text/html";
