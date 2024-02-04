@@ -7,13 +7,14 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 										_index_list(serv.getIndex()), \
 										_body_request(req.getBodyRequest()), \
 										_status_code(/* req.getStatusCode() */202), \
-										_is_cgi(req.getIsCgi()) {
+										_is_cgi(req.getIsCgi()), \
+										_cookie(req.getCookie()) {
 	if (_status_code != 202)
 		throw StatusSender::send_status(_status_code, serv);
 	if (_is_cgi) {
 		server_log("Found CGI", DEBUG);
 		server_log("Cgi file: " + _path, DEBUG);
-		_status_code = Cgi::exec_cgi(_path, _response, _body_request);
+		_status_code = Cgi::exec_cgi(_path, _response, _body_request, _cookie);
 		if (_status_code != 200)
 			throw StatusSender::send_status(_status_code, serv);
 		else if (_response.empty() || _response[0] == 'X')

@@ -28,43 +28,31 @@ def print_http_response(body):
     else:
         print("X")
 
-def check_cookie(cookie_id, current_time):
+def delete_cookie(cookie_id):
     filename="website_exmpl/Zzewebsite/user/welcome/cookie_data.csv"
     valid_cookies = []
-    user_found = ''
+    cookie_deleted = False
     try:
          with open(filename, newline='') as csvfile:
                reader = csv.reader(csvfile)
                for row in reader:
-                    if row and row[0]:
-                           cookie_time = datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S')
-                           if current_time < cookie_time:
-                               valid_cookies.append(row)
-                           if row[1] == cookie_id and current_time < cookie_time:
-                                 user_found = row[0]
+                    if row and row[0] and row[1] != cookie_id:
+                        valid_cookies.append(row)
+                    else:
+                        cookie_deleted = True
          with open(filename, mode='w', newline='') as csvfile:
              writer = csv.writer(csvfile)
              writer.writerows(valid_cookies)
-         return user_found
+         return cookie_deleted
     except FileNotFoundError:
-    	return ''
+    	return False
 
-def print_login_page(body):
+def print_html_page(body):
     file_path = 'website_exmpl/Zzewebsite/user/login/login.html'
     try:
         with open(file_path, 'r') as file:
             for line in file:
                 body += (line)
-    except FileNotFoundError:
-        body = ("X")
-    return body
-
-def print_html_page(username, body):
-    file_path = 'website_exmpl/Zzewebsite/user/welcome/welcome.html'
-    try:
-        with open(file_path, 'r') as file:
-            for line in file:
-                body += (line.replace('USER', username))
     except FileNotFoundError:
         body = ("X")
     return body
@@ -75,11 +63,10 @@ if "login-cookie=" in cookie_string:
     cookie_id = cookie_string.split("login-cookie=")[-1]
 
 current_time = datetime.now()
-username = check_cookie(cookie_id, current_time)
 body = ''
 
-if cookie_id and username:
-    body += print_html_page(username, body)  
+if delete_cookie(cookie_id):
+    body += print_html_page(body)  
 else:
-    body += print_login_page(body)
+    body = "X"
 print_http_response(body)

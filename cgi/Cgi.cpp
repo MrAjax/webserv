@@ -33,7 +33,7 @@ int	child_process(int *fd, std::string &path) {
 	return (500);
 }
 
-int	Cgi::exec_cgi(std::string &path, std::string &output, std::string &input) {
+int	Cgi::exec_cgi(std::string &path, std::string &output, std::string &input, std::string &cookie) {
 	server_log("Executing script...", DEBUG);
 	int	fd[2];
 	int	status = check_file_permission(path);
@@ -44,7 +44,7 @@ int	Cgi::exec_cgi(std::string &path, std::string &output, std::string &input) {
 		return (500);
 	}
 	server_log("Add QUERY_STRING to environ", DEBUG);
-	if (setenv("QUERY_STRING", input.c_str(), 1)) {
+	if (setenv("QUERY_STRING", input.c_str(), 1) || setenv("COOKIE_ID", cookie.c_str(), 1)) {
 		server_log("setenv error in cgi management", ERROR);
 		return (500);
 	}

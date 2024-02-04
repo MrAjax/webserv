@@ -8,7 +8,7 @@ class Cgi {
 	Cgi();
 	~Cgi();
 public:
-	static	int	exec_cgi(std::string &path, std::string &output, std::string &input);
+	static	int	exec_cgi(std::string &path, std::string &output, std::string &input, std::string &cookie);
 };
 
 #endif

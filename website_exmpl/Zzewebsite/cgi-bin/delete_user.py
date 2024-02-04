@@ -51,6 +51,25 @@ def print_user_not_found(username, body):
         body = "X"
     return  body
 
+def delete_cookie(usernmame):
+    filename="website_exmpl/Zzewebsite/user/welcome/cookie_data.csv"
+    valid_cookies = []
+    cookie_deleted = False
+    try:
+         with open(filename, newline='') as csvfile:
+               reader = csv.reader(csvfile)
+               for row in reader:
+                    if row and row[0] != username:
+                        valid_cookies.append(row)
+                    else:
+                        cookie_deleted = True
+         with open(filename, mode='w', newline='') as csvfile:
+             writer = csv.writer(csvfile)
+             writer.writerows(valid_cookies)
+         return cookie_deleted
+    except FileNotFoundError:
+    	return False
+
 def delete_user(username):
     data_file = 'website_exmpl/Zzewebsite/user/welcome/welcome_data.csv'
     temp_file = 'website_exmpl/Zzewebsite/user/welcome/temp_welcome_data.csv'
@@ -62,6 +81,7 @@ def delete_user(username):
             for row in reader:
                 if row[0] == username:
                     found_user = True
+                    delete_cookie(username)
                 else:
                     writer.writerow(row)
         os.replace(temp_file, data_file)
