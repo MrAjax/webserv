@@ -22,7 +22,7 @@
 #define PROCESSING_BODY 3
 #define DONE_ALL 4
 
-#define NBPARAM 16
+#define NBPARAM 17
 
 class HttpRequest
 {
@@ -61,6 +61,7 @@ class HttpRequest
 		std::string getSecFetchSite();
 		std::size_t getContentLength();
 		std::string getContentType();
+		std::string getCookie();
 
 		std::string getBodyRequest();
 		std::string getHeaderRequest();
@@ -96,6 +97,7 @@ class HttpRequest
 		void setSecFetchSite(const std::string &value);
 		void setContentLength(const std::size_t &value);
 		void setContentType(const std::string &value);
+		void setCookie(const std::string &value);
 
 		void setBodyRequest(const std::string &value);
 		void setHeaderRequest(const std::string &value);
@@ -129,6 +131,7 @@ class HttpRequest
 		std::string _secFetchSite;
 		std::size_t _contentLength;
 		std::string _contentType;
+		std::string _cookie;
 
 		std::string _bodyRequest;
 		std::string _headerRequest;

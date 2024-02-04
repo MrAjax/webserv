@@ -63,8 +63,12 @@ static	void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 	server_log("Activity detected on server: " + serv.getServerName(), DEBUG);
 	if (connfd < 0)
 		throw error_throw("send response - main.cpp", true);
+
+	
 	
 	try {
+		if (Req.getMyserver() == NULL)
+			throw StatusSender::send_status(Req.getStatusCode(), serv); //Pb si pas de servers
 
 		server_log("Parsing Request...", DEBUG);
 		std::string	request_header = Req.getHeaderRequest();
@@ -183,7 +187,7 @@ int main(int ac, char **av)
 							//std::cout << "server name: " << it->second->getServerName() << "\n";
 							server_log("other request on clientFD", DEBUG);
 							int status = clientMap[pollfds[i].fd].second->processingRequest();
-							clientMap[pollfds[i].fd].second->printAttribute();
+							// clientMap[pollfds[i].fd].second->printAttribute();
 							if (status > 200)
 							{
 								send_response(pollfds[i].fd, *it->second, *clientMap[pollfds[i].fd].second);

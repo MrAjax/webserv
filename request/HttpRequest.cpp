@@ -8,7 +8,7 @@
 HttpRequest::HttpRequest(int connfd, std::vector<Server> &servers, int listenFd) : _method(""), _path(""), _http(""),
 _host(""), _userAgent(""), _accept(""), _acceptLanguage(""), _acceptEncoding(""),
 _connection(""), _upInsecureRqst(""), _referer(""), _secFetchDest(""), _secFetchMode(""),
-_secFetchSite(""), _contentLength(0), _contentType(""),
+_secFetchSite(""), _contentLength(0), _contentType(""), _cookie(""),
 _bodyRequest(""), _headerRequest(""),
 _connfd(connfd), saveString(""), _strContentLength(""),
 _servers(servers), _myServer(NULL),
@@ -41,17 +41,16 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
 		const char* key;                  // La clé
     	std::string (HttpRequest::*getter)();  // Pointeur vers le getter
 	};
-//	std::size_t	nbParam = 16;
-/* 	struct _tab tab[NBPARAM] = {{"Method:", &HttpRequest::getMethod}, {"Path:", &HttpRequest::getPath},
+ 	struct _tab tab[NBPARAM] = {{"Method:", &HttpRequest::getMethod}, {"Path:", &HttpRequest::getPath},
 		{"Protocol:", &HttpRequest::getHttp},{"Host:", &HttpRequest::getHost}, {"User-Agent:", &HttpRequest::getUserAgent},
 		{"Accept:", &HttpRequest::getAccept}, {"Accept-Language:", &HttpRequest::getAcceptLanguage},
 		{"Accept-Encoding:", &HttpRequest::getAcceptEncoding}, {"Connection:", &HttpRequest::getConnection},
 		{"Upgrade-Insecure-Requests:", &HttpRequest::getUpInsecureRqst}, {"Referer:", &HttpRequest::getReferer},
 		{"Sec-Fetch-Dest:", &HttpRequest::getSecFetchDest}, {"Sec-Fetch-Mode:", &HttpRequest::getSecFetchMode},
 		{"Sec-Fetch-Site:", &HttpRequest::getSecFetchSite}, {"Content-Length:", &HttpRequest::getStrContentLength},
-		{"Content-Type:", &HttpRequest::getContentType}};
+		{"Content-Type:", &HttpRequest::getContentType}, {"Cookie:", &HttpRequest::getCookie}};
 	for (std::size_t i = 0; i < NBPARAM; i++)
-		std::cout << YELLOW << tab[i].key << RESET << (this->*(tab[i].getter))() << std::endl; */
+		std::cout << YELLOW << tab[i].key << RESET << (this->*(tab[i].getter))() << std::endl;
 }
 
 void		HttpRequest::resetRequest(void)
@@ -73,6 +72,7 @@ void		HttpRequest::resetRequest(void)
 	_secFetchSite = "";
 	_contentLength = 0;
 	_contentType = "";
+	_cookie = "";
 
 	_bodyRequest = "";
 	_headerRequest = "";
@@ -158,6 +158,7 @@ std::string HttpRequest::getSecFetchMode()		{return (this->_secFetchMode);}
 std::string HttpRequest::getSecFetchSite()		{return (this->_secFetchSite);}
 std::size_t HttpRequest::getContentLength()		{return (this->_contentLength);}
 std::string	HttpRequest::getContentType()		{return (this->_contentType);}
+std::string	HttpRequest::getCookie()			{return (this->_cookie);}
 
 std::string HttpRequest::getBodyRequest()		{return (this->_bodyRequest);}
 std::string HttpRequest::getHeaderRequest()		{return (this->_headerRequest);}
@@ -195,6 +196,8 @@ void	HttpRequest::setSecFetchMode(const std::string &value)		{_secFetchMode = va
 void	HttpRequest::setSecFetchSite(const std::string &value)		{_secFetchSite = value;}
 void	HttpRequest::setContentLength(const std::size_t &value)		{_contentLength = value;}
 void	HttpRequest::setContentType(const std::string &value)		{_contentType = value;}
+void	HttpRequest::setCookie(const std::string &value)			{_cookie = value;}
+
 
 void	HttpRequest::setBodyRequest(const std::string &value)		{_bodyRequest = value;}
 void	HttpRequest::setHeaderRequest(const std::string &value)		{_headerRequest = value;}
@@ -207,4 +210,4 @@ void	HttpRequest::setStatusCode(const int &value)				{_statusCode = value;}
 
 void	HttpRequest::setIsCgi(const bool &value)					{_isCgi = value;}
 
-void	HttpRequest::setMaxBodySize(const std::size_t &value)				{_maxBodySize = value;}
+void	HttpRequest::setMaxBodySize(const std::size_t &value)		{_maxBodySize = value;}
