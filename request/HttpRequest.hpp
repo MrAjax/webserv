@@ -19,10 +19,13 @@
 #define NEW 0
 #define PROCESSING_HEADER 1
 #define DONE_HEADER 2
-#define PROCESSING_BODY 3
-#define DONE_ALL 4
+#define DONE_HEADER_CHECKING 3
+#define PROCESSING_BODY 4
+#define DONE_ALL 5
 
 #define NBPARAM 17
+
+#define TIMEOUT_REQUEST 10 // en seconds
 
 class HttpRequest
 {
@@ -77,42 +80,41 @@ class HttpRequest
 
 		int			getListenFd();
 
-		std::size_t			getMaxBodySize();
+		std::size_t	getMaxBodySize();
 		
 		// ----------------------Setter--------------
 
-		void setMethod(const std::string &value);
-		void setPath(const std::string &value);
-		void setHttp(const std::string &value);
-		void setHost(const std::string &value);
-		void setUserAgent(const std::string &value);
-		void setAccept(const std::string &value);
-		void setAcceptLanguage(const std::string &value);
-		void setAcceptEncoding(const std::string &value);
-		void setConnection(const std::string &value);
-		void setUpInsecureRqst(const std::string &value);
-		void setReferer(const std::string &value);
-		void setSecFetchDest(const std::string &value);
-		void setSecFetchMode(const std::string &value);
-		void setSecFetchSite(const std::string &value);
-		void setContentLength(const std::size_t &value);
-		void setContentType(const std::string &value);
-		void setCookie(const std::string &value);
+		void	setMethod(const std::string &value);
+		void	setPath(const std::string &value);
+		void	setHttp(const std::string &value);
+		void	setHost(const std::string &value);
+		void	setUserAgent(const std::string &value);
+		void	setAccept(const std::string &value);
+		void	setAcceptLanguage(const std::string &value);
+		void	setAcceptEncoding(const std::string &value);
+		void	setConnection(const std::string &value);
+		void	setUpInsecureRqst(const std::string &value);
+		void	setReferer(const std::string &value);
+		void	setSecFetchDest(const std::string &value);
+		void	setSecFetchMode(const std::string &value);
+		void	setSecFetchSite(const std::string &value);
+		void	setContentLength(const std::size_t &value);
+		void	setContentType(const std::string &value);
+		void	setCookie(const std::string &value);
 
-		void setBodyRequest(const std::string &value);
-		void setHeaderRequest(const std::string &value);
+		void	setBodyRequest(const std::string &value);
+		void	setHeaderRequest(const std::string &value);
 
-		void setConnfd(const int &value);
+		void	setConnfd(const int &value);
 
-		void setSaveString(const std::string & value);
+		void	setSaveString(const std::string & value);
 
-		void setStrContentLength(const std::string &value);
+		void	setStrContentLength(const std::string &value);
 
 		void	setStatusCode(const int &value);
 		void	setIsCgi(const bool &value);
 
 		void	setMaxBodySize(const std::size_t &value);
-
 
 	private:
 		std::string _method;
@@ -150,6 +152,8 @@ class HttpRequest
 		int 				_listenFd;
 
 		std::size_t			_maxBodySize;
+
+		std::string			_debugFd;
 
 };
 

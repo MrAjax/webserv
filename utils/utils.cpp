@@ -150,3 +150,23 @@ std::string	trimString(std::string str, std::string const &toTrim, int STARTorEN
 	}
 	return (str);
 }
+
+std::size_t	strToSize_t(std::string const &toConvert)
+{
+	if (toConvert.empty())
+		throw std::runtime_error("ERROR: string to size_t convertor nothing to convert\n");
+	if (toConvert[0] == '0' && toConvert.size() > 1)
+		throw std::runtime_error("ERROR: string to size_t convertor bad synthax\n");
+	for (std::size_t i = 0; i < toConvert.size(); i++)
+	{
+		if (!std::isdigit(toConvert[i]))
+			throw std::runtime_error("ERROR: string to size_t convertor != digit\n");
+	}
+	std::stringstream ss;
+	ss << toConvert;
+	std::size_t	value;
+	ss >> value;
+	if (value == std::numeric_limits<std::size_t>::max())
+		throw std::runtime_error("ERROR: string to size_t convertor value >= size_t MAX\n");
+	return (value);
+}

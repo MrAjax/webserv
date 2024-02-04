@@ -3,7 +3,7 @@
 #include "HttpRequestParsing.hpp"
 
 //throw StatusSender::send_status(500, serv); quand le server et la requete n'est pas conforme il faut envoyer ca et pas un autre truc avec erreur 500 le server ne doit pas s arreter
-#define TIMEOUT_REQUEST 10 // en seconds
+
 
 HttpRequest::HttpRequest(int connfd, std::vector<Server> &servers, int listenFd) : _method(""), _path(""), _http(""),
 _host(""), _userAgent(""), _accept(""), _acceptLanguage(""), _acceptEncoding(""),
@@ -15,6 +15,9 @@ _servers(servers), _myServer(NULL),
 _statusCode(NEW), _isCgi(false), _listenFd(listenFd), _maxBodySize(0)
 {
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
+	std::stringstream ss;
+	ss << _connfd;
+	_debugFd = ss.str();
 	//std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
 }
 
@@ -95,47 +98,41 @@ int	HttpRequest::recvfd(int & fd)
 	numbytes = recv(fd, recvline, MAXLINE - 1, 0);
 	saveString += reinterpret_cast< char * >(recvline); 
 	if (numbytes < 0)
-		throw error_throw("recv error in request", true);
+	{
+		server_log(std::string(REDD) + "Request fd " + _debugFd + " recv error", ERROR);
+		_statusCode = 400;
+	}
 	return (numbytes);
 }
 
 int    HttpRequest::processingRequest(void)
 {
+	HttpRequestParsing	parsing(*this);
+
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
-	std::stringstream ss;
-	ss << _connfd;
-	if (_statusCode > 200 || _statusCode == -1)
+	if (_statusCode > 200 || _statusCode == KILL_ME)
 		return (_statusCode);
-	try
+	if (recvfd(_connfd) == 0)
+		_statusCode = KILL_ME;
+	if (_statusCode == NEW || _statusCode == PROCESSING_HEADER)
 	{
-		if (recvfd(_connfd) == 0)
-			_statusCode = -1;
-		if (_statusCode < DONE_HEADER && _statusCode != -1)
-		{
-			server_log(std::string(GREENN) + "Request fd " + ss.str() + " getHeader in process", DEBUG);
-			HttpRequestParsing header(*this);
-			header.parsingHeader();
-		}
-		if (_statusCode == DONE_HEADER)
-		{
-			server_log(std::string(GREENN) + "Request fd " + ss.str() + " getHeader succesfuly done", DEBUG);
-			HttpRequestChecking checkError(*this);
-			_myServer = checkError.findMyServer(_servers);
-			if (_myServer == NULL)
-				throw error_throw("Request fd " + ss.str() + " server not found", false);
-			if (checkError.BuildAndCheckHeader() != 0)
-				throw error_throw("Request fd " + ss.str() + " path not good", false);
-		}
-		if (_statusCode != DONE_ALL && _statusCode >= DONE_HEADER && _statusCode < 200)
-		{
-			server_log(std::string(GREENN) + "Request fd " + ss.str() + " succesfuly check header and find final path : " + _path , DEBUG);
-			HttpRequestParsing body(*this);
-			body.parsingBody();
-		}
+		server_log(std::string(GREENN) + "Request fd " + _debugFd + " getHeader in process", DEBUG);
+		parsing.parsingHeader();
 	}
-	catch (std::exception &e)
+	if (_statusCode == DONE_HEADER)
 	{
-		std::cerr << e.what() << std::endl;
+		HttpRequestChecking checking(*this);
+		server_log(std::string(GREENN) + "Request fd " + _debugFd + " getHeader succesfuly done", DEBUG);
+		_myServer = checking.findMyServer(_servers);
+		if (_myServer == NULL || checking.BuildAndCheckHeader() != 0)
+			return (_statusCode);
+		else
+			_statusCode = DONE_HEADER_CHECKING;
+	}
+	if (_statusCode == DONE_HEADER_CHECKING || _statusCode == PROCESSING_BODY)
+	{
+		server_log(std::string(GREENN) + "Request fd " + _debugFd + " succesfuly check header and find final path : " + _path , DEBUG);
+		parsing.parsingBody();
 	}
 	return (_statusCode);
 }

@@ -1,12 +1,10 @@
 #include "HttpRequestChecking.hpp"
 
-#define MAX_HEADER_SIZE 1000
-
 HttpRequestChecking::HttpRequestChecking(HttpRequest &request) : _request(request)
 {
 	std::stringstream ss;
 	ss << _request.getConnfd();
-	_strFd = ss.str();
+	_debugFd = ss.str();
 }
 
 HttpRequestChecking::~HttpRequestChecking() {}
@@ -27,13 +25,13 @@ int HttpRequestChecking::POST(void)
 	isGoodProtocol("HTTP/1.1");
 	if (_request.getContentType().empty())
 	{
-		server_log(std::string(REDD) + "Reqest fd " + _strFd + " method POST whitout content type", ERROR);
+		server_log(std::string(REDD) + "Reqest fd " + _debugFd + " method POST whitout content type", ERROR);
 		_request.setStatusCode(411);
 		return (2);
 	}
 	if (_request.getContentLength() == 0)
 	{
-		server_log(std::string(REDD) + "Reqest fd " + _strFd + " method POST whitout content lenght", ERROR);
+		server_log(std::string(REDD) + "Reqest fd " + _debugFd + " method POST whitout content lenght", ERROR);
 		_request.setStatusCode(411);
 		return (3);
 	}
@@ -72,7 +70,7 @@ int HttpRequestChecking::BuildAndCheckHeader(void)
 		case 2:
 			return ((this->*f[2])());
 		case 3:
-			server_log(std::string(REDD) + "Request fd " + _strFd + " method "
+			server_log(std::string(REDD) + "Request fd " + _debugFd + " method "
 				+ _request.getMethod() + " not allowed", ERROR);
 			_request.setStatusCode(405);
 			return (7);
@@ -84,30 +82,10 @@ bool HttpRequestChecking::isGoodProtocol(std::string const &http)
 {
 	if (_request.getHttp() == http)
 		return (true);
-	server_log(std::string(REDD) + "Request fd " + _strFd + " protocol "
+	server_log(std::string(REDD) + "Request fd " + _debugFd + " protocol "
 		+ _request.getHttp() + " not allowed", ERROR);
 	_request.setStatusCode(400);
 	return (false);
-}
-
-int HttpRequestChecking::maxSize(void)
-{
-	if (_request.getMyserver() == NULL)
-		return (3);
-	if (_request.getSaveString().size() + _request.getBodyRequest().size() > _request.getMaxBodySize())
-		return (1);
-	if (_request.getHeaderRequest().size() > MAX_HEADER_SIZE)
-		return (2);
-	return (0);
-}
-
-int HttpRequestChecking::socketfdServers(std::vector<Server> &servers)
-{
-	std::vector<Server>::iterator it = servers.begin();
-	for (; it != servers.end(); it++)
-		if (it->getSocketfd() == _request.getConnfd())
-			return (1);
-	return (0);
 }
 
 int HttpRequestChecking::checkSockfdPortIP(Server &server)
@@ -136,6 +114,11 @@ Server  *HttpRequestChecking::findMyServer(std::vector<Server> &servers)
 		if (checkSockfdPortIP(*it))
 			findServer = &(*it);
 	}
+	if (findServer == NULL)
+	{
+		_request.setStatusCode(400);
+		server_log(std::string(REDD) + "Request fd " + _debugFd + " cannot find any server", ERROR);
+	}
 	return (findServer);
 }
 
@@ -145,7 +128,7 @@ bool HttpRequestChecking::findCgi()
 		return (false);
 	_request.setIsCgi(true);
 	_request.setPath(trimString(_request.getPath(), ".cgi", END));
-	server_log(std::string(GREEN) + "Request fd " + _strFd + " find cgi", DEBUG);
+	server_log(std::string(GREEN) + "Request fd " + _debugFd + " find cgi", DEBUG);
 	return (true);
 }
 
@@ -175,12 +158,12 @@ bool HttpRequestChecking::findRootPath()
 	if (status == -1)
 	{
 		_request.setStatusCode(404);
-		server_log(std::string(REDD) + "Request fd " + _strFd + " cannot find any valide path root/index", ERROR);
+		server_log(std::string(REDD) + "Request fd " + _debugFd + " cannot find any valide path root/index", ERROR);
 	}
 	if (status == 0)
 	{
 		_request.setStatusCode(403);
-		server_log(std::string(REDD) + "Request fd " + _strFd + " cannot access any path root/index", ERROR);
+		server_log(std::string(REDD) + "Request fd " + _debugFd + " cannot access any path root/index", ERROR);
 	}
 	return (false);
 }
@@ -201,12 +184,12 @@ bool HttpRequestChecking::findOtherPath()
 	else if (status == -1)
 	{
 		_request.setStatusCode(404);
-		server_log(std::string(REDD) + "Request fd " + _strFd + " cannot find the path : " + finalPath, ERROR);
+		server_log(std::string(REDD) + "Request fd " + _debugFd + " cannot find the path : " + finalPath, ERROR);
 	}
 	else if (status == 0)
 	{
 		_request.setStatusCode(403);
-		server_log(std::string(REDD) + "Request fd " + _strFd + " cannot access path : " + finalPath, ERROR);
+		server_log(std::string(REDD) + "Request fd " + _debugFd + " cannot access path : " + finalPath, ERROR);
 	}
 	return (false);
 }
@@ -232,7 +215,7 @@ int	HttpRequestChecking::isGoodPath(std::string &str)
 		case 2:
 			return (hasReadPermission(str) && hasWritePermission(str) && hasExecutePermission(str));
 		case 3:
-			throw error_throw("Request fd " + _strFd + " method not allowed", false); //TODO 
+			throw error_throw("Request fd " + _debugFd + " method not allowed", false); //TODO 
 			return (false);
 	}
 	return (false);
