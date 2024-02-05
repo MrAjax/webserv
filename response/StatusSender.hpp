@@ -4,6 +4,7 @@
 #include "../inc/webserv.hpp"
 #include "../utils/utils.hpp"
 #include "../parsing/Server.hpp"
+#include "../method/Method.hpp"
 
 class StatusSender {
 	std::string		_path;
@@ -24,6 +25,7 @@ class StatusSender {
 	std::string		_error_403();
 	std::string		_error_404();
 	std::string		_error_500();
+	std::string		_post_error();
 	std::string		_error_generic(int err);
 	std::string		_get_response();
 public:
