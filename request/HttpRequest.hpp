@@ -1,16 +1,7 @@
 #ifndef HTTPREQUEST_HPP
 # define HTTPREQUEST_HPP
 
-#include <iostream>
-#include <unistd.h>
-#include <cstring>
-#include <cstdlib>
-#include <vector>
-#include <sstream>
-#include <poll.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <limits>
+#include "../inc/webserv.hpp"
 #include "../parsing/Server.hpp"
 #include "../utils/utils.hpp"
 #include "../response/StatusSender.hpp"
