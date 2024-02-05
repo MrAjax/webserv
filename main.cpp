@@ -61,7 +61,7 @@ static	void	send_response_to_client(int connfd, std::string response) {
 static	void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 
 	std::string	response;
-	server_log("Activity detected on server: " + serv.getServerName(), DEBUG);
+	server_log("Activity detected on server: " + Req.getMyserver()->getServerName(), DEBUG);
 	if (connfd < 0)
 		throw error_throw("send response - main.cpp", true);
 
@@ -188,25 +188,36 @@ int main(int ac, char **av)
 									addingNewClient(&clientRequest, clientAddr, serversMap, it, clientMap, pollfds);
 								}
 								else
-									server_log(std::string(REDD) + "HttpRequest malloc fail", ERROR);
+									server_log(std::string(REDD) + "HttpRequest allocation fail", ERROR);
 							}
 						}
 						else // socketfd aldready set c/p from HttpRequest
 						{
 							server_log("other request on clientFD", DEBUG);
 							int status = clientMap[pollfds[i].fd].second->processingRequest();
+							clientMap[pollfds[i].fd].second->printAttribute();
 							if (status >= 200)
 							{
-								send_response(pollfds[i].fd, *it->second, *clientMap[pollfds[i].fd].second);
-								clientMap[pollfds[i].fd].second->resetRequest();
+								pollfds[i].events = POLLOUT;
+								
 							}
 							else if (status == KILL_ME)
 								killRequest(clientMap, pollfds, i);
 						}
 					}
 				}
-				removeTimeout(clientMap, pollfds);
+				if (pollfds[i].revents & POLLOUT)
+				{
+					std::cout << "---------------------\n";
+					clientMap[pollfds[i].fd].second->printAttribute();
+					if (clientMap[pollfds[i].fd].second->getMyserver() == NULL)
+						std::cout << "AAAAAAAAAAAAAAA\n";
+					send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second);
+					clientMap[pollfds[i].fd].second->resetRequest();
+					pollfds[i].events = POLLIN;
+				}
 			}
+			removeTimeout(clientMap, pollfds);
 		}
 
 	}		
