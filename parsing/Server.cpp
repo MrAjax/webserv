@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/05 10:43:22 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/05 11:16:48 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,6 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 		if (j == PARAM && config[i][0] != '}') // no condition
 			throw error_throw("unknown directive \"" + config[i] + "\" - config file", false);
 	}
-	configServer();
-	setDefaultValue();
-	server_log("Server " + int_to_str(_i) + " set up and ready to listen", INFO);
 }
 
 Server& Server::operator = (Server const& a) {
@@ -79,6 +76,7 @@ Server& Server::operator = (Server const& a) {
 	_location_error_page = a._location_error_page;
 	_index = a._index;	
 	_socketIsSet = a._socketIsSet;
+	_allow_methods = a._allow_methods;
 	
 	std::map<std::string, Location*>::const_iterator it;
 		for (it = a._locations.begin(); it != a._locations.end(); ++it) {
@@ -102,6 +100,7 @@ Server::Server(Server const& a) {
 	_location_error_page = a._location_error_page;
 	_index = a._index;	
 	_socketIsSet = a._socketIsSet;
+	_allow_methods = a._allow_methods;
 	
 	std::map<std::string, Location*>::const_iterator it;
 		for (it = a._locations.begin(); it != a._locations.end(); ++it) {
@@ -112,10 +111,10 @@ Server::Server(Server const& a) {
 Server::~Server(void) {
 
 	std::map<std::string, Location*>::iterator it;
-		for (it = _locations.begin(); it != _locations.end(); ++it) {
-			delete it->second;
-		}	
-	}
+	for (it = _locations.begin(); it != _locations.end(); ++it) {
+		delete it->second;
+	}	
+}
 
 void Server::openSocket(void) { 
 
@@ -169,6 +168,7 @@ void Server::configServer(void) {
 		}
 	}	
 	freeaddrinfo(_res);
+	setDefaultValue();
 }	
 
 void Server::setDefaultValue(void) {
@@ -181,6 +181,7 @@ void Server::setDefaultValue(void) {
 		_location_error_page = "/errorpages";
 	if (_index.empty() == true)
 		_index.push_back("/index.html");
+	server_log("Server " + int_to_str(_i) + " set up and ready to listen", INFO);
 }		
 
 void Server::p_listen(std::string const& line) {

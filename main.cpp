@@ -145,6 +145,10 @@ int main(int ac, char **av)
 	}
 	catch (const std::exception &e) {
 		std::cerr << e.what() << std::endl;
+		for (size_t i = 0; i < servers.size(); i++) {
+			if (servers[i].getSocketfd() != -1)
+				close(servers[i].getSocketfd());
+		}	
 		return 1;
 	}
 	try {

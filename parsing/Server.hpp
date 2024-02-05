@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/05 10:35:52 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/05 11:16:10 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ public:
 	Server& operator = ( Server const& a);
 	Server( Server const& a);
 	~Server( void );
+
+	void configServer(void);
 
 	std::string getIp( void ) const;
 	std::string getPort( void ) const;
@@ -57,7 +59,6 @@ private:
 	void p_index(std::string const& line);
 	void p_allow_methods(std::string const& line);
 
-	void configServer(void);
 	void openSocket(void);
 	void setDefaultValue(void);
 

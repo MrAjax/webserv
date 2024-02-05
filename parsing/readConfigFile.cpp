@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/18 12:43:31 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/01 16:02:04 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/05 11:15:51 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,10 +96,10 @@ void readConfigFile (std::vector<Server> & servers, char const* file)
 		}
 		else if (line.find_first_not_of(" \t\n\r\f\v") != std::string::npos) 
 			throw error_throw("unknown directive \"" + line + "\" - config file", false);
-	//	std::cout << "line recorded = [" << line << "]" << std::endl;
 		countBrackets(bracket, line);
 		if (line[0] == '}' && bracket == 0 && recording == true) {
 			servers.push_back(Server(block, servers, i));
+			servers[i].configServer();
 			block.clear();
 			recording = false;
 			i++;
