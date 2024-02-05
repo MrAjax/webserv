@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/05 09:14:26 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/05 10:37:16 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 
 	void (Server::*ptr[PARAM])(std::string const&) =
 		{ &Server::p_listen, &Server::p_host, &Server::p_server_name, &Server::p_bodySize,
-			&Server::p_root, &Server::p_errorPage, &Server::p_index };
+			&Server::p_root, &Server::p_errorPage, &Server::p_index, &Server::p_allow_methods };
 	std::string keyword[] = {"listen", "host", "server_name", "client_max_body_size", "root",
-		"error_page", "index"};
+		"error_page", "index", "allow_methods"};
 
 	std::vector<std::string> block;
 	std::string tempLocation;
@@ -315,6 +315,31 @@ void Server::p_index(std::string const& line) {
 	}
 }	
 	
+void Server::p_allow_methods(std::string const& line) {
+
+	if (_allow_methods.empty() == false) {
+		throw error_throw ("On server Location allow_methods setup twice", false);
+	}
+
+	size_t pos = std::string("allow_methods").length();
+	while (pos < line.length()) {
+		while (pos < line.length() && std::isspace(line[pos])) {
+			++pos;
+		}
+		size_t end = line.find_first_of(" \t\n\r\f\v", pos);
+		if (end == std::string::npos)
+			_allow_methods.push_back(line.substr(pos, line.length() - pos));
+		else
+			_allow_methods.push_back(line.substr(pos, end - pos));
+		pos = end;	
+	}
+	
+	for (size_t i = 0; i < _allow_methods.size(); i++) {
+		std::cout << "[" << _allow_methods[i] << "]";
+	}	
+	std::cout << std::endl;
+}	
+
 std::string Server::settempLocation(std::string line) {
 
 	size_t start = std::string("location").length();
@@ -364,6 +389,10 @@ std::string Server::getLocationErrorPage(void) const {
 std::vector<std::string> Server::getIndex(void) const {
 	return _index;
 }	
+
+std::vector<std::string> Server::getallow_methods(void) const {
+	return _allow_methods;
+}
 
 Location* Server::getLocation(std::string type) const {
 

@@ -7,15 +7,12 @@ server {
 
     root website_exmpl/Zzewebsite;
     index /index/index.html;
+	allow_methods GET			POST;
 
 	error_page 404 502 503 /errorpages;
-    location / {
-        try_files $uri $uri/ =404;
-    }
 
     # Configuration pour les fichiers statiques
     location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
-        expires 30d;
     }
 }	
 # Deuxième serveur
@@ -30,7 +27,6 @@ server{
 
 	error_page 404 502 503 /errorpages;
     location / {
-        try_files $uri $uri/ =404;
 		allow_methods GET POST;
 		return www.example2.com;
 		autoindex on;
@@ -54,11 +50,7 @@ server{
 
 	error_page 404 502 503 /errorpages;
     location / {
-        try_files $uri $uri/ =404;
+		allow_methods GET POST;
     }
 
-    # Configuration pour les fichiers statiques
-    location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
-        expires 30d;
-    }
 }

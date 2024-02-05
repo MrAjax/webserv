@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:30:56 by bahommer          #+#    #+#             */
-/*   Updated: 2024/01/26 13:18:48 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/05 10:31:27 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "webserv.hpp"
 #include "../parsing/Server.hpp"
 
-# define PARAM 7
+# define PARAM 8
 # define MAX_CO 10
 # define MAXLINE 4096
 

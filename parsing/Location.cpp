@@ -17,8 +17,8 @@ Location::Location(std::vector<std::string> config) : _autoindex(false)
 			}
 			j++;	
 		}	
-	//	if (j == PARAM && config[i][0] != '}') // no condition
-	//		throw error_throw("unknown directive \"" + config[i] + "\" - config file", false);
+		if (j == PARAM_LOC && config[i][0] != '}') // no condition
+			throw error_throw("unknown directive \"" + config[i] + "\" - config file", false);
 	}
 }
 
