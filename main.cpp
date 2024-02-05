@@ -137,7 +137,7 @@ int main(int ac, char **av)
 		std::string					dot[3] = {".  ", ".. ", "..."};
 		int							n = 0;
 
-		HttpRequestAllow check(10, 2000);
+		HttpRequestAllow check(50, 1000);
 	
 	try {
 		init_server();
@@ -188,14 +188,14 @@ int main(int ac, char **av)
 									addingNewClient(&clientRequest, clientAddr, serversMap, it, clientMap, pollfds);
 								}
 								else
-									server_log(std::string(REDD) + "Malloc HttpRequest fail", ERROR);
+									server_log(std::string(REDD) + "HttpRequest malloc fail", ERROR);
 							}
 						}
 						else // socketfd aldready set c/p from HttpRequest
 						{
 							server_log("other request on clientFD", DEBUG);
 							int status = clientMap[pollfds[i].fd].second->processingRequest();
-							if (status > 200)
+							if (status >= 200)
 							{
 								send_response(pollfds[i].fd, *it->second, *clientMap[pollfds[i].fd].second);
 								clientMap[pollfds[i].fd].second->resetRequest();

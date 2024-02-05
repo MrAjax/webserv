@@ -24,10 +24,16 @@ void    removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* >
 
 void    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds, int i)
 {
-    delete clientMap[pollfds[i].fd].second;
-	clientMap.erase(pollfds[i].fd);
-	close(pollfds[i].fd);
-	pollfds.erase(pollfds.begin() + i);
+	// clientMap[pollfds[i].fd].second->setMyserver(NULL);
+	// if (clientMap[pollfds[i].fd].second != NULL)
+	// {
+    // 	delete clientMap[pollfds[i].fd].second;
+	// 	clientMap[pollfds[i].fd].second = NULL;
+	// }
+	// clientMap.erase(pollfds[i].fd);
+	// close(pollfds[i].fd);
+	// pollfds.erase(pollfds.begin() + i);
+	clientMap[pollfds[i].fd].second->resetRequest();
 }
 
 void    addingNewClient(HttpRequest **clientRequest, struct sockaddr_in &clientAddr, 

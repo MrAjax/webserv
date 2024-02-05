@@ -200,6 +200,7 @@ void	HttpRequest::setSaveString(const std::string &value)		{saveString = value;}
 
 void	HttpRequest::setStrContentLength(const std::string &value)	{_strContentLength = value;}
 void	HttpRequest::setStatusCode(const int &value)				{_statusCode = value;}
+void	HttpRequest::setMyserver(Server **value)					{if (value == NULL){_myServer = NULL;}else{_myServer= *value;}}
 
 void	HttpRequest::setIsCgi(const bool &value)					{_isCgi = value;}
 

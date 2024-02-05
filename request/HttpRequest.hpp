@@ -106,6 +106,8 @@ class HttpRequest
 
 		void	setMaxBodySize(const std::size_t &value);
 
+		void	setMyserver(Server **value);
+
 	private:
 		std::string _method;
 		std::string _path;
