@@ -23,7 +23,7 @@ class HttpRequestParsing
 		bool		parsingHeader_rest(std::string &line, std::string const & keyWord, std::string & output);
         bool        parseAllAttributes(std::string header);
 
-		bool		isMaxSize();
+		bool		isMaxSize(std::size_t SIZE);
 
 		//---------Utils---------------------
 		std::size_t findLine(std::string &header, std::string &line, std::string &delimiteur);

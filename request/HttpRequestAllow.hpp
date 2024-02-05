@@ -2,6 +2,10 @@
 # define HTTPREQUESTALLOW_HPP
 
 #include "../inc/webserv.hpp"
+#include "HttpRequest.hpp"
+
+
+#define MAX_NUMBER_REQUEST 1000
 
 class HttpRequestAllow
 {
@@ -12,7 +16,7 @@ class HttpRequestAllow
 		~HttpRequestAllow(void);
 		//------------OPERATOR------------------//
 
-        bool    allowRequest();
+        bool    allowRequest(std::vector<struct pollfd> &pollfds, HttpRequest &Request);
 
 		private:
             struct timespec _lastResetTime;

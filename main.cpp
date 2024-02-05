@@ -122,9 +122,6 @@ bool isListener(int fd, std::vector<Server> servers) {
 	return false;
 }
 
-#define MAX_NUMBER_REQUEST 1000
-
-
 
 int main(int ac, char **av)
 {
@@ -185,11 +182,13 @@ int main(int ac, char **av)
 							}
 							else {
 								HttpRequest *clientRequest = new HttpRequest(clientFd, servers, pollfds[i].fd);
-								if (sizePollfds > MAX_NUMBER_REQUEST)
-									clientRequest->setStatusCode(429);
-								if (!check.allowRequest())
-									clientRequest->setStatusCode(429);
-								addingNewClient(&clientRequest, clientAddr, serversMap, it, clientMap, pollfds);
+								if (clientRequest != NULL)
+								{
+									check.allowRequest(pollfds, *clientRequest);
+									addingNewClient(&clientRequest, clientAddr, serversMap, it, clientMap, pollfds);
+								}
+								else
+									server_log(std::string(REDD) + "Malloc HttpRequest fail", ERROR);
 							}
 						}
 						else // socketfd aldready set c/p from HttpRequest
