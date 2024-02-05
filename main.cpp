@@ -1,4 +1,5 @@
 #include "request/HttpRequest.hpp"
+#include "request/HttpRequestAllow.hpp"
 #include "response/HttpResponse.hpp"
 #include "inc/webserv.hpp"
 #include "signal/signal.hpp"
@@ -121,38 +122,9 @@ bool isListener(int fd, std::vector<Server> servers) {
 	return false;
 }
 
-#define MAX_NUMBER_REQUEST 100
+#define MAX_NUMBER_REQUEST 1000
 
-bool allowRequest()
-{
-        // Vérifier si le temps écoulé dépasse l'intervalle défini
 
-		struct timespec end;
-		clock_gettime(CLOCK_REALTIME, &end);
-		int timeSec = end.tv_sec - _lastUpdate.tv_sec;
-
-        time_t currentTime = std::time(nullptr);
-        if (currentTime - lastResetTime_ >= intervalSeconds_)
-		{
-            // Réinitialiser le compteur de requêtes
-            requestCount_ = 0;
-            lastResetTime_ = currentTime;
-        }
-
-        // Vérifier si le nombre de requêtes dépasse la limite
-        if (requestCount_ < maxRequests_)
-		{
-            // Autoriser la requête et incrémenter le compteur
-            ++requestCount_;
-            return true;
-        }
-		else
-		{
-            // Refuser la requête en renvoyant une erreur 429 (Too Many Requests)
-            std::cerr << "Error 429: Too Many Requests" << std::endl;
-            return false;
-        }
-}
 
 int main(int ac, char **av)
 {
@@ -166,6 +138,8 @@ int main(int ac, char **av)
 		std::map<int, Server*> serversMap;
 		std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > clientMap;
 
+		HttpRequestAllow check(10, 2000);
+	
 	try {
 		init_server();
 		readConfigFile(servers, av[1]);
@@ -210,6 +184,8 @@ int main(int ac, char **av)
 							else {
 								HttpRequest *clientRequest = new HttpRequest(clientFd, servers, pollfds[i].fd);
 								if (sizePollfds > MAX_NUMBER_REQUEST)
+									clientRequest->setStatusCode(429);
+								if (!check.allowRequest())
 									clientRequest->setStatusCode(429);
 								addingNewClient(&clientRequest, clientAddr, serversMap, it, clientMap, pollfds);
 							}
