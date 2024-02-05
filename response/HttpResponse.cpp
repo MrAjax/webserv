@@ -65,6 +65,7 @@ std::string	HttpResponse::get_response(Server &serv) {
 	//std::cout << std::string(GREENN) + _header << "\n";
 	delete m;
 	server_log("Response ready to send", DEBUG);
+	std::cout << _response;
 	return _response;
 }
 

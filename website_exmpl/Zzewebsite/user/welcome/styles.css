@@ -153,6 +153,30 @@ p {
     text-align: center;
 }
 
+.erase {
+	margin-top: 10%;
+}
+
+.erase-button {
+	position: absolute;
+	left: 50%;
+    transform: translateX(-50%);
+	background-color:brown; /* Green */
+	border: none;
+	color: white;
+	padding: 7px 130px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	border-radius: 4px;
+	margin: 0 auto
+}
+
+.erase-button:hover {
+	background-color:chocolate;
+}
+
 footer {
     font-size: 30px;
 }

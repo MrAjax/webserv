@@ -25,7 +25,6 @@ class StatusSender {
 	std::string		_error_403();
 	std::string		_error_404();
 	std::string		_error_500();
-	std::string		_post_error();
 	std::string		_error_generic(int err);
 	std::string		_get_response();
 public:

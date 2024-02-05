@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login</title>
-    <link rel="stylesheet" href="/index/styles.css">
+    <link rel="stylesheet" href="/user/welcome/styles.css">
 </head>
 <body>
     <div class="container">
@@ -18,6 +18,36 @@
             <textarea id="diaryEntry" name="diaryEntry" rows="20" cols="103" placeholder="Write your diary entry here..." required></textarea><br>
             <input type="submit" value="Submit Diary Entry">
         </form>
+        <a href="/user/welcome/diary.sh.cgi" >Allow Data Removal</a>
     </div>
+	<div>
+		<div class="erase">
+			<button type="submit" id="eraseAll" class="erase-button">Erase all</button>
+		</div>
+		<script>
+			document.getElementById('eraseAll').addEventListener('click', function() {
+				const path = '/user/welcome/diary_data.csv';
+				fetch(path, {
+					method: 'DELETE',
+				})
+				.then(response => {
+					if (!response.ok) {
+						if(response.status === 404) {
+							throw new Error('No diary to be deleted');
+						} else {
+							throw new Error('An error occurred');
+						}
+					}
+					return response.json();
+				})
+				.then(data => {
+					alert(data.message);
+				})
+				.catch((error) => {
+					console.error('Error:', error);
+				});
+			});
+		</script>
+	</div>
 </body>
 </html>

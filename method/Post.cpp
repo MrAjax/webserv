@@ -21,7 +21,8 @@ std::string	set_post_path(std::string path) {
 }
 
 void	Post::fill_post_file(Server &serv, std::string query_string) {
-	std::fstream				post_file(set_post_path(this->get_path()).c_str(), std::ios::out | std::ios::app);
+	std::string					path = set_post_path(this->get_path());
+	std::fstream				post_file(path.c_str(), std::ios::out | std::ios::app);
 	std::string					key, value, token;
 	std::istringstream			query_stream(query_string);
 	std::vector<std::string>	values;
