@@ -1,17 +1,6 @@
 #ifndef HTTPREQUESTPARSING_HPP
 # define HTTPREQUESTPARSING_HPP
 
-#include <iostream>
-#include <unistd.h>
-#include <cstring>
-#include <cstdlib>
-#include <vector>
-#include <sstream>
-#include <poll.h>
-#include <sys/types.h>
-
-#include <sys/socket.h>
-
 #include "HttpRequest.hpp"
 
 #define MAX_HEADER_SIZE 1024

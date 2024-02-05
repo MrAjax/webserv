@@ -6,6 +6,7 @@ LOG_FILE = server/server.log
 
 SRC = 	main.cpp \
 		request/HttpRequest.cpp \
+		request/HttpRequestAllow.cpp \
 		request/HttpRequestChecking.cpp \
 		request/HttpRequestParsing.cpp \
 		method/Delete.cpp \

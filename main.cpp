@@ -1,4 +1,5 @@
 #include "request/HttpRequest.hpp"
+#include "request/HttpRequestAllow.hpp"
 #include "response/HttpResponse.hpp"
 #include "inc/webserv.hpp"
 #include "signal/signal.hpp"
@@ -121,7 +122,9 @@ bool isListener(int fd, std::vector<Server> servers) {
 	return false;
 }
 
-#define MAX_NUMBER_REQUEST 100
+#define MAX_NUMBER_REQUEST 1000
+
+
 
 int main(int ac, char **av)
 {
@@ -137,6 +140,8 @@ int main(int ac, char **av)
 		std::string					dot[3] = {".  ", ".. ", "..."};
 		int							n = 0;
 
+		HttpRequestAllow check(10, 2000);
+	
 	try {
 		init_server();
 		readConfigFile(servers, av[1]);
@@ -189,6 +194,8 @@ int main(int ac, char **av)
 							else {
 								HttpRequest *clientRequest = new HttpRequest(clientFd, servers, pollfds[i].fd);
 								if (sizePollfds > MAX_NUMBER_REQUEST)
+									clientRequest->setStatusCode(429);
+								if (!check.allowRequest())
 									clientRequest->setStatusCode(429);
 								addingNewClient(&clientRequest, clientAddr, serversMap, it, clientMap, pollfds);
 							}
