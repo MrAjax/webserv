@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/03 14:22:15 by mferracc         ###   ########.fr       */
+/*   Updated: 2024/02/05 09:14:26 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,6 @@ Server& Server::operator = (Server const& a) {
 			_locations[it->first] = new Location(*(it->second));
 		}	
 	}
-	std::cout << BLUE << "Server " << _i << " assignment operator = called" << RESET << std::endl;
 	return *this;
 }
 
@@ -108,12 +107,10 @@ Server::Server(Server const& a) {
 		for (it = a._locations.begin(); it != a._locations.end(); ++it) {
 			_locations[it->first] = new Location(*(it->second));
 		}	
-//	std::cout << BLUE << "Server " << _i << " copy constructor called" << RESET << std::endl;
 }
 
 Server::~Server(void) {
 
-//	std::cout << BLUE << "Server " << _i << " destructor called" << RESET << std::endl;
 	std::map<std::string, Location*>::iterator it;
 		for (it = _locations.begin(); it != _locations.end(); ++it) {
 			delete it->second;

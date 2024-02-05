@@ -130,10 +130,12 @@ int main(int ac, char **av)
 		return 0;
 	}
 
-		std::vector<Server> servers;
-		std::vector<struct pollfd> pollfds;
-		std::map<int, Server*> serversMap;
+		std::vector<Server>			servers;
+		std::vector<struct pollfd>	pollfds;
+		std::map<int, Server*>		serversMap;
 		std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > clientMap;
+		std::string					dot[3] = {".  ", ".. ", "..."};
+		int							n = 0;
 
 	try {
 		init_server();
@@ -155,9 +157,13 @@ int main(int ac, char **av)
 				std::cerr << "poll error: " << strerror(errno) << std::endl;
 
 	//		std::cout << YELLOW "Number of pollfd= " RESET << sizePollfds << std::endl;			
+			if (n == 3)
+				n = 0;
+			std::cout << "\rWebserv is running" << dot[n++] << std::flush;
 
 			for(size_t i = 0; i < sizePollfds; i++)
 			{
+	
 				if (pollfds[i].revents & POLLIN) //EVENT!
 				{
 					server_log("EVENT", DEBUG);
