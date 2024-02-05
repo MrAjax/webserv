@@ -22,6 +22,7 @@ StatusSender::StatusSender(int err, Server &serv): _server_path(serv.getRoot()),
 		break;
 	case POST:
 		_response = _post_error();
+		break;
 	default:
 		_response = _error_generic(err); // TODO changer c'est pas erreur 500 l'erreur par defaut
 		break;
