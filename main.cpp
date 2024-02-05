@@ -163,13 +163,10 @@ int main(int ac, char **av)
 		
 			int poll_count = poll(&pollfds[0], sizePollfds, 1000);
 			if (poll_count == -1) 
-				std::cerr << "poll error: " << strerror(errno) << std::endl;
-
-	//		std::cout << YELLOW "Number of pollfd= " RESET << sizePollfds << std::endl;			
+				std::cerr << "poll error: " << strerror(errno) << std::endl;	
 			if (n == 3)
 				n = 0;
 			std::cout << "\rWebserv is running" << dot[n++] << std::flush;
-
 			for(size_t i = 0; i < sizePollfds; i++)
 			{
 	
@@ -180,14 +177,9 @@ int main(int ac, char **av)
 					if (it != serversMap.end()) {
 						if (isListener(pollfds[i].fd, servers)) //socketfd is listener == 1st co
 						{
-			//				std::cout << "server name: " << it->second->getServerName() << "\n";
 							struct sockaddr_in clientAddr;
 							socklen_t tempAddrlen = sizeof(clientAddr);
-
-					//		std::cout << PURPLE "New connexion with listener socket fd= " RESET <<  pollfds[i].fd << std::endl;
 							int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
-					//		std::cout << PURPLE "New client fd= " RESET << clientFd << std::endl;
-
 							if (clientFd == -1) {
 								std::cerr << "Accept error: " << strerror(errno) << std::endl;
 							}
@@ -202,13 +194,8 @@ int main(int ac, char **av)
 						}
 						else // socketfd aldready set c/p from HttpRequest
 						{
-					//		std::cout << GREEN "pollfds.fd= " RESET << pollfds[i].fd << std::endl;
-					//		std::cout << GREEN "requestfd.fd= " RESET << clientMap[pollfds[i].fd].second->getConnfd() << std::endl;
-
-							//std::cout << "server name: " << it->second->getServerName() << "\n";
 							server_log("other request on clientFD", DEBUG);
 							int status = clientMap[pollfds[i].fd].second->processingRequest();
-							// clientMap[pollfds[i].fd].second->printAttribute();
 							if (status > 200)
 							{
 								send_response(pollfds[i].fd, *it->second, *clientMap[pollfds[i].fd].second);
@@ -229,5 +216,14 @@ int main(int ac, char **av)
 	}
 	for (size_t i = 0; i < pollfds.size(); i++) {
 		close(pollfds[i].fd);
-	}	
+	}
+	for (std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >::iterator it =  clientMap.begin();
+		it != clientMap.end(); it++)
+	{
+		if (it->second.second != NULL)
+		{
+			delete it->second.second;
+			it->second.second = NULL;
+		}
+	}
 }
