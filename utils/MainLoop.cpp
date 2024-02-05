@@ -2,22 +2,23 @@
 
 void    removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
 {
-    std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >::iterator it = clientMap.begin();
-	for (;it != clientMap.end(); it++)
-	{
-		if (it->second.second->checkTimeout())
-		{
+	std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >::iterator it = clientMap.begin();
+	while (it != clientMap.end()) {
+		if (it->second.second->checkTimeout()) {
 			delete it->second.second;
-			for (std::size_t i = 0; i < pollfds.size() ; i++)
-			{
-				if (pollfds[i].fd == it->first)
-				{
-					close(pollfds[i].fd);
-					pollfds.erase(pollfds.begin() + i);
+
+			for (std::vector<struct pollfd>::iterator pollIt = pollfds.begin(); pollIt != pollfds.end(); ) {
+				if (pollIt->fd == it->first) {
+					close(pollIt->fd);
+					pollIt = pollfds.erase(pollIt);
+				} else {
+					++pollIt;
 				}
 			}
-			clientMap.erase(it->first);
-		}
+
+			clientMap.erase(it++);
+		} else
+			++it;
 	}
 }
 
