@@ -123,6 +123,37 @@ bool isListener(int fd, std::vector<Server> servers) {
 
 #define MAX_NUMBER_REQUEST 100
 
+bool allowRequest()
+{
+        // Vérifier si le temps écoulé dépasse l'intervalle défini
+
+		struct timespec end;
+		clock_gettime(CLOCK_REALTIME, &end);
+		int timeSec = end.tv_sec - _lastUpdate.tv_sec;
+
+        time_t currentTime = std::time(nullptr);
+        if (currentTime - lastResetTime_ >= intervalSeconds_)
+		{
+            // Réinitialiser le compteur de requêtes
+            requestCount_ = 0;
+            lastResetTime_ = currentTime;
+        }
+
+        // Vérifier si le nombre de requêtes dépasse la limite
+        if (requestCount_ < maxRequests_)
+		{
+            // Autoriser la requête et incrémenter le compteur
+            ++requestCount_;
+            return true;
+        }
+		else
+		{
+            // Refuser la requête en renvoyant une erreur 429 (Too Many Requests)
+            std::cerr << "Error 429: Too Many Requests" << std::endl;
+            return false;
+        }
+}
+
 int main(int ac, char **av)
 {
 	if (ac != 2) {
