@@ -35,7 +35,6 @@ class HttpRequest
 		HttpRequest(int connfd);
 		HttpRequest(int connfd, std::vector<Server> &servers, int listenFd);
 
-		HttpRequest(int connfd, std::string contentType, std::string input);
 		HttpRequest(HttpRequest const &copy);
 		~HttpRequest(void);
 		//------------OPERATOR------------------//

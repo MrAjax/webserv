@@ -32,7 +32,6 @@ int			HttpRequest::checkTimeout(void) // permet de check si on doit kill la requ
 	int timeSec = end.tv_sec - _lastUpdate.tv_sec;
 	if (timeSec > TIMEOUT_REQUEST)
 		return (1);
-
 	else
 		return (0);
 }
@@ -102,18 +101,18 @@ int	HttpRequest::recvfd(int & fd)
 		server_log(std::string(REDD) + "Request fd " + _debugFd + " recv error", ERROR);
 		_statusCode = 400;
 	}
+	if (numbytes == 0)
+		_statusCode = KILL_ME;
 	return (numbytes);
 }
 
 int    HttpRequest::processingRequest(void)
 {
-	HttpRequestParsing	parsing(*this);
-
 	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
 	if (_statusCode > 200 || _statusCode == KILL_ME)
 		return (_statusCode);
-	if (recvfd(_connfd) == 0)
-		_statusCode = KILL_ME;
+	recvfd(_connfd);
+	HttpRequestParsing	parsing(*this);
 	if (_statusCode == NEW || _statusCode == PROCESSING_HEADER)
 	{
 		server_log(std::string(GREENN) + "Request fd " + _debugFd + " getHeader in process", DEBUG);
@@ -171,9 +170,7 @@ bool		HttpRequest::getIsCgi()				{return (this->_isCgi);}
 
 int			HttpRequest::getListenFd()			{return (this->_listenFd);}
 
-std::size_t			HttpRequest::getMaxBodySize()			{return (this->_maxBodySize);}
-
-
+std::size_t	HttpRequest::getMaxBodySize()		{return (this->_maxBodySize);}
 
 //-------------------STETTEUR-------------------
 
@@ -194,7 +191,6 @@ void	HttpRequest::setSecFetchSite(const std::string &value)		{_secFetchSite = va
 void	HttpRequest::setContentLength(const std::size_t &value)		{_contentLength = value;}
 void	HttpRequest::setContentType(const std::string &value)		{_contentType = value;}
 void	HttpRequest::setCookie(const std::string &value)			{_cookie = value;}
-
 
 void	HttpRequest::setBodyRequest(const std::string &value)		{_bodyRequest = value;}
 void	HttpRequest::setHeaderRequest(const std::string &value)		{_headerRequest = value;}

@@ -121,6 +121,8 @@ bool isListener(int fd, std::vector<Server> servers) {
 	return false;
 }
 
+#define MAX_NUMBER_REQUEST 100
+
 int main(int ac, char **av)
 {
 	if (ac != 2) {
@@ -176,6 +178,8 @@ int main(int ac, char **av)
 							}
 							else {
 								HttpRequest *clientRequest = new HttpRequest(clientFd, servers, pollfds[i].fd);
+								if (sizePollfds > MAX_NUMBER_REQUEST)
+									clientRequest->setStatusCode(429);
 								addingNewClient(&clientRequest, clientAddr, serversMap, it, clientMap, pollfds);
 							}
 						}
