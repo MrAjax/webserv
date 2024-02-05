@@ -20,6 +20,8 @@ StatusSender::StatusSender(int err, Server &serv): _server_path(serv.getRoot()),
 	case 500:
 		_response = _error_500();
 		break;
+	case POST:
+		_response = _post_error();
 	default:
 		_response = _error_generic(err); // TODO changer c'est pas erreur 500 l'erreur par defaut
 		break;
@@ -150,6 +152,10 @@ std::string	StatusSender::_error_500() {
 	_body = file_content.str();
 	_header = build_header(_status_code, "text/html", _body.length());
 	return _header + _body;
+}
+
+std::string	StatusSender::_post_error() {
+	return _error_generic(413);
 }
 
 std::string	StatusSender::_error_generic(int err) {
