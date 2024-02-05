@@ -6,7 +6,7 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 										_server_path(serv.getRoot()), \
 										_index_list(serv.getIndex()), \
 										_body_request(req.getBodyRequest()), \
-										_status_code(/* req.getStatusCode() */202), \
+										_status_code(req.getStatusCode()), \
 										_is_cgi(req.getIsCgi()), \
 										_cookie(req.getCookie()) {
 	if (_status_code != 202)
