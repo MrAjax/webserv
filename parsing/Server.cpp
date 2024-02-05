@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/05 10:37:16 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/05 10:43:22 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -333,11 +333,6 @@ void Server::p_allow_methods(std::string const& line) {
 			_allow_methods.push_back(line.substr(pos, end - pos));
 		pos = end;	
 	}
-	
-	for (size_t i = 0; i < _allow_methods.size(); i++) {
-		std::cout << "[" << _allow_methods[i] << "]";
-	}	
-	std::cout << std::endl;
 }	
 
 std::string Server::settempLocation(std::string line) {
