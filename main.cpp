@@ -156,8 +156,7 @@ int main(int ac, char **av)
 		while (g_sig == 0) { /* Here is the main loop */
 			std::size_t sizePollfds = pollfds.size();
 		
-			int poll_count = poll(&pollfds[0], sizePollfds, 1000);
-			if (poll_count == -1) 
+			if (poll(&pollfds[0], sizePollfds, 1000) == -1)
 				std::cerr << "poll error: " << strerror(errno) << std::endl;
 
 	//		std::cout << YELLOW "Number of pollfd= " RESET << sizePollfds << std::endl;			
@@ -167,11 +166,10 @@ int main(int ac, char **av)
 
 			for(size_t i = 0; i < sizePollfds; i++)
 			{
-	
 				if (pollfds[i].revents & POLLIN) //EVENT!
 				{
 					server_log("EVENT", DEBUG);
-					std::map<int, Server*>::iterator it = serversMap.find(pollfds[i].fd); //
+					std::map<int, Server*>::iterator it = serversMap.find(pollfds[i].fd); 
 					if (it != serversMap.end()) {
 						if (isListener(pollfds[i].fd, servers)) //socketfd is listener == 1st co
 						{
@@ -215,7 +213,6 @@ int main(int ac, char **av)
 				removeTimeout(clientMap, pollfds);
 			}
 		}
-
 	}		
 	catch (const std::exception &e) {
 		std::cerr << e.what() << "\n";
