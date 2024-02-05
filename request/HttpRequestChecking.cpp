@@ -93,12 +93,14 @@ int HttpRequestChecking::checkSockfdPortIP(Server &server)
 	std::size_t pos = _request.getHost().find(":");
 	if (pos == std::string::npos)
 		return (0);
-	std::string ip = _request.getHost().substr(0, pos);
+	std::string requestIp = _request.getHost().substr(0, pos);
+	if (requestIp == "127.0.0.1" || requestIp == "::1")
+		requestIp = "localhost";
 	std::string port = _request.getHost().substr(1 + pos);
-	std::string convertIP = server.getIp();
-	if (convertIP == "127.0.0.1" || convertIP == "::1")
-		convertIP = "localhost";
-	if (ip == convertIP && port == server.getPort()
+	std::string serverIp = server.getIp();
+	if (serverIp == "127.0.0.1" || serverIp == "::1")
+		serverIp = "localhost";
+	if (requestIp == serverIp && port == server.getPort()
 		&& _request.getListenFd() == server.getSocketfd())
 		return (1);
 	return (0);
