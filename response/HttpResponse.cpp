@@ -23,6 +23,12 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 	server_log(std::string(WHITEE) + "method = " + _method, DEBUG);
 	server_log(std::string(WHITEE) + "method code = " + int_to_str(_method_code), DEBUG);
 	server_log(std::string(WHITEE) + "path = " + _path, DEBUG);
+	if (_method_code == GET && serv.getIsAllowed())
+		throw StatusSender::send_status(405, serv);
+	if (_method_code == POST && serv.postIsAllowed())
+		throw StatusSender::send_status(405, serv);
+	if (_method_code == DELETE && serv.deleteIsAllowed())
+		throw StatusSender::send_status(405, serv);
 }
 
 HttpResponse::~HttpResponse() {}
