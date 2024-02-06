@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/05 11:16:10 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/06 12:57:38 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,9 @@ public:
 	int	getMaxBodySize( void ) const;
 	int	getSocketfd( void ) const;
 	std::vector<int> getErrorPages( void ) const;
+	bool getIsAllowed( void ) const;
+	bool postIsAllowed( void ) const;
+	bool deleteIsAllowed( void ) const;
 	Location *getLocation( std::string type ) const;
 	
 private:
@@ -77,6 +80,9 @@ private:
 	std::string			_location_error_page;
 	std::vector<std::string> _index;	
 	bool				_socketIsSet;
+	bool				_get;
+	bool				_post;
+	bool				_delete;
 	std::map<std::string, Location*> _locations;
 	std::vector<std::string> _allow_methods;
 

@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/05 11:16:48 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/06 12:59:04 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@
 #include "Location.hpp"
 
 Server::Server(std::vector<std::string> config, std::vector<Server> const& servers, int i)
-	: _i(i), _socketfd(-1), _max_body_size(-1), _servers(servers), _socketIsSet(false) 
+	: _i(i), _socketfd(-1), _max_body_size(-1), _servers(servers), _socketIsSet(false),
+	_get(true), _post(true), _delete(true)
 {	
 
 	memset(&_res, 0, sizeof(_res));
@@ -334,6 +335,27 @@ void Server::p_allow_methods(std::string const& line) {
 			_allow_methods.push_back(line.substr(pos, end - pos));
 		pos = end;	
 	}
+
+	std::vector<std::string>::iterator it;
+
+	for (it = _allow_methods.begin(); it != _allow_methods.end(); ++it) {
+		if (*it == "GET")
+			break;
+	}
+	if (it == _allow_methods.end())
+		_get = false;
+	for (it = _allow_methods.begin(); it != _allow_methods.end(); ++it) {
+		if (*it == "POST")
+			break;
+	}
+	if (it == _allow_methods.end())
+		_post = false;
+	for (it = _allow_methods.begin(); it != _allow_methods.end(); ++it) {
+		if (*it == "DELETE")
+			break;
+	}
+	if (it == _allow_methods.end())
+		_delete = false;
 }	
 
 std::string Server::settempLocation(std::string line) {
@@ -402,3 +424,13 @@ Location* Server::getLocation(std::string type) const {
 		return NULL;
 	}
 }
+
+bool Server::getIsAllowed(void) const {
+	return _get;
+}	
+bool Server::postIsAllowed(void) const {
+	return _post;
+}	
+bool Server::deleteIsAllowed(void) const {
+	return _delete;
+}	
