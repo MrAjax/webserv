@@ -24,16 +24,17 @@ void    removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* >
 
 void    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds, int i)
 {
-	clientMap[pollfds[i].fd].second->setMyserver(NULL);
-	if (clientMap[pollfds[i].fd].second != NULL)
-	{
-    	delete clientMap[pollfds[i].fd].second;
-		clientMap[pollfds[i].fd].second = NULL;
-	}
-	clientMap.erase(pollfds[i].fd);
-	close(pollfds[i].fd);
-	pollfds.erase(pollfds.begin() + i);
-	// clientMap[pollfds[i].fd].second->resetRequest();
+	//Pour tester siege sans crash à la fin commenter les lignes à commenter 
+	clientMap[pollfds[i].fd].second->setMyserver(NULL);// a commenter
+	if (clientMap[pollfds[i].fd].second != NULL)// a commenter
+	{// a commenter
+    	delete clientMap[pollfds[i].fd].second;// a commenter
+		clientMap[pollfds[i].fd].second = NULL;// a commenter
+	}// a commenter
+	clientMap.erase(pollfds[i].fd);// a commenter
+	close(pollfds[i].fd);// a commenter
+	pollfds.erase(pollfds.begin() + i);// a commenter
+	// clientMap[pollfds[i].fd].second->resetRequest(); //A DECOMMENTER
 }
 
 void    addingNewClient(HttpRequest **clientRequest, struct sockaddr_in &clientAddr, 
