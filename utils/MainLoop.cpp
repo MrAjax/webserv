@@ -37,11 +37,8 @@ void    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >
 }
 
 void    addingNewClient(HttpRequest **clientRequest, struct sockaddr_in &clientAddr, 
-    std::map<int, Server*> &serversMap, std::map<int, Server*>::iterator &it,
     std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
 {
-	serversMap[(*clientRequest)->getConnfd()] = it->second;
-	//std::cout << it->second->getSocketfd() << std::endl;
 	clientMap[(*clientRequest)->getConnfd()] = std::make_pair(clientAddr, *clientRequest); //add client information to map Client
 	struct pollfd newPfd;
 	newPfd.fd = (*clientRequest)->getConnfd();
