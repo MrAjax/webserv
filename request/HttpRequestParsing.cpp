@@ -10,20 +10,20 @@ HttpRequestParsing::HttpRequestParsing(HttpRequest &request) : _request(request)
 
 HttpRequestParsing::~HttpRequestParsing() {}
 
-bool	HttpRequestParsing::isMaxSize()
+bool	HttpRequestParsing::isMaxSize(std::size_t SIZE)
 {
-	if (_request.getSaveString().size() > MAX_HEADER_SIZE &&
+	if (SIZE > MAX_HEADER_SIZE &&
 		(_request.getStatusCode() == PROCESSING_HEADER || _request.getStatusCode() == NEW))
 	{
 		server_log(std::string(REDD) + "Request fd " + _debugFd + " Header > max_size_header", ERROR);
-		_request.setStatusCode(400);
+		_request.setStatusCode(413);
 		return (true);
 	}
-	if (_request.getMyserver() != NULL && _request.getSaveString().size() > _request.getMaxBodySize() &&
+	if (_request.getMyserver() != NULL && SIZE > _request.getMaxBodySize() &&
 		(_request.getStatusCode() == DONE_HEADER_CHECKING || _request.getStatusCode() == PROCESSING_BODY))
 	{
 		server_log(std::string(REDD) + "Request fd " + _debugFd + " Body > max_size", ERROR);
-		_request.setStatusCode(400);
+		_request.setStatusCode(413);
 		return (true);
 	}
 	return (false);
@@ -33,12 +33,12 @@ bool    HttpRequestParsing::parsingHeader(void)
 {
 	if (_request.getStatusCode() != NEW && _request.getStatusCode() != PROCESSING_HEADER)
 		return (false);
-	if (isMaxSize() == true)
-		return (false);
 	std::string delimiteur = "\r\n\r\n";
 	std::size_t pos = _request.getSaveString().find(delimiteur);
 	if (pos == std::string::npos)
 	{
+		if (isMaxSize(_request.getSaveString().size()) == true)
+			return (false);
 		_request.setStatusCode(PROCESSING_HEADER);
 		return (false);
 	}
@@ -47,6 +47,8 @@ bool    HttpRequestParsing::parsingHeader(void)
 		_request.setSaveString(_request.getSaveString().substr(pos + delimiteur.size()));
 	else
 		_request.getSaveString() = "";
+	if (isMaxSize(_request.getHeaderRequest().size()) == true)
+		return (false);
 	if (parseAllAttributes(_request.getHeaderRequest()) == false)
 		return (false);
     if (!_request.getStrContentLength().empty())
@@ -74,7 +76,7 @@ bool    HttpRequestParsing::parsingBody(void)
 		server_log(std::string(GREENN) + "Request fd " + _debugFd + " succesful code 202", DEBUG);
 		return (true);
 	}
-	if (isMaxSize() == true)
+	if (isMaxSize(_request.getSaveString().size()) == true)
 		return (false);
 	if (_request.getSaveString().size() >= _request.getContentLength())
 	{

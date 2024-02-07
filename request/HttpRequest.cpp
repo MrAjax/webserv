@@ -18,10 +18,10 @@ _statusCode(NEW), _isCgi(false), _listenFd(listenFd), _maxBodySize(0)
 	std::stringstream ss;
 	ss << _connfd;
 	_debugFd = ss.str();
-	//std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
+	// std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
 }
 
-HttpRequest::~HttpRequest(void)	{/* std::cout << BLUE << _connfd << " Destructor call\n" << RESET; */}
+HttpRequest::~HttpRequest(void)	{/*std::cout << BLUE << _connfd << " Destructor call\n" << RESET;*/ }
 
 //-----------UTILS------------------
 
@@ -43,6 +43,9 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
 		const char* key;                  // La clé
     	std::string (HttpRequest::*getter)();  // Pointeur vers le getter
 	};
+	std::cout << YELLOW << "-----MY FD IS " << _connfd << " -----"<< RESET << std::endl;
+	std::cout << YELLOW << "status code: " << RESET << _statusCode << std::endl;
+
  	struct _tab tab[NBPARAM] = {{"Method:", &HttpRequest::getMethod}, {"Path:", &HttpRequest::getPath},
 		{"Protocol:", &HttpRequest::getHttp},{"Host:", &HttpRequest::getHost}, {"User-Agent:", &HttpRequest::getUserAgent},
 		{"Accept:", &HttpRequest::getAccept}, {"Accept-Language:", &HttpRequest::getAcceptLanguage},
@@ -200,6 +203,7 @@ void	HttpRequest::setSaveString(const std::string &value)		{saveString = value;}
 
 void	HttpRequest::setStrContentLength(const std::string &value)	{_strContentLength = value;}
 void	HttpRequest::setStatusCode(const int &value)				{_statusCode = value;}
+void	HttpRequest::setMyserver(Server **value)					{if (value == NULL){_myServer = NULL;}else{_myServer= *value;}}
 
 void	HttpRequest::setIsCgi(const bool &value)					{_isCgi = value;}
 

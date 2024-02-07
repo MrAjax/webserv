@@ -13,7 +13,6 @@ void    removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* >
 void    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds, int i);
 
 void    addingNewClient(HttpRequest **clientRequest, struct sockaddr_in &clientAddr, 
-    std::map<int, Server*> &serversMap, std::map<int, Server*>::iterator &it,
     std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds);
 
 #endif

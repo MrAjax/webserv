@@ -59,17 +59,13 @@ static	void	send_response_to_client(int connfd, std::string response) {
 }
 
 static	void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
-
 	std::string	response;
-	server_log("Activity detected on server: " + serv.getServerName(), DEBUG);
-	if (connfd < 0)
-		throw error_throw("send response - main.cpp", true);
-
-	
-	
 	try {
 		if (Req.getMyserver() == NULL)
-			throw StatusSender::send_status(Req.getStatusCode(), serv); //Pb si pas de servers
+			throw StatusSender::send_status(Req.getStatusCode(), serv); //Pb si server = NULL ici =segFault
+		server_log("Activity detected on server: " + serv.getServerName(), DEBUG);
+		if (connfd < 0)
+			throw error_throw("send response - main.cpp", true);
 
 		server_log("Parsing Request...", DEBUG);
 		std::string	request_header = Req.getHeaderRequest();
@@ -122,9 +118,6 @@ bool isListener(int fd, std::vector<Server> servers) {
 	return false;
 }
 
-#define MAX_NUMBER_REQUEST 1000
-
-
 
 int main(int ac, char **av)
 {
@@ -140,13 +133,13 @@ int main(int ac, char **av)
 		std::string					dot[3] = {".  ", ".. ", "..."};
 		int							n = 0;
 
-		HttpRequestAllow check(10, 2000);
+		HttpRequestAllow check(50, 1000);
 	
 	try {
 		init_server();
 		readConfigFile(servers, av[1]);
 		allocatePollFds(servers, pollfds); //set struct pollfd
-		allocateServersMap(servers, serversMap); //set map pollfd.fd Server*
+		// allocateServersMap(servers, serversMap); //set map pollfd.fd Server*  NE sert plus
 	}
 	catch (const std::exception &e) {
 		std::cerr << e.what() << std::endl;
@@ -172,41 +165,47 @@ int main(int ac, char **av)
 				if (pollfds[i].revents & POLLIN) //EVENT!
 				{
 					server_log("EVENT", DEBUG);
-					std::map<int, Server*>::iterator it = serversMap.find(pollfds[i].fd); 
-					if (it != serversMap.end()) {
-						if (isListener(pollfds[i].fd, servers)) //socketfd is listener == 1st co
-						{
-							struct sockaddr_in clientAddr;
-							socklen_t tempAddrlen = sizeof(clientAddr);
-							int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
-							if (clientFd == -1) {
-								std::cerr << "Accept error: " << strerror(errno) << std::endl;
-							}
-							else {
-								HttpRequest *clientRequest = new HttpRequest(clientFd, servers, pollfds[i].fd);
-								if (sizePollfds > MAX_NUMBER_REQUEST)
-									clientRequest->setStatusCode(429);
-								if (!check.allowRequest())
-									clientRequest->setStatusCode(429);
-								addingNewClient(&clientRequest, clientAddr, serversMap, it, clientMap, pollfds);
-							}
+					if (isListener(pollfds[i].fd, servers)) //socketfd is listener == 1st co
+					{
+						struct sockaddr_in clientAddr;
+						socklen_t tempAddrlen = sizeof(clientAddr);
+						int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
+						if (clientFd == -1) {
+							std::cerr << "Accept error: " << strerror(errno) << std::endl;
 						}
-						else // socketfd aldready set c/p from HttpRequest
-						{
-							server_log("other request on clientFD", DEBUG);
-							int status = clientMap[pollfds[i].fd].second->processingRequest();
-							if (status > 200)
+						else {
+							HttpRequest *clientRequest = new HttpRequest(clientFd, servers, pollfds[i].fd);
+							if (clientRequest != NULL)
 							{
-								send_response(pollfds[i].fd, *it->second, *clientMap[pollfds[i].fd].second);
-								clientMap[pollfds[i].fd].second->resetRequest();
+								check.allowRequest(pollfds, *clientRequest);
+								addingNewClient(&clientRequest, clientAddr, clientMap, pollfds);
 							}
-							else if (status == KILL_ME)
-								killRequest(clientMap, pollfds, i);
+							else
+								server_log(std::string(REDD) + "HttpRequest allocation fail", ERROR);
 						}
 					}
+					else // socketfd aldready set c/p from HttpRequest
+					{
+						server_log("other request on clientFD", DEBUG);
+						
+						if (clientMap[pollfds[i].fd].second->processingRequest() >= 200)
+						{
+							// clientMap[pollfds[i].fd].second->printAttribute();
+							pollfds[i].events = POLLOUT;
+						}
+						else if (clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)
+							killRequest(clientMap, pollfds, i);
+					}
+					
 				}
-				removeTimeout(clientMap, pollfds);
+				if (pollfds[i].revents & POLLOUT)
+				{
+					send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second); // get my server peut etre = NULL risque segFault
+					clientMap[pollfds[i].fd].second->resetRequest();
+					pollfds[i].events = POLLIN;
+				}
 			}
+			removeTimeout(clientMap, pollfds);
 		}
 	}		
 	catch (const std::exception &e) {
