@@ -62,7 +62,9 @@ static	void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 	std::string	response;
 	try {
 		if (Req.getMyserver() == NULL)
-			throw StatusSender::send_status(Req.getStatusCode(), serv); //Pb si server = NULL ici =segFault
+			throw std::runtime_error("No server in request");
+		// if (Req.getMyserver() == NULL)
+		// 	throw StatusSender::send_status(Req.getStatusCode(), serv); //Pb si server = NULL ici =segFault
 		server_log("Activity detected on server: " + serv.getServerName(), DEBUG);
 		if (connfd < 0)
 			throw error_throw("send response - main.cpp", true);
@@ -190,7 +192,7 @@ int main(int ac, char **av)
 						
 						if (clientMap[pollfds[i].fd].second->processingRequest() >= 200)
 						{
-							// clientMap[pollfds[i].fd].second->printAttribute();
+							clientMap[pollfds[i].fd].second->printAttribute();
 							pollfds[i].events = POLLOUT;
 						}
 						else if (clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)
@@ -201,8 +203,17 @@ int main(int ac, char **av)
 				if (pollfds[i].revents & POLLOUT)
 				{
 					send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second); // get my server peut etre = NULL risque segFault
-					clientMap[pollfds[i].fd].second->resetRequest();
-					pollfds[i].events = POLLIN;
+					if (clientMap[pollfds[i].fd].second->getStatusCode() >= 400)
+					{
+						std::cout << RED "KILLREQUEST\n";
+						killRequest(clientMap, pollfds, i);
+					}
+					else
+					{
+						clientMap[pollfds[i].fd].second->resetRequest();
+						pollfds[i].events = POLLIN;
+
+					}
 				}
 			}
 			removeTimeout(clientMap, pollfds);
