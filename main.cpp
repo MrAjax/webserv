@@ -62,9 +62,10 @@ static	void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 	std::string	response;
 	try {
 		if (Req.getMyserver() == NULL)
-			throw std::runtime_error("No server in request");
-		// if (Req.getMyserver() == NULL)
-		// 	throw StatusSender::send_status(Req.getStatusCode(), serv); //Pb si server = NULL ici =segFault
+		{
+			std::cout << RED "NO SERVER" RESET << std::endl;
+			return ;
+		}
 		server_log("Activity detected on server: " + serv.getServerName(), DEBUG);
 		if (connfd < 0)
 			throw error_throw("send response - main.cpp", true);
@@ -111,15 +112,6 @@ void	init_server(void) {
 	init_log_file();
 	server_log("SERVER STARTED", INFO);
 }
-
-bool isListener(int fd, std::vector<Server> servers) {
-	for (size_t i = 0; i < servers.size(); i++) {
-		if (fd == servers[i].getSocketfd())
-			return true;	
-	}
-	return false;
-}
-
 
 int main(int ac, char **av)
 {
@@ -173,17 +165,19 @@ int main(int ac, char **av)
 						socklen_t tempAddrlen = sizeof(clientAddr);
 						int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
 						if (clientFd == -1) {
-							std::cerr << "Accept error: " << strerror(errno) << std::endl;
+							server_log(std::string(REDD) + "Accept error for socketfd " + int_to_str(pollfds[i].fd), ERROR);
 						}
 						else {
-							HttpRequest *clientRequest = new HttpRequest(clientFd, servers, pollfds[i].fd);
-							if (clientRequest != NULL)
+							try
 							{
+								HttpRequest *clientRequest = new HttpRequest(clientFd, servers, pollfds[i].fd);
 								check.allowRequest(pollfds, *clientRequest);
 								addingNewClient(&clientRequest, clientAddr, clientMap, pollfds);
 							}
-							else
-								server_log(std::string(REDD) + "HttpRequest allocation fail", ERROR);
+							catch (const std::exception &e)
+							{
+								server_log(std::string(REDD) + "HttpRequest allocation fail clientfd " + int_to_str(clientFd), ERROR);
+							}
 						}
 					}
 					else // socketfd aldready set c/p from HttpRequest
@@ -216,6 +210,7 @@ int main(int ac, char **av)
 					}
 				}
 			}
+			// removeRequest(clientMap, pollfds, servers);
 			removeTimeout(clientMap, pollfds);
 		}
 	}		
