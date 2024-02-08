@@ -205,7 +205,7 @@ int main(int ac, char **av)
 					}
 					else
 					{
-						clientMap[pollfds[i].fd].second->resetRequest();
+						clientMap[pollfds[i].fd].second->setStatusCode(-1);
 						pollfds[i].events = POLLIN;
 
 					}
@@ -214,7 +214,7 @@ int main(int ac, char **av)
 			removeRequest(clientMap, pollfds, servers);
 			removeTimeout(clientMap, pollfds);
 		}
-	}		
+	}
 	catch (const std::exception &e) {
 		std::cerr << e.what() << "\n";
 	}
