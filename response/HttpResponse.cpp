@@ -10,25 +10,25 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 										_is_cgi(req.getIsCgi()), \
 										_cookie(req.getCookie()) {
 	if (_status_code != 202)
-		throw StatusSender::send_status(_status_code, serv);
+		throw StatusSender::send_status(_status_code, serv, true);
 	if (_is_cgi) {
 		server_log("Found CGI", DEBUG);
 		server_log("Cgi file: " + _path, DEBUG);
 		_status_code = Cgi::exec_cgi(_path, _response, _body_request, _cookie);
 		if (_status_code != 200)
-			throw StatusSender::send_status(_status_code, serv);
+			throw StatusSender::send_status(_status_code, serv, true);
 		else if (_response.empty() || _response[0] == 'X')
-			throw StatusSender::send_status(400, serv);
+			throw StatusSender::send_status(400, serv, true);
 	}
 	server_log(std::string(WHITEE) + "method = " + _method, DEBUG);
 	server_log(std::string(WHITEE) + "method code = " + int_to_str(_method_code), DEBUG);
 	server_log(std::string(WHITEE) + "path = " + _path, DEBUG);
 	if (_method_code == GET && serv.getIsAllowed())
-		throw StatusSender::send_status(405, serv);
+		throw StatusSender::send_status(405, serv, true);
 	if (_method_code == POST && serv.postIsAllowed())
-		throw StatusSender::send_status(405, serv);
+		throw StatusSender::send_status(405, serv, true);
 	if (_method_code == DELETE && serv.deleteIsAllowed())
-		throw StatusSender::send_status(405, serv);
+		throw StatusSender::send_status(405, serv, true);
 }
 
 HttpResponse::~HttpResponse() {}
@@ -64,7 +64,7 @@ std::string	HttpResponse::get_response(Server &serv) {
 	else
 		_contentType = ContentTypeFinder::get_content_type(_path);
 	if (_contentType.empty())
-		throw StatusSender::send_status(404, serv);
+		throw StatusSender::send_status(404, serv, true);
 	m = _execute_method(_method_code, serv);
 	_header = m->get_header();
 	_response = _header + m->get_body();

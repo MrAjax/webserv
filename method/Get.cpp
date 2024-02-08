@@ -11,7 +11,7 @@ void	Get::execute_method(Server &serv) {
 
 	if (!file_requested.is_open()) {
 		server_log("Cannot open " + file_name, ERROR);
-		throw	StatusSender::send_status(404, serv);
+		throw	StatusSender::send_status(404, serv, true);
 	}
 	else {
 		server_log("Server successfully found " + file_name, DEBUG);
