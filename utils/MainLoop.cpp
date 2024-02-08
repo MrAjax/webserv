@@ -23,31 +23,29 @@ void    removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* >
 	}
 }
 
-void	removeRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds, std::vector<Server> &servers)
+void	removeRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds, std::vector<Server> servers)
 {
-	std::size_t i = 0;
-	while (i < pollfds.size())
-	{
-		if (pollfds[i].fd == -1)
-		{
-			server_log(std::string(REDD) + "RemoveRequest pollfds[" + int_to_str(static_cast<std::size_t>(i)) + "].fd = -1", ERROR);
-			pollfds.erase(pollfds.begin() + i);
-		}
-		else if (isListener(pollfds[i].fd, servers) == false)
-		{
-			if (clientMap[pollfds[i].fd].second == NULL)
-			{
-				server_log(std::string(REDD) + "RemoveRequest Error : clientMap[pollfds[" + int_to_str(static_cast<std::size_t>(i))
-				+ "].fd].second = NULL, pollfds[x] shouldn't exist", ERROR);
-				close(pollfds[i].fd);
-				pollfds.erase(pollfds.begin() + i);
-			}
-			else if (clientMap[pollfds[i].fd].second->getStatusCode() >= 400 && killRequest(clientMap, pollfds, i) == false)
-				i++;
-		}
-		else
-			i++;
-	}
+	for (std::size_t i = pollfds.size(); i > 0; --i)
+    {
+        std::size_t index = i - 1;
+        if (pollfds[index].fd == -1)
+        {
+            server_log(std::string(REDD) + "RemoveRequest pollfds[" + int_to_str(static_cast<std::size_t>(index)) + "].fd = -1", ERROR);
+            pollfds.erase(pollfds.begin() + index);
+        }
+        else if (isListener(pollfds[index].fd, servers) == false)
+        {
+            if (clientMap[pollfds[index].fd].second == NULL)
+            {
+                server_log(std::string(REDD) + "RemoveRequest Error : clientMap[pollfds[" + int_to_str(static_cast<std::size_t>(index))
+                + "].fd].second = NULL, pollfds[x] shouldn't exist", ERROR);
+                close(pollfds[index].fd);
+                pollfds.erase(pollfds.begin() + index);
+            }
+            else if (clientMap[pollfds[index].fd].second->getStatusCode() == KILL_ME || clientMap[pollfds[index].fd].second->getStatusCode() >= 400)
+            	killRequest(clientMap, pollfds, index);
+        }
+    }
 }
 
 bool    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds, std::size_t i)
@@ -66,6 +64,7 @@ bool    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >
 		else
 			server_log("KillRequest pollfds[" + int_to_str(static_cast<std::size_t>(i)) + "].fd = -1", DEBUG);
 		pollfds.erase(pollfds.begin() + i);
+		server_log("clientMap[pollfds[" + int_to_str(static_cast<std::size_t>(i)) + "].fd] removed : pollfds[i].fd = " + int_to_str(pollfds[i].fd), DEBUG);
 		return (true);
 	}
 	server_log(std::string(REDD) + "KillRequest Error -> possible invalid read on clientMap " + int_to_str(static_cast<std::size_t>(i)), ERROR);
@@ -83,7 +82,7 @@ void    addingNewClient(HttpRequest **clientRequest, struct sockaddr_in &clientA
 	server_log("New connexion on fd " + int_to_str((*clientRequest)->getConnfd()) , DEBUG);
 }
 
-bool isListener(int fd, std::vector<Server> &servers) {
+bool isListener(int fd, std::vector<Server> servers) {
 	for (size_t i = 0; i < servers.size(); i++) {
 		if (fd == servers[i].getSocketfd())
 			return true;	

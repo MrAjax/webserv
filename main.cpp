@@ -182,25 +182,26 @@ int main(int ac, char **av)
 					}
 					else // socketfd aldready set c/p from HttpRequest
 					{
-						server_log("other request on clientFD", DEBUG);
+						server_log("Processing request clientFd " + int_to_str(pollfds[i].fd), DEBUG);
 						
 						if (clientMap[pollfds[i].fd].second->processingRequest() >= 200)
 						{
 							clientMap[pollfds[i].fd].second->printAttribute();
 							pollfds[i].events = POLLOUT;
 						}
-						else if (clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)
-							killRequest(clientMap, pollfds, i);
+						// else if (clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)
+							// killRequest(clientMap, pollfds, i);
 					}
 					
 				}
 				if (pollfds[i].revents & POLLOUT)
 				{
-					send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second); // get my server peut etre = NULL risque segFault
-					if (clientMap[pollfds[i].fd].second->getStatusCode() >= 400)
+					if (clientMap[pollfds[i].fd].second->getStatusCode() != KILL_ME)
+						send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second); // get my server peut etre = NULL risque segFault
+					if (clientMap[pollfds[i].fd].second->getStatusCode() >= 400 || clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)
 					{
 						std::cout << RED "KILLREQUEST\n";
-						killRequest(clientMap, pollfds, i);
+						// killRequest(clientMap, pollfds, i);
 					}
 					else
 					{
@@ -210,7 +211,7 @@ int main(int ac, char **av)
 					}
 				}
 			}
-			// removeRequest(clientMap, pollfds, servers);
+			removeRequest(clientMap, pollfds, servers);
 			removeTimeout(clientMap, pollfds);
 		}
 	}		

@@ -3,6 +3,7 @@
 // rediriger vers les pages d'erreur si besoin
 
 StatusSender::StatusSender(int err, Server &serv): _status_code(0), _server_path(serv.getRoot()), _error_pages(serv.getLocationErrorPage()) {
+	
 	switch (err)
 	{
 	case 400:

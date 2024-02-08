@@ -16,9 +16,9 @@ bool    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >
 void    addingNewClient(HttpRequest **clientRequest, struct sockaddr_in &clientAddr, 
     std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds);
 
-bool    isListener(int fd, std::vector<Server> &servers);
+bool    isListener(int fd, std::vector<Server> servers);
 
-void	removeRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds, std::vector<Server> &servers);
+void	removeRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds, std::vector<Server> servers);
 
 
 #endif
