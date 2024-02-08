@@ -186,7 +186,7 @@ int main(int ac, char **av)
 						
 						if (clientMap[pollfds[i].fd].second->processingRequest() >= 200)
 						{
-							clientMap[pollfds[i].fd].second->printAttribute();
+							// clientMap[pollfds[i].fd].second->printAttribute();
 							pollfds[i].events = POLLOUT;
 						}
 						// else if (clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)

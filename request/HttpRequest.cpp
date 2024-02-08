@@ -18,10 +18,10 @@ _statusCode(NEW), _isCgi(false), _listenFd(listenFd), _maxBodySize(0)
 	std::stringstream ss;
 	ss << _connfd;
 	_debugFd = ss.str();
-	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
+	// std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
 }
 
-HttpRequest::~HttpRequest(void)	{std::cout << BLUE << _connfd << " Destructor call\n" << RESET;}
+HttpRequest::~HttpRequest(void)	{/*std::cout << BLUE << _connfd << " Destructor call\n" << RESET;*/}
 
 //-----------UTILS------------------
 
