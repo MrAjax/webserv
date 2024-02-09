@@ -86,12 +86,11 @@ bool    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >
 			clientMap[pollfds[i].fd].second = NULL;
 		}
 		clientMap.erase(pollfds[i].fd);
+		std::string pollfd = int_to_str(pollfds[i].fd);
 		if (pollfds[i].fd != -1)
 			close(pollfds[i].fd);
-		else
-			server_log("KillRequest pollfds[" + int_to_str(i) + "].fd = -1", DEBUG);
 		pollfds.erase(pollfds.begin() + i);
-		server_log("clientMap[pollfds[" + int_to_str(i) + "].fd] removed : pollfds[i].fd = " + int_to_str(pollfds[i].fd), DEBUG);
+		server_log("clientMap[pollfds[" + int_to_str(i) + "].fd] removed : pollfds[i].fd = " + pollfd, DEBUG);
 		return (true);
 	}
 	server_log(std::string(REDD) + "KillRequest Error -> possible invalid read on clientMap " + int_to_str(i), ERROR);
