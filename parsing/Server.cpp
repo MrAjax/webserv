@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/06 12:59:04 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/09 20:38:47 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,9 @@ Server& Server::operator = (Server const& a) {
 	_location_error_page = a._location_error_page;
 	_index = a._index;	
 	_socketIsSet = a._socketIsSet;
+	_get = a._get;
+	_post = a._post;
+	_delete = a._delete;
 	_allow_methods = a._allow_methods;
 	
 	std::map<std::string, Location*>::const_iterator it;
@@ -101,6 +104,9 @@ Server::Server(Server const& a) {
 	_location_error_page = a._location_error_page;
 	_index = a._index;	
 	_socketIsSet = a._socketIsSet;
+	_get = a._get;
+	_post = a._post;
+	_delete = a._delete;
 	_allow_methods = a._allow_methods;
 	
 	std::map<std::string, Location*>::const_iterator it;
