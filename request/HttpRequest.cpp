@@ -2,7 +2,7 @@
 #include "HttpRequestChecking.hpp"
 #include "HttpRequestParsing.hpp"
 
-//throw StatusSender::send_status(500, serv); quand le server et la requete n'est pas conforme il faut envoyer ca et pas un autre truc avec erreur 500 le server ne doit pas s arreter
+//throw StatusSender::send_status(500, serv, true); quand le server et la requete n'est pas conforme il faut envoyer ca et pas un autre truc avec erreur 500 le server ne doit pas s arreter
 
 
 HttpRequest::HttpRequest(int connfd, std::vector<Server> &servers, int listenFd) : _method(""), _path(""), _http(""),
@@ -18,10 +18,10 @@ _statusCode(NEW), _isCgi(false), _listenFd(listenFd), _maxBodySize(0)
 	std::stringstream ss;
 	ss << _connfd;
 	_debugFd = ss.str();
-	std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
+	// std::cout << BLUE << _connfd << " Constructor call\n" << RESET;
 }
 
-HttpRequest::~HttpRequest(void)	{std::cout << BLUE << _connfd << " Destructor call\n" << RESET;}
+HttpRequest::~HttpRequest(void)	{/*std::cout << BLUE << _connfd << " Destructor call\n" << RESET;*/}
 
 //-----------UTILS------------------
 
@@ -127,7 +127,10 @@ int    HttpRequest::processingRequest(void)
 		server_log(std::string(GREENN) + "Request fd " + _debugFd + " getHeader succesfuly done", DEBUG);
 		_myServer = checking.findMyServer(_servers);
 		if (_myServer == NULL || checking.BuildAndCheckHeader() != 0)
+		{
+			std::cout << _statusCode << " HERRRRREEEEEEEEEEEEEEEEEEE\n";
 			return (_statusCode);
+		}
 		else
 			_statusCode = DONE_HEADER_CHECKING;
 	}

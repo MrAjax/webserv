@@ -216,7 +216,7 @@ int	HttpRequestChecking::isGoodPath(std::string &str)
 			return (hasWritePermission(str));
 		case 2:
 			return (hasReadPermission(str) && hasWritePermission(str) && hasExecutePermission(str));
-		case 3:
+		default :
 			throw error_throw("Request fd " + _debugFd + " method not allowed", false); //TODO 
 			return (false);
 	}

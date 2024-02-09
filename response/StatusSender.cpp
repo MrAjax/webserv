@@ -2,29 +2,36 @@
 
 // rediriger vers les pages d'erreur si besoin
 
-StatusSender::StatusSender(int err, Server &serv): _status_code(0), _server_path(serv.getRoot()), _error_pages(serv.getLocationErrorPage()) {
-	
-	switch (err)
-	{
-	case 400:
-		_response = _error_400();
-		break;
-	case 401:
-		_response = _error_401();
-		break;
-	case 403:
-		_response = _error_403();
-		break;
-	case 404:
-		_response = _error_404();
-		break;
-	case 500:
-		_response = _error_500();
-		break;
-	default:
-		_response = _error_generic(err); // TODO changer c'est pas erreur 500 l'erreur par defaut
-		break;
+StatusSender::StatusSender(int err, Server &serv, bool is_serv) {
+	_status_code = 0;
+	if (is_serv) {
+		_server_path = serv.getRoot();
+		_error_pages = serv.getLocationErrorPage();
+		
+		switch (err)
+		{
+		case 400:
+			_response = _error_400();
+			break;
+		case 401:
+			_response = _error_401();
+			break;
+		case 403:
+			_response = _error_403();
+			break;
+		case 404:
+			_response = _error_404();
+			break;
+		case 500:
+			_response = _error_500();
+			break;
+		default:
+			_response = _error_generic(err); // TODO changer c'est pas erreur 500 l'erreur par defaut
+			break;
+		}
 	}
+	else
+		_response = _error_generic(err);
 	server_log("Response status is ready", DEBUG);
 	// TODO --> Rediriger certains codes d'erreur vers un code plus generique
 }
@@ -161,7 +168,7 @@ std::string	StatusSender::_error_generic(int err) {
 
 std::string		StatusSender::_get_response() {return _response;}
 
-std::string		StatusSender::send_status(int err, Server &serv) {
-	StatusSender	status(err, serv);
+std::string		StatusSender::send_status(int err, Server &serv, bool is_server) {
+	StatusSender	status(err, serv, is_server);
 	return status._get_response();
 }

@@ -17,7 +17,7 @@ class StatusSender {
 	std::string		_server_path;
 	std::string		_error_pages;
 
-	StatusSender(int err, Server &serv);
+	StatusSender(int err, Server &serv, bool is_serv);
 	~StatusSender();
 
 	std::string		_error_400();
@@ -28,7 +28,7 @@ class StatusSender {
 	std::string		_error_generic(int err);
 	std::string		_get_response();
 public:
-	static	std::string		send_status(int err, Server &serv);
+	static	std::string		send_status(int err, Server &serv, bool is_serv);
 };
 
 #endif

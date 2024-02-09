@@ -64,7 +64,7 @@ static	void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 		if (Req.getMyserver() == NULL)
 		{
 			std::cout << RED "NO SERVER" RESET << std::endl;
-			return ;
+			throw	StatusSender::send_status(Req.getStatusCode(), serv, true);
 		}
 		server_log("Activity detected on server: " + serv.getServerName(), DEBUG);
 		if (connfd < 0)
@@ -158,9 +158,9 @@ int main(int ac, char **av)
 			{
 				if (pollfds[i].revents & POLLIN) //EVENT!
 				{
-					server_log("EVENT", DEBUG);
 					if (isListener(pollfds[i].fd, servers)) //socketfd is listener == 1st co
 					{
+						server_log("--- SocketFd " + int_to_str(pollfds[i].fd) + " accept new client ---", DEBUG);
 						struct sockaddr_in clientAddr;
 						socklen_t tempAddrlen = sizeof(clientAddr);
 						int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
@@ -182,20 +182,19 @@ int main(int ac, char **av)
 					}
 					else // socketfd aldready set c/p from HttpRequest
 					{
-						server_log("Processing request clientFd " + int_to_str(pollfds[i].fd), DEBUG);
+						server_log("--- Processing request clientFd " + int_to_str(pollfds[i].fd) + " ---", DEBUG);
 						
 						if (clientMap[pollfds[i].fd].second->processingRequest() >= 200)
 						{
 							clientMap[pollfds[i].fd].second->printAttribute();
 							pollfds[i].events = POLLOUT;
 						}
-						// else if (clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)
-							// killRequest(clientMap, pollfds, i);
 					}
 					
 				}
 				if (pollfds[i].revents & POLLOUT)
 				{
+					server_log("--- Sending respnse to clientFd " + int_to_str(pollfds[i].fd) + " ---", DEBUG);
 					if (clientMap[pollfds[i].fd].second->getStatusCode() != KILL_ME)
 						send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second); // get my server peut etre = NULL risque segFault
 					if (clientMap[pollfds[i].fd].second->getStatusCode() >= 400 || clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)
@@ -218,16 +217,5 @@ int main(int ac, char **av)
 	catch (const std::exception &e) {
 		std::cerr << e.what() << "\n";
 	}
-	for (size_t i = 0; i < pollfds.size(); i++) {
-		close(pollfds[i].fd);
-	}
-	for (std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >::iterator it =  clientMap.begin();
-		it != clientMap.end(); it++)
-	{
-		if (it->second.second != NULL)
-		{
-			delete it->second.second;
-			it->second.second = NULL;
-		}
-	}
+	exitClean(clientMap, pollfds);
 }

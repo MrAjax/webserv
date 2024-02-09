@@ -20,5 +20,6 @@ bool    isListener(int fd, std::vector<Server> servers);
 
 void	removeRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds, std::vector<Server> servers);
 
+void	exitClean(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds);
 
 #endif

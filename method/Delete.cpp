@@ -9,7 +9,7 @@ void	Delete::remove_file(Server &serv) {
 	server_log("Remove entire file", DEBUG);
 	if (std::remove(this->get_path().c_str()) != 0) {
 		server_log("std::remove failed - Delete.cpp", ERROR);
-		throw StatusSender::send_status(500, serv);
+		throw StatusSender::send_status(500, serv, true);
 	}
 }
 

@@ -30,19 +30,19 @@ void	removeRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > 
         std::size_t index = i - 1;
         if (pollfds[index].fd == -1)
         {
-            server_log(std::string(REDD) + "RemoveRequest pollfds[" + int_to_str(static_cast<std::size_t>(index)) + "].fd = -1", ERROR);
+            server_log(std::string(REDD) + "RemoveRequest pollfds[" + int_to_str(index) + "].fd = -1", ERROR);
             pollfds.erase(pollfds.begin() + index);
         }
         else if (isListener(pollfds[index].fd, servers) == false)
         {
             if (clientMap[pollfds[index].fd].second == NULL)
             {
-                server_log(std::string(REDD) + "RemoveRequest Error : clientMap[pollfds[" + int_to_str(static_cast<std::size_t>(index))
+                server_log(std::string(REDD) + "RemoveRequest Error : clientMap[pollfds[" + int_to_str(index)
                 + "].fd].second = NULL, pollfds[x] shouldn't exist", ERROR);
                 close(pollfds[index].fd);
                 pollfds.erase(pollfds.begin() + index);
             }
-            else if (clientMap[pollfds[index].fd].second->getStatusCode() == KILL_ME || clientMap[pollfds[index].fd].second->getStatusCode() >= 400)
+            else if (clientMap[pollfds[index].fd].second->getStatusCode() == KILL_ME)
             	killRequest(clientMap, pollfds, index);
         }
     }
@@ -62,12 +62,12 @@ bool    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >
 		if (pollfds[i].fd != -1)
 			close(pollfds[i].fd);
 		else
-			server_log("KillRequest pollfds[" + int_to_str(static_cast<std::size_t>(i)) + "].fd = -1", DEBUG);
+			server_log("KillRequest pollfds[" + int_to_str(i) + "].fd = -1", DEBUG);
 		pollfds.erase(pollfds.begin() + i);
-		server_log("clientMap[pollfds[" + int_to_str(static_cast<std::size_t>(i)) + "].fd] removed : pollfds[i].fd = " + int_to_str(pollfds[i].fd), DEBUG);
+		server_log("clientMap[pollfds[" + int_to_str(i) + "].fd] removed : pollfds[i].fd = " + int_to_str(pollfds[i].fd), DEBUG);
 		return (true);
 	}
-	server_log(std::string(REDD) + "KillRequest Error -> possible invalid read on clientMap " + int_to_str(static_cast<std::size_t>(i)), ERROR);
+	server_log(std::string(REDD) + "KillRequest Error -> possible invalid read on clientMap " + int_to_str(i), ERROR);
 	return (false);
 }
 
@@ -88,4 +88,31 @@ bool isListener(int fd, std::vector<Server> servers) {
 			return true;	
 	}
 	return false;
+}
+
+void	exitClean(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
+{
+	for (size_t i = 0; i < pollfds.size(); i++)
+	{
+		if (pollfds[i].fd == -1)
+			server_log(std::string(REDD) + "ExitClean pollfds[" + int_to_str(i) + "].fd = -1", ERROR);
+		else
+			close(pollfds[i].fd);
+	}
+	for (std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >::iterator it = clientMap.begin();
+		it != clientMap.end(); it++)
+	{
+		if (it->second.second != NULL)
+		{
+			try
+			{
+				delete it->second.second;
+				it->second.second = NULL;
+			}
+			catch(const std::exception& e)
+			{
+				server_log(std::string(REDD) + "ExitClean delete HttpRequest fail clientMap[" + int_to_str(it->first) + "]", ERROR);
+			}
+		}
+	}
 }
