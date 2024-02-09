@@ -1,6 +1,6 @@
 #include "Delete.hpp"
 
-Delete::Delete(std::string path, std::string content): Method(path, content) {}
+Delete::Delete(std::string path, std::string content, std::string connection_status): Method(path, content, connection_status) {}
 
 Delete::~Delete() {}
 
@@ -17,9 +17,7 @@ void	Delete::execute_method(Server &serv) {
 	server_log("Delete", DEBUG);
 	remove_file(serv);
 	set_statuscode(200);
-	set_header(" " \
-	+ int_to_str(get_status_code()) \
-	+ " " \
-	+ HttpStatusCode::get_error_msg(get_status_code()) \
+	set_header(" " + int_to_str(get_status_code()) + " " + HttpStatusCode::get_error_msg(get_status_code()) \
+	+ "\r\nConnection: " + get_connection_status() \
 	+ "\r\n\r\n");
 }

@@ -6,7 +6,7 @@
 
 class Delete: public Method {
 	public:
-	Delete(std::string path, std::string content);
+	Delete(std::string path, std::string content, std::string connection_status);
 	~Delete();
 	void	remove_file(Server &serv);
 	void	remove_line(std::string arg, Server &serv);

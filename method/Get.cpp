@@ -1,6 +1,6 @@
 #include "Get.hpp"
 
-Get::Get(std::string path, std::string content): Method(path, content) {}
+Get::Get(std::string path, std::string content, std::string connection_status): Method(path, content, connection_status) {}
 
 Get::~Get() {}
 
@@ -22,5 +22,6 @@ void	Get::execute_method(Server &serv) {
 	set_body(file_content.str());
 	set_header(build_header(get_status_code(), \
 							get_content_type(), \
-							get_body().length()));
+							get_body().length(), \
+							get_connection_status()));
 }

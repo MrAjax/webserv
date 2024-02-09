@@ -2,9 +2,15 @@
 
 //Method::Method() {};
 
-Method::Method(std::string path, std::string content): _path(path), _content_type(content), _header(""), _body(""), _status_code(0) {}
+Method::Method(std::string path, std::string content, std::string connection_status): _path(path), _content_type(content), _connection_status(connection_status), _header(""), _body(""), _status_code(0) {
+	if (_connection_status.empty())
+		_connection_status = "keep-alive";
+}
 
-Method::Method(std::string path, std::string content, std::string body_request): _path(path), _content_type(content), _body_request(body_request), _header("HTTP/1.1"), _body(""), _status_code(0) {}
+Method::Method(std::string path, std::string content, std::string connection_status, std::string body_request): _path(path), _content_type(content), _connection_status(connection_status), _body_request(body_request), _header("HTTP/1.1"), _body(""), _status_code(0) {
+	if (_connection_status.empty())
+		_connection_status = "keep-alive";
+}
 
 Method::~Method() {}
 
@@ -16,6 +22,10 @@ std::string	Method::get_path() {
 
 std::string	Method::get_content_type() {
 	return _content_type;
+}
+
+std::string	Method::get_connection_status() {
+	return _connection_status;
 }
 
 std::string	Method::get_header() {

@@ -1,6 +1,6 @@
 #include "Post.hpp"
 
-Post::Post(std::string path, std::string content, std::string body_request): Method(path, content, body_request) {}
+Post::Post(std::string path, std::string content, std::string body_request, std::string connection_status): Method(path, content, body_request, connection_status) {}
 
 Post::~Post() {}
 
@@ -31,7 +31,6 @@ void	Post::fill_post_file(Server &serv, std::string query_string) {
 		server_log("Cannot open post file - Post.cpp", ERROR);
 		throw StatusSender::send_status(500, serv, true);
 	}
-	//post_file << "\n";
 	while (getline(query_stream, token, '&')) {
 		std::istringstream	token_stream(token);
 		if (getline(token_stream, key, '=') && getline(token_stream, value))
@@ -47,16 +46,12 @@ void	Post::fill_post_file(Server &serv, std::string query_string) {
 }
 
 void	Post::execute_method(Server &serv) {
-	// TODO generaliser le path du post file suivant le contexte
-	// TODO Status 200: A description of the result of the action is transmitted to the message body.
 	fill_post_file(serv, this->get_body_request());
 	set_statuscode(303);
 	set_header(" " \
-	+ int_to_str(get_status_code()) \
-	+ " " \
-	+ HttpStatusCode::get_error_msg(get_status_code()) \
-	+ "\r\n" \
-	+ "Location: " + this->get_path().substr(serv.getRoot().length(), this->get_path().length() - serv.getRoot().length()) \
+	+ int_to_str(get_status_code()) + " " + HttpStatusCode::get_error_msg(get_status_code()) \
+	+ "\r\nLocation: " + this->get_path().substr(serv.getRoot().length(), this->get_path().length() - serv.getRoot().length()) \
 	+ "\r\nContent-Length: 0" \
+	+ "\r\nConnection: " + this->get_connection_status() \
 	+ "\r\n\r\n");
 }
