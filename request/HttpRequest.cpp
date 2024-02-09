@@ -128,7 +128,6 @@ int    HttpRequest::processingRequest(void)
 		_myServer = checking.findMyServer(_servers);
 		if (_myServer == NULL || checking.BuildAndCheckHeader() != 0)
 		{
-			std::cout << _statusCode << " HERRRRREEEEEEEEEEEEEEEEEEE\n";
 			return (_statusCode);
 		}
 		else

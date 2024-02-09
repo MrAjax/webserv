@@ -186,7 +186,7 @@ int main(int ac, char **av)
 						
 						if (clientMap[pollfds[i].fd].second->processingRequest() >= 200)
 						{
-							clientMap[pollfds[i].fd].second->printAttribute();
+							// clientMap[pollfds[i].fd].second->printAttribute();
 							pollfds[i].events = POLLOUT;
 						}
 					}
@@ -199,7 +199,7 @@ int main(int ac, char **av)
 						send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second); // get my server peut etre = NULL risque segFault
 					if (clientMap[pollfds[i].fd].second->getStatusCode() >= 400)
 					{
-						std::cout << RED "KILLREQUEST\n";
+						// std::cout << RED "KILLREQUEST\n";
 						// killRequest(clientMap, pollfds, i);
 						clientMap[pollfds[i].fd].second->setStatusCode(-1);
 					}
