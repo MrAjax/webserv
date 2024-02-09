@@ -16,7 +16,7 @@ bool	HttpRequestParsing::isMaxSize(std::size_t SIZE)
 		(_request.getStatusCode() == PROCESSING_HEADER || _request.getStatusCode() == NEW))
 	{
 		server_log(std::string(REDD) + "Request fd " + _debugFd + " Header > max_size_header", ERROR);
-		_request.setStatusCode(413);
+		_request.setStatusCode(431);
 		return (true);
 	}
 	if (_request.getMyserver() != NULL && SIZE > _request.getMaxBodySize() &&
@@ -73,7 +73,6 @@ bool    HttpRequestParsing::parsingBody(void)
 	if (_request.getContentLength() == 0)
 	{
 		_request.setStatusCode(202);
-		server_log(std::string(GREENN) + "Request fd " + _debugFd + " succesful code 202", DEBUG);
 		return (true);
 	}
 	if (isMaxSize(_request.getSaveString().size()) == true)
@@ -83,7 +82,6 @@ bool    HttpRequestParsing::parsingBody(void)
 		_request.setBodyRequest(_request.getSaveString().substr(0, _request.getContentLength()));
 		_request.setSaveString("");
 		_request.setStatusCode(202);
-		server_log(std::string(GREENN) + "Request fd " + _debugFd + " succesful code 202", DEBUG);
 		return (true);
 	}
 	_request.setStatusCode(PROCESSING_BODY);

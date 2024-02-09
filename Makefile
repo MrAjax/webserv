@@ -17,8 +17,9 @@ SRC = 	main.cpp \
 		response/StatusSender.cpp \
 		utils/ContentTypeFinder.cpp \
 		utils/HttpStatusCode.cpp \
-		utils/MainLoop.cpp \
+		utils/LoopUtils.cpp \
 		utils/utils.cpp \
+		clean/clean.cpp \
 		parsing/allocateSTL.cpp \
 		parsing/readConfigFile.cpp \
 		parsing/Server.cpp \

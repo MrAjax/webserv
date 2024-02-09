@@ -2,9 +2,9 @@
 #include "request/HttpRequestAllow.hpp"
 #include "response/HttpResponse.hpp"
 #include "inc/webserv.hpp"
-#include "signal/signal.hpp"
 #include "inc/parsing.hpp"
-#include "utils/MainLoop.hpp"
+#include "utils/LoopUtils.hpp"
+#include "clean/clean.hpp"
 
 volatile int	g_sig;
 
@@ -52,66 +52,6 @@ volatile int	g_sig;
 
 */
 
-static	void	send_response_to_client(int connfd, std::string response) {
-	server_log("Sending response...", DEBUG);
-	write(connfd, response.c_str(), response.length());
-	server_log("Response sent", INFO);
-}
-
-static	void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
-	std::string	response;
-	try {
-		if (Req.getMyserver() == NULL)
-		{
-			std::cout << RED "NO SERVER" RESET << std::endl;
-			throw	StatusSender::send_status(Req.getStatusCode(), serv, false);
-		}
-		server_log("Activity detected on server: " + serv.getServerName(), DEBUG);
-		if (connfd < 0)
-			throw error_throw("send response - main.cpp", true);
-
-		server_log("Parsing Request...", DEBUG);
-		std::string	request_header = Req.getHeaderRequest();
-
-		server_log("All the chunks received", DEBUG);
-		if (request_header.empty()) {
-			server_log("Invalid request", ERROR);
-			throw std::runtime_error(std::string(REDD) + "Unsupported request type" + std::string(ENDD));
-		}
-		server_log("Request is valid", DEBUG);
-		server_log(request_header + "\n\n", DIALOG);
-		server_log(Req.getBodyRequest() + "\n\n", DIALOG);
-		server_log("Building Response...", DEBUG);
-
-		HttpResponse	Rep(Req, serv);
-
-		
-		response = Rep.get_response(serv);
-		server_log(Rep.get_header(), DIALOG);
-		send_response_to_client(connfd, response);
-	}
-	catch (std::string &s) {
-		response = s;
-		send_response_to_client(connfd, response);
-	}
-	// Remove the client in case of an error
-}
-
-static	void	init_log_file() {
-	std::fstream log_file(LOG_FILE, std::ios::out | std::ios::trunc);
-    
-    if (!log_file.is_open())
-		throw error_throw("log file cannot be created - init_log_file - main.cpp", true);
-    log_file.close();
-}
-
-void	init_server(void) {
-	g_sig = 0;
-	signal(SIGINT, &sigint_handler);
-	signal(SIGQUIT, &sigquit_handler);
-	init_log_file();
-	server_log("SERVER STARTED", INFO);
-}
 
 int main(int ac, char **av)
 {
@@ -133,7 +73,6 @@ int main(int ac, char **av)
 		init_server();
 		readConfigFile(servers, av[1]);
 		allocatePollFds(servers, pollfds); //set struct pollfd
-		// allocateServersMap(servers, serversMap); //set map pollfd.fd Server*  NE sert plus
 	}
 	catch (const std::exception &e) {
 		std::cerr << e.what() << std::endl;
@@ -160,7 +99,7 @@ int main(int ac, char **av)
 				{
 					if (isListener(pollfds[i].fd, servers)) //socketfd is listener == 1st co
 					{
-						server_log("--- SocketFd " + int_to_str(pollfds[i].fd) + " accept new client ---", DEBUG);
+						server_log("--------- SocketFd " + int_to_str(pollfds[i].fd) + " accept new client ---------", DIALOG);
 						struct sockaddr_in clientAddr;
 						socklen_t tempAddrlen = sizeof(clientAddr);
 						int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
@@ -182,29 +121,25 @@ int main(int ac, char **av)
 					}
 					else // socketfd aldready set c/p from HttpRequest
 					{
-						server_log("--- Processing request clientFd " + int_to_str(pollfds[i].fd) + " ---", DEBUG);
-						
+						server_log("--------- Processing request clientFd " + int_to_str(pollfds[i].fd) + " ---------", DIALOG);
 						if (clientMap[pollfds[i].fd].second->processingRequest() >= 200)
-						{
-							clientMap[pollfds[i].fd].second->printAttribute();
 							pollfds[i].events = POLLOUT;
-						}
 					}
 					
 				}
 				if (pollfds[i].revents & POLLOUT)
 				{
-					server_log("--- Sending respnse to clientFd " + int_to_str(pollfds[i].fd) + " ---", DEBUG);
+					server_log("--------- Sending response to clientFd " + int_to_str(pollfds[i].fd) + " ---------", DIALOG);
 					if (clientMap[pollfds[i].fd].second->getStatusCode() != KILL_ME)
 						send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second); // get my server peut etre = NULL risque segFault
-					if (clientMap[pollfds[i].fd].second->getStatusCode() >= 400)
+					if (clientMap[pollfds[i].fd].second->getStatusCode() >= 400 || clientMap[pollfds[i].fd].second->getConnection() == "close")
 					{
-						std::cout << RED "KILLREQUEST\n";
-						// killRequest(clientMap, pollfds, i);
-						clientMap[pollfds[i].fd].second->setStatusCode(-1);
+						server_log("Set clientFd " + int_to_str(pollfds[i].fd) + " to close status", DEBUG);
+						clientMap[pollfds[i].fd].second->setStatusCode(KILL_ME);
 					}
 					else
 					{
+						server_log("Reset clientFd " + int_to_str(pollfds[i].fd) + " for other requests (keep-alive)", DEBUG);
 						pollfds[i].events = POLLIN;
 						clientMap[pollfds[i].fd].second->resetRequest();
 					}

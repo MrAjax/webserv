@@ -118,26 +118,29 @@ int    HttpRequest::processingRequest(void)
 	HttpRequestParsing	parsing(*this);
 	if (_statusCode == NEW || _statusCode == PROCESSING_HEADER)
 	{
-		server_log(std::string(GREENN) + "Request fd " + _debugFd + " getHeader in process", DEBUG);
+		server_log("Request fd " + _debugFd + " getHeader in process", DEBUG);
 		parsing.parsingHeader();
 	}
 	if (_statusCode == DONE_HEADER)
 	{
 		HttpRequestChecking checking(*this);
-		server_log(std::string(GREENN) + "Request fd " + _debugFd + " getHeader succesfuly done", DEBUG);
+		server_log("Request fd " + _debugFd + " Header has been found", DEBUG);
 		_myServer = checking.findMyServer(_servers);
 		if (_myServer == NULL || checking.BuildAndCheckHeader() != 0)
 		{
-			std::cout << _statusCode << " HERRRRREEEEEEEEEEEEEEEEEEE\n";
 			return (_statusCode);
 		}
 		else
+		{
 			_statusCode = DONE_HEADER_CHECKING;
+			server_log("Request fd " + _debugFd + " checking Header succeed", DEBUG);
+			server_log("Request fd " + _debugFd + " final path : " + _path , DEBUG);
+		}
 	}
 	if (_statusCode == DONE_HEADER_CHECKING || _statusCode == PROCESSING_BODY)
 	{
-		server_log(std::string(GREENN) + "Request fd " + _debugFd + " succesfuly check header and find final path : " + _path , DEBUG);
-		parsing.parsingBody();
+		if (parsing.parsingBody() == true)
+			server_log(std::string(GREENN) + "Request fd " + _debugFd + " succesful status code " + int_to_str(_statusCode), DEBUG);
 	}
 	return (_statusCode);
 }

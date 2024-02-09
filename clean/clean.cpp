@@ -1,4 +1,31 @@
-#include "MainLoop.hpp"
+#include "clean.hpp"
+
+void	exitClean(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
+{
+	for (size_t i = 0; i < pollfds.size(); i++)
+	{
+		if (pollfds[i].fd == -1)
+			server_log(std::string(REDD) + "ExitClean pollfds[" + int_to_str(i) + "].fd = -1", ERROR);
+		else
+			close(pollfds[i].fd);
+	}
+	for (std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >::iterator it = clientMap.begin();
+		it != clientMap.end(); it++)
+	{
+		if (it->second.second != NULL)
+		{
+			try
+			{
+				delete it->second.second;
+				it->second.second = NULL;
+			}
+			catch(const std::exception& e)
+			{
+				server_log(std::string(REDD) + "ExitClean delete HttpRequest fail clientMap[" + int_to_str(it->first) + "]", ERROR);
+			}
+		}
+	}
+}
 
 void    removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
 {
@@ -69,50 +96,4 @@ bool    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >
 	}
 	server_log(std::string(REDD) + "KillRequest Error -> possible invalid read on clientMap " + int_to_str(i), ERROR);
 	return (false);
-}
-
-void    addingNewClient(HttpRequest **clientRequest, struct sockaddr_in &clientAddr, 
-    std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
-{
-	clientMap[(*clientRequest)->getConnfd()] = std::make_pair(clientAddr, *clientRequest); //add client information to map Client
-	struct pollfd newPfd;
-	newPfd.fd = (*clientRequest)->getConnfd();
-	newPfd.events = POLLIN;
-	pollfds.push_back(newPfd); // add new fd to monitoring
-	server_log("New connexion on fd " + int_to_str((*clientRequest)->getConnfd()) , DEBUG);
-}
-
-bool isListener(int fd, std::vector<Server> servers) {
-	for (size_t i = 0; i < servers.size(); i++) {
-		if (fd == servers[i].getSocketfd())
-			return true;	
-	}
-	return false;
-}
-
-void	exitClean(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
-{
-	for (size_t i = 0; i < pollfds.size(); i++)
-	{
-		if (pollfds[i].fd == -1)
-			server_log(std::string(REDD) + "ExitClean pollfds[" + int_to_str(i) + "].fd = -1", ERROR);
-		else
-			close(pollfds[i].fd);
-	}
-	for (std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >::iterator it = clientMap.begin();
-		it != clientMap.end(); it++)
-	{
-		if (it->second.second != NULL)
-		{
-			try
-			{
-				delete it->second.second;
-				it->second.second = NULL;
-			}
-			catch(const std::exception& e)
-			{
-				server_log(std::string(REDD) + "ExitClean delete HttpRequest fail clientMap[" + int_to_str(it->first) + "]", ERROR);
-			}
-		}
-	}
 }
