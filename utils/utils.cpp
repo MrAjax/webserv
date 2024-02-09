@@ -71,28 +71,16 @@ std::runtime_error	error_throw(std::string description, bool errno_need) {
 	return std::runtime_error(error);
 }
 
-std::string	build_header(int status_code, std::string content_type, size_t body_len) {
+std::string	build_header(int status_code, std::string content_type, size_t body_len, std::string connection_status) {
 	server_log("Building header...", DEBUG);
 	std::string	header("HTTP/1.1 ");
-	
-	header 	+= int_to_str(status_code) \
-			+ " " 
-			+ HttpStatusCode::get_error_msg(status_code) \
-			+ "\r\n" \
-			+ "Date: " + getTimestamp() \
-			+ "\r\n" \
-			+ "Server: Webserv" \
-			+ "\r\n";
-			// TODO --> Set the right date: Sat, 09 Oct 2010 14:28:02 GMT
 
-	// if (body_len > 0) {
-		header 	+= "Content-Type: " \
-				+ content_type \
-				+ "\r\n" \
-				+ "Content-Length: " \
-				+ int_to_str(body_len);
-	// }
-	header += "\r\n\r\n";
+	header 	+= int_to_str(status_code) + " " + HttpStatusCode::get_error_msg(status_code) \
+			+ "\r\nDate: " + getTimestamp() \
+			+ "\r\nServer: Webserv" \
+			+ "\r\nContent-Type: " + content_type \
+			+ "\r\nContent-Length: " + int_to_str(body_len) \
+			+ "\r\nConnection: " + connection_status + "\r\n\r\n";
 	server_log("Header ready", DEBUG);
 	return (header);
 }
