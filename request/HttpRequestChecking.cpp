@@ -69,7 +69,7 @@ int HttpRequestChecking::BuildAndCheckHeader(void)
 			return ((this->*f[1])());
 		case 2:
 			return ((this->*f[2])());
-		case 3:
+		default :
 			server_log(std::string(REDD) + "Request fd " + _debugFd + " method "
 				+ _request.getMethod() + " not allowed", ERROR);
 			_request.setStatusCode(405);
@@ -157,6 +157,12 @@ bool HttpRequestChecking::findRootPath()
 		else if (check == 0)
 			status = 0;
 	}
+	if (status == -2)
+	{
+		server_log(std::string(REDD) + "Request fd " + _debugFd + " method "
+			+ _request.getMethod() + " not allowed", ERROR);
+		_request.setStatusCode(405);
+	}
 	if (status == -1)
 	{
 		_request.setStatusCode(404);
@@ -182,6 +188,12 @@ bool HttpRequestChecking::findOtherPath()
 	{
 		_request.setPath(finalPath);
 		return (true);
+	}
+	else if (status == -2)
+	{
+		server_log(std::string(REDD) + "Request fd " + _debugFd + " method "
+			+ _request.getMethod() + " not allowed", ERROR);
+		_request.setStatusCode(405);
 	}
 	else if (status == -1)
 	{
@@ -217,8 +229,7 @@ int	HttpRequestChecking::isGoodPath(std::string &str)
 		case 2:
 			return (hasReadPermission(str) && hasWritePermission(str) && hasExecutePermission(str));
 		default :
-			throw error_throw("Request fd " + _debugFd + " method not allowed", false); //TODO 
-			return (false);
+			return (-2);
 	}
 	return (false);
 }
