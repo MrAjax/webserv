@@ -25,13 +25,13 @@ int HttpRequestChecking::POST(void)
 	isGoodProtocol("HTTP/1.1");
 	if (_request.getContentType().empty())
 	{
-		server_log(std::string(REDD) + "Reqest fd " + _debugFd + " method POST whitout content type", ERROR);
+		server_log("Reqest fd " + _debugFd + " method POST whitout content type", ERROR);
 		_request.setStatusCode(411);
 		return (2);
 	}
 	if (_request.getContentLength() == 0)
 	{
-		server_log(std::string(REDD) + "Reqest fd " + _debugFd + " method POST whitout content lenght", ERROR);
+		server_log("Reqest fd " + _debugFd + " method POST whitout content lenght", ERROR);
 		_request.setStatusCode(411);
 		return (3);
 	}
@@ -70,7 +70,7 @@ int HttpRequestChecking::BuildAndCheckHeader(void)
 		case 2:
 			return ((this->*f[2])());
 		default :
-			server_log(std::string(REDD) + "Request fd " + _debugFd + " method "
+			server_log("Request fd " + _debugFd + " method "
 				+ _request.getMethod() + " not allowed", ERROR);
 			_request.setStatusCode(405);
 			return (7);
@@ -82,7 +82,7 @@ bool HttpRequestChecking::isGoodProtocol(std::string const &http)
 {
 	if (_request.getHttp() == http)
 		return (true);
-	server_log(std::string(REDD) + "Request fd " + _debugFd + " protocol "
+	server_log("Request fd " + _debugFd + " protocol "
 		+ _request.getHttp() + " not allowed", ERROR);
 	_request.setStatusCode(400);
 	return (false);
@@ -119,7 +119,7 @@ Server  *HttpRequestChecking::findMyServer(std::vector<Server> &servers)
 	if (findServer == NULL)
 	{
 		_request.setStatusCode(400);
-		server_log(std::string(REDD) + "Request fd " + _debugFd + " cannot find any server", ERROR);
+		server_log("Request fd " + _debugFd + " cannot find any server", ERROR);
 	}
 	return (findServer);
 }
@@ -159,19 +159,19 @@ bool HttpRequestChecking::findRootPath()
 	}
 	if (status == -2)
 	{
-		server_log(std::string(REDD) + "Request fd " + _debugFd + " method "
+		server_log("Request fd " + _debugFd + " method "
 			+ _request.getMethod() + " not allowed", ERROR);
 		_request.setStatusCode(405);
 	}
 	if (status == -1)
 	{
 		_request.setStatusCode(404);
-		server_log(std::string(REDD) + "Request fd " + _debugFd + " cannot find any valide path root/index", ERROR);
+		server_log("Request fd " + _debugFd + " cannot find any valide path root/index", ERROR);
 	}
 	if (status == 0)
 	{
 		_request.setStatusCode(403);
-		server_log(std::string(REDD) + "Request fd " + _debugFd + " cannot access any path root/index", ERROR);
+		server_log("Request fd " + _debugFd + " cannot access any path root/index", ERROR);
 	}
 	return (false);
 }
@@ -191,19 +191,19 @@ bool HttpRequestChecking::findOtherPath()
 	}
 	else if (status == -2)
 	{
-		server_log(std::string(REDD) + "Request fd " + _debugFd + " method "
+		server_log("Request fd " + _debugFd + " method "
 			+ _request.getMethod() + " not allowed", ERROR);
 		_request.setStatusCode(405);
 	}
 	else if (status == -1)
 	{
 		_request.setStatusCode(404);
-		server_log(std::string(REDD) + "Request fd " + _debugFd + " cannot find the path : " + finalPath, ERROR);
+		server_log("Request fd " + _debugFd + " cannot find the path : " + finalPath, ERROR);
 	}
 	else if (status == 0)
 	{
 		_request.setStatusCode(403);
-		server_log(std::string(REDD) + "Request fd " + _debugFd + " cannot access path : " + finalPath, ERROR);
+		server_log("Request fd " + _debugFd + " cannot access path : " + finalPath, ERROR);
 	}
 	return (false);
 }

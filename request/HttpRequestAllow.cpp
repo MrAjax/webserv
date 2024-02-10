@@ -15,8 +15,7 @@ bool HttpRequestAllow::allowRequest(std::vector<struct pollfd> &pollfds, HttpReq
 	std::string debugFd = ss.str();
     if (pollfds.size() > MAX_NUMBER_REQUEST)
     {
-        server_log(std::string(REDD) + "Request fd " + debugFd
-        + " too many requests", ERROR);
+        server_log("Request fd " + debugFd + " too many requests", ERROR);
 		Request.setStatusCode(429);
         return (false);
     }
@@ -37,7 +36,7 @@ bool HttpRequestAllow::allowRequest(std::vector<struct pollfd> &pollfds, HttpReq
     }
 	else
     {
-        server_log(std::string(REDD) + "Request fd " + debugFd
+        server_log("Request fd " + debugFd
         + " too many request in small periode of time", ERROR);
         Request.setStatusCode(429);
         return false;

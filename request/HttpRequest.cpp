@@ -101,7 +101,7 @@ int	HttpRequest::recvfd(int & fd)
 	saveString += reinterpret_cast< char * >(recvline); 
 	if (numbytes < 0)
 	{
-		server_log(std::string(REDD) + "Request fd " + _debugFd + " recv error", ERROR);
+		server_log("Request fd " + _debugFd + " recv error", ERROR);
 		_statusCode = 400;
 	}
 	if (numbytes == 0)
@@ -134,13 +134,14 @@ int    HttpRequest::processingRequest(void)
 		{
 			_statusCode = DONE_HEADER_CHECKING;
 			server_log("Request fd " + _debugFd + " checking Header succeed", DEBUG);
+			server_log("Request fd " + _debugFd + " server name : " + _myServer->getServerName(), DEBUG);
 			server_log("Request fd " + _debugFd + " final path : " + _path , DEBUG);
 		}
 	}
 	if (_statusCode == DONE_HEADER_CHECKING || _statusCode == PROCESSING_BODY)
 	{
 		if (parsing.parsingBody() == true)
-			server_log(std::string(GREENN) + "Request fd " + _debugFd + " succesful status code " + int_to_str(_statusCode), DEBUG);
+			server_log("Request fd " + _debugFd + " succesful status code " + int_to_str(_statusCode), INFO);
 	}
 	return (_statusCode);
 }

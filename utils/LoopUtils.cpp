@@ -50,18 +50,16 @@ void	send_response_to_client(int connfd, std::string response) {
 void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 	std::string	response;
 	try {
-		if (Req.getMyserver() == NULL)
-		{
-			std::cout << RED "NO SERVER" RESET << std::endl;
-			throw	StatusSender::send_status(Req.getStatusCode(), serv, false);
-		}
-		server_log("Activity detected on server: " + serv.getServerName(), DEBUG);
 		if (connfd < 0)
 			throw error_throw("send response - main.cpp", true);
 
-		server_log("Parsing Request...", DEBUG);
+		if (Req.getMyserver() == NULL)
+		{
+			server_log("No server in request clientFd " + int_to_str(connfd), ERROR);
+			throw	StatusSender::send_status(Req.getStatusCode(), serv, false);
+		}
+		server_log("Activity detected clientFd: " + int_to_str(connfd) + " from server: " + serv.getServerName(), DEBUG);
 
-		server_log("All the chunks received", DEBUG);
 		if (Req.getHeaderRequest().empty()) {
 			server_log("Invalid request", ERROR);
 			throw std::runtime_error(std::string(REDD) + "Unsupported request type" + std::string(ENDD));

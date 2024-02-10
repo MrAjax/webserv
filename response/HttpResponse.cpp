@@ -24,12 +24,24 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 	server_log(std::string(WHITEE) + "method = " + _method, DEBUG);
 	server_log(std::string(WHITEE) + "method code = " + int_to_str(_method_code), DEBUG);
 	server_log(std::string(WHITEE) + "path = " + _path, DEBUG);
-	if (_method_code == GET && serv.getIsAllowed())
+	server_log(std::string(WHITEE) + "serv name " + serv.getServerName(), DEBUG);
+
+
+	if (_method_code == GET && !serv.getIsAllowed())
+	{
+		server_log("Method GET not allowed", ERROR);
 		throw StatusSender::send_status(405, serv, true);
-	if (_method_code == POST && serv.postIsAllowed())
+	}
+	if (_method_code == POST && !serv.postIsAllowed())
+	{
+		server_log("Method POST not allowed", ERROR);
 		throw StatusSender::send_status(405, serv, true);
-	if (_method_code == DELETE && serv.deleteIsAllowed())
+	}
+	if (_method_code == DELETE && !serv.deleteIsAllowed())
+	{
+		server_log("Method DELETE not allowed", ERROR);
 		throw StatusSender::send_status(405, serv, true);
+	}
 }
 
 HttpResponse::~HttpResponse() {}
