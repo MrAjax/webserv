@@ -27,7 +27,6 @@ SRC = 	main.cpp \
 		signal/signal.cpp \
 		cgi/Cgi.cpp
 
-
 OBJ = $(SRC:.cpp=.o)
 DEP = $(SRC:.cpp=.d)
 

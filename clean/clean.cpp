@@ -21,7 +21,7 @@ void	exitClean(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &cli
 			}
 			catch(const std::exception& e)
 			{
-				server_log(std::string(REDD) + "ExitClean delete HttpRequest fail clientMap[" + int_to_str(it->first) + "]", ERROR);
+				server_log("ExitClean delete HttpRequest fail clientMap[" + int_to_str(it->first) + "]", ERROR);
 			}
 		}
 	}
@@ -57,15 +57,15 @@ void	removeRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > 
         std::size_t index = i - 1;
         if (pollfds[index].fd == -1)
         {
-            server_log(std::string(REDD) + "RemoveRequest pollfds[" + int_to_str(index) + "].fd = -1", ERROR);
+            server_log("RemoveRequest pollfds[" + int_to_str(index) + "].fd = -1", ERROR);
             pollfds.erase(pollfds.begin() + index);
         }
         else if (isListener(pollfds[index].fd, servers) == false)
         {
             if (clientMap[pollfds[index].fd].second == NULL)
             {
-                server_log(std::string(REDD) + "RemoveRequest Error : clientMap[pollfds[" + int_to_str(index)
-                + "].fd].second = NULL, pollfds[x] shouldn't exist", ERROR);
+                server_log("RemoveRequest Error : clientMap[pollfds[" + int_to_str(index)
+                + "].fd].second = NULL, pollfds[" + int_to_str(index) + "] shouldn't exist", ERROR);
                 close(pollfds[index].fd);
                 pollfds.erase(pollfds.begin() + index);
             }
@@ -86,11 +86,11 @@ bool    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >
 			clientMap[pollfds[i].fd].second = NULL;
 		}
 		clientMap.erase(pollfds[i].fd);
-		std::string pollfd = int_to_str(pollfds[i].fd);
+		std::string strPollfd = int_to_str(pollfds[i].fd);
 		if (pollfds[i].fd != -1)
 			close(pollfds[i].fd);
 		pollfds.erase(pollfds.begin() + i);
-		server_log("clientMap[pollfds[" + int_to_str(i) + "].fd] removed : pollfds[i].fd = " + pollfd, DEBUG);
+		server_log("clientMap[pollfds[" + int_to_str(i) + "].fd] removed : pollfds[" + int_to_str(i) + "].fd = " + strPollfd, DEBUG);
 		return (true);
 	}
 	server_log(std::string(REDD) + "KillRequest Error -> possible invalid read on clientMap " + int_to_str(i), ERROR);

@@ -34,7 +34,10 @@ void    addingNewClient(HttpRequest **clientRequest, struct sockaddr_in &clientA
 	clientMap[(*clientRequest)->getConnfd()] = std::make_pair(clientAddr, *clientRequest); //add client information to map Client
 	struct pollfd newPfd;
 	newPfd.fd = (*clientRequest)->getConnfd();
-	newPfd.events = POLLIN;
+	if ((*clientRequest)->getStatusCode() != NEW)
+		newPfd.events = POLLOUT;
+	else
+		newPfd.events = POLLIN;
 	pollfds.push_back(newPfd); // add new fd to monitoring
 	server_log("New connexion on fd " + int_to_str((*clientRequest)->getConnfd()) , DEBUG);
 }
@@ -51,8 +54,10 @@ void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 	std::string	response;
 	try {
 		if (connfd < 0)
-			throw error_throw("send response - main.cpp", true);
-
+		{
+			server_log("pollfds[i].fd = -1 HttpRequest fd = " + int_to_str(Req.getConnfd()), ERROR);
+			throw	StatusSender::send_status(Req.getStatusCode(), serv, false);
+		}
 		if (Req.getMyserver() == NULL)
 		{
 			server_log("No server in request clientFd " + int_to_str(connfd), ERROR);
@@ -61,8 +66,9 @@ void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 		server_log("Activity detected clientFd: " + int_to_str(connfd) + " from server: " + serv.getServerName(), DEBUG);
 
 		if (Req.getHeaderRequest().empty()) {
-			server_log("Invalid request", ERROR);
-			throw std::runtime_error(std::string(REDD) + "Unsupported request type" + std::string(ENDD));
+			server_log("ClientFd " + int_to_str(connfd) + " invalid request : no header", ERROR);
+			server_log("ClientFd " + int_to_str(connfd) + " request status code : " + int_to_str(Req.getStatusCode()), ERROR);
+			throw	StatusSender::send_status(Req.getStatusCode(), serv, true);
 		}
 		server_log("Request is valid", DEBUG);
 		server_log(Req.getHeaderRequest() + "\n\n", DIALOG);
@@ -78,5 +84,7 @@ void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 	catch (std::string &s) {
 		response = s;
 		send_response_to_client(connfd, response);
+		Req.setStatusCode(KILL_ME);
+		server_log("Set clientFd " + int_to_str(connfd) + " to close", DEBUG);
 	}
 }

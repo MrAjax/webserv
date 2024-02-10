@@ -82,7 +82,7 @@ bool HttpRequestChecking::isGoodProtocol(std::string const &http)
 {
 	if (_request.getHttp() == http)
 		return (true);
-	server_log("Request fd " + _debugFd + " protocol "
+	server_log("Request clientFd " + _debugFd + " protocol "
 		+ _request.getHttp() + " not allowed", ERROR);
 	_request.setStatusCode(400);
 	return (false);
@@ -92,7 +92,7 @@ int HttpRequestChecking::checkSockfdPortIP(Server &server)
 {
 	std::size_t pos = _request.getHost().find(":");
 	if (pos == std::string::npos)
-		return (0);
+		return (-1);
 	std::string requestIp = _request.getHost().substr(0, pos);
 	if (requestIp == "127.0.0.1" || requestIp == "::1")
 		requestIp = "localhost";
@@ -110,11 +110,19 @@ Server  *HttpRequestChecking::findMyServer(std::vector<Server> &servers)
 {
 	Server  *findServer = NULL;
 
+	std::size_t pos = _request.getHost().find(":");
+	if (pos == std::string::npos)
+	{
+		server_log("Request clientFd " + _debugFd + " Host bad synthax : " + _request.getHost(), ERROR);
+		_request.setStatusCode(400);
+		return (NULL);
+	}
 	std::vector<Server>::reverse_iterator it = servers.rbegin();
 	for (; it != servers.rend(); it++)
 	{
-		if (checkSockfdPortIP(*it))
+		if (int status = checkSockfdPortIP(*it))
 			findServer = &(*it);
+		
 	}
 	if (findServer == NULL)
 	{

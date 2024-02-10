@@ -88,7 +88,7 @@ int main(int ac, char **av)
 			std::size_t sizePollfds = pollfds.size();
 		
 			if (poll(&pollfds[0], sizePollfds, 1000) == -1)
-				std::cerr << "poll error: " << strerror(errno) << std::endl;
+				server_log("Poll error pollfds.size() = " + int_to_str(sizePollfds), ERROR); // TODO doit on renvoyer une erreur et fermer server?
 
 			if (n == 3)
 				n = 0;
@@ -104,7 +104,7 @@ int main(int ac, char **av)
 						socklen_t tempAddrlen = sizeof(clientAddr);
 						int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
 						if (clientFd == -1) {
-							server_log(std::string(REDD) + "Accept error for socketfd " + int_to_str(pollfds[i].fd), ERROR);
+							server_log("Accept error for socketfd " + int_to_str(pollfds[i].fd), ERROR);
 						}
 						else {
 							try
@@ -115,7 +115,7 @@ int main(int ac, char **av)
 							}
 							catch (const std::exception &e)
 							{
-								server_log(std::string(REDD) + "HttpRequest allocation fail clientfd " + int_to_str(clientFd), ERROR);
+								server_log("HttpRequest allocation fail clientfd " + int_to_str(clientFd), ERROR);
 							}
 						}
 					}

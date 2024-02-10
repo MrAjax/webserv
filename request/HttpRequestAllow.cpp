@@ -15,7 +15,7 @@ bool HttpRequestAllow::allowRequest(std::vector<struct pollfd> &pollfds, HttpReq
 	std::string debugFd = ss.str();
     if (pollfds.size() > MAX_NUMBER_REQUEST)
     {
-        server_log("Request fd " + debugFd + " too many requests", ERROR);
+        server_log("Request clientFd " + debugFd + " too many requests", ERROR);
 		Request.setStatusCode(429);
         return (false);
     }
@@ -24,19 +24,19 @@ bool HttpRequestAllow::allowRequest(std::vector<struct pollfd> &pollfds, HttpReq
     double currentInterval = ((currentTime.tv_sec - _lastResetTime.tv_sec) * 1e9 + (currentTime.tv_nsec - _lastResetTime.tv_nsec)) / 1000;
     if (currentInterval >= _intervalUseconds)
 	{
-        _requestCount = 0; // reset count et lastTime si on a des req suffisament espacés
+        _requestCount = 0; // reset count et lastTime si on a des req suffisament espaces
         _lastResetTime = currentTime;
     }
-    // Vérifier si le nombre de requêtes dépasse la limite
+    // Verifier si le nombre de req depasse la limite
     if (_requestCount < _maxRequests)
 	{
-        // Autoriser la requête et incrémenter le compteur
+        // Autoriser la req et incrementer le compteur
         _requestCount++;
         return true;
     }
 	else
     {
-        server_log("Request fd " + debugFd
+        server_log("Request clientFd " + debugFd
         + " too many request in small periode of time", ERROR);
         Request.setStatusCode(429);
         return false;

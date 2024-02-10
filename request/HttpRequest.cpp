@@ -101,7 +101,7 @@ int	HttpRequest::recvfd(int & fd)
 	saveString += reinterpret_cast< char * >(recvline); 
 	if (numbytes < 0)
 	{
-		server_log("Request fd " + _debugFd + " recv error", ERROR);
+		server_log("Request clientFd " + _debugFd + " recv error", ERROR);
 		_statusCode = 400;
 	}
 	if (numbytes == 0)
@@ -118,13 +118,13 @@ int    HttpRequest::processingRequest(void)
 	HttpRequestParsing	parsing(*this);
 	if (_statusCode == NEW || _statusCode == PROCESSING_HEADER)
 	{
-		server_log("Request fd " + _debugFd + " getHeader in process", DEBUG);
+		server_log("Request clientFd " + _debugFd + " getHeader in process", DEBUG);
 		parsing.parsingHeader();
 	}
 	if (_statusCode == DONE_HEADER)
 	{
 		HttpRequestChecking checking(*this);
-		server_log("Request fd " + _debugFd + " Header has been found", DEBUG);
+		server_log("Request clientFd " + _debugFd + " Header has been found", DEBUG);
 		_myServer = checking.findMyServer(_servers);
 		if (_myServer == NULL || checking.BuildAndCheckHeader() != 0)
 		{
@@ -133,15 +133,15 @@ int    HttpRequest::processingRequest(void)
 		else
 		{
 			_statusCode = DONE_HEADER_CHECKING;
-			server_log("Request fd " + _debugFd + " checking Header succeed", DEBUG);
-			server_log("Request fd " + _debugFd + " server name : " + _myServer->getServerName(), DEBUG);
-			server_log("Request fd " + _debugFd + " final path : " + _path , DEBUG);
+			server_log("Request clientFd " + _debugFd + " checking Header succeed", DEBUG);
+			server_log("Request clientFd " + _debugFd + " server name : " + _myServer->getServerName(), DEBUG);
+			server_log("Request clientFd " + _debugFd + " final path : " + _path , DEBUG);
 		}
 	}
 	if (_statusCode == DONE_HEADER_CHECKING || _statusCode == PROCESSING_BODY)
 	{
 		if (parsing.parsingBody() == true)
-			server_log("Request fd " + _debugFd + " succesful status code " + int_to_str(_statusCode), INFO);
+			server_log("Request clientFd " + _debugFd + " succesful status code " + int_to_str(_statusCode), INFO);
 	}
 	return (_statusCode);
 }
