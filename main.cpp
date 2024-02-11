@@ -132,7 +132,7 @@ int main(int ac, char **av)
 					server_log("--------- Sending response to clientFd " + int_to_str(pollfds[i].fd) + " ---------", DIALOG);
 					if (clientMap[pollfds[i].fd].second->getStatusCode() != KILL_ME)
 						send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second); // get my server peut etre = NULL risque segFault
-					if (clientMap[pollfds[i].fd].second->getStatusCode() >= 400 || clientMap[pollfds[i].fd].second->getConnection() == "close")
+					if (clientMap[pollfds[i].fd].second->getStatusCode() != KILL_ME && (clientMap[pollfds[i].fd].second->getStatusCode() >= 400 || clientMap[pollfds[i].fd].second->getConnection() == "close"))
 					{
 						server_log("Set clientFd " + int_to_str(pollfds[i].fd) + " to close", DEBUG);
 						clientMap[pollfds[i].fd].second->setStatusCode(KILL_ME);
@@ -147,6 +147,7 @@ int main(int ac, char **av)
 			}
 			removeRequest(clientMap, pollfds, servers);
 			removeTimeout(clientMap, pollfds);
+			//timeout(clientMap, pollfds);
 		}
 	}
 	catch (const std::exception &e) {

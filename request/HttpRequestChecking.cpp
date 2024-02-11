@@ -120,9 +120,8 @@ Server  *HttpRequestChecking::findMyServer(std::vector<Server> &servers)
 	std::vector<Server>::reverse_iterator it = servers.rbegin();
 	for (; it != servers.rend(); it++)
 	{
-		if (int status = checkSockfdPortIP(*it))
+		if (checkSockfdPortIP(*it))
 			findServer = &(*it);
-		
 	}
 	if (findServer == NULL)
 	{

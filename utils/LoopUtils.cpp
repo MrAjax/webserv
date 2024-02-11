@@ -56,7 +56,7 @@ void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 		if (connfd < 0)
 		{
 			server_log("pollfds[i].fd = -1 HttpRequest fd = " + int_to_str(Req.getConnfd()), ERROR);
-			throw	StatusSender::send_status(Req.getStatusCode(), serv, false);
+			throw	StatusSender::send_status(500, serv, false);
 		}
 		if (Req.getMyserver() == NULL)
 		{

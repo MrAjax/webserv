@@ -6,17 +6,14 @@
 #include "../utils/utils.hpp"
 #include "../response/StatusSender.hpp"
 
-#define KILL_ME -1
-#define NEW 0
-#define PROCESSING_HEADER 1
-#define DONE_HEADER 2
-#define DONE_HEADER_CHECKING 3
-#define PROCESSING_BODY 4
-#define DONE_ALL 5
+enum	{KILL_ME = -1, NEW_BORN, 
+		NEW, PROCESSING_HEADER, DONE_HEADER,
+		DONE_HEADER_CHECKING, PROCESSING_BODY,
+		DONE_ALL};
 
 #define NBPARAM 17
-
-#define TIMEOUT_REQUEST 10 // en seconds
+#define KEEP_ALIVE_TIMEOUT 10 // en seconds
+#define REQUEST_TIMEOUT 2 // en seconds
 
 class HttpRequest
 {
@@ -34,7 +31,8 @@ class HttpRequest
 		int		recvfd(int & fd); //on read buffer[MAXLINE -1] du fd
 
 		//------------UTIL----------------------
-		int			checkTimeout(void);
+		bool		isKeepAliveTimeout(void);
+		bool		isRequestTimeout(void);
 		void		printAttribute(void);
 		void		resetRequest(void);
 		//---------Guetter-----------------
@@ -133,7 +131,6 @@ class HttpRequest
 		int         _connfd;
 		std::string saveString;
 		std::string _strContentLength;
-		struct timespec _lastUpdate;
 
 		std::vector<Server> &_servers;
 		Server				*_myServer;
@@ -146,6 +143,9 @@ class HttpRequest
 		std::size_t			_maxBodySize;
 
 		std::string			_debugFd;
+
+		struct timespec _keepAliveTimeout;
+		struct timespec _requestTimeout;
 
 };
 

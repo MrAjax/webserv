@@ -14,7 +14,8 @@ _connfd(connfd), saveString(""), _strContentLength(""),
 _servers(servers), _myServer(NULL),
 _statusCode(NEW), _isCgi(false), _listenFd(listenFd), _maxBodySize(0)
 {
-	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
+	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
+	clock_gettime(CLOCK_REALTIME, &_requestTimeout);
 	std::stringstream ss;
 	ss << _connfd;
 	_debugFd = ss.str();
@@ -25,15 +26,31 @@ HttpRequest::~HttpRequest(void)	{/*std::cout << BLUE << _connfd << " Destructor 
 
 //-----------UTILS------------------
 
-int			HttpRequest::checkTimeout(void) // permet de check si on doit kill la requette car timout
+bool	HttpRequest::isKeepAliveTimeout(void) // permet de check si on doit kill la requette car timout
 {
 	struct timespec end;
 	clock_gettime(CLOCK_REALTIME, &end);
-	int timeSec = end.tv_sec - _lastUpdate.tv_sec;
-	if (timeSec > TIMEOUT_REQUEST)
-		return (1);
+	int timeSec = end.tv_sec - _keepAliveTimeout.tv_sec;
+	if (timeSec > KEEP_ALIVE_TIMEOUT)
+		return (true);
 	else
-		return (0);
+		return (false);
+}
+
+bool	HttpRequest::isRequestTimeout(void) 
+{
+	if (_statusCode == NEW_BORN)
+	{
+		clock_gettime(CLOCK_REALTIME, &_requestTimeout);
+		return (false);
+	}
+	struct timespec end;
+	clock_gettime(CLOCK_REALTIME, &end);
+	int timeSec = end.tv_sec - _requestTimeout.tv_sec;
+	if (timeSec > REQUEST_TIMEOUT)
+		return (true);
+	else
+		return (false);
 }
 
 void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que tout est bien parse
@@ -60,7 +77,7 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
 
 void		HttpRequest::resetRequest(void)
 {
-	_statusCode = NEW;
+	_statusCode = NEW_BORN;
 	_method = "";
 	_path = "";
 	_http = "";
@@ -87,7 +104,8 @@ void		HttpRequest::resetRequest(void)
 
 	_myServer = NULL;
 	_isCgi = false;
-	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
+	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
+	clock_gettime(CLOCK_REALTIME, &_requestTimeout);
 }
 
 //-----------Core functions----------
@@ -111,9 +129,15 @@ int	HttpRequest::recvfd(int & fd)
 
 int    HttpRequest::processingRequest(void)
 {
-	clock_gettime(CLOCK_REALTIME, &_lastUpdate);
+	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
+	if (_statusCode == NEW_BORN)
+	{
+		clock_gettime(CLOCK_REALTIME, &_requestTimeout);
+		_statusCode = NEW;
+	}
 	if (_statusCode > 200 || _statusCode == KILL_ME)
 		return (_statusCode);
+	server_log("Request clientFd " + _debugFd + " starting processing...", DEBUG);
 	recvfd(_connfd);
 	HttpRequestParsing	parsing(*this);
 	if (_statusCode == NEW || _statusCode == PROCESSING_HEADER)
@@ -127,9 +151,7 @@ int    HttpRequest::processingRequest(void)
 		server_log("Request clientFd " + _debugFd + " Header has been found", DEBUG);
 		_myServer = checking.findMyServer(_servers);
 		if (_myServer == NULL || checking.BuildAndCheckHeader() != 0)
-		{
 			return (_statusCode);
-		}
 		else
 		{
 			_statusCode = DONE_HEADER_CHECKING;

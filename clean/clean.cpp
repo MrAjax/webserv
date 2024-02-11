@@ -27,34 +27,55 @@ void	exitClean(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &cli
 	}
 }
 
-void    removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
+void removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
 {
 	std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >::iterator it = clientMap.begin();
-	while (it != clientMap.end())
+	for(; it != clientMap.end();)
 	{
-		if (it->second.second->checkTimeout()) {
-			delete it->second.second;
-
-			for (std::vector<struct pollfd>::iterator pollIt = pollfds.begin(); pollIt != pollfds.end(); )
+		int i = 0;
+		bool matchPollfd = false;
+		for (int index = pollfds.size(); index > 0; --index)
+		{
+			i = index - 1;
+			if (it->first == pollfds[i].fd)
 			{
-				if (pollIt->fd != -1 && pollIt->fd == it->first) {
-					close(pollIt->fd);
-					pollIt = pollfds.erase(pollIt);
-				} else {
-					++pollIt;
-				}
+				matchPollfd = true;
+				break;
 			}
-			clientMap.erase(it++);
-		} else
-			++it;
+		}
+		if (matchPollfd == false)
+			server_log("No match clientMap[val = " + int_to_str(it->first) + " ] and pollfds[x].fd = val", ERROR);
+		if (it->second.second == NULL)
+		{
+			server_log("RemoveTimeout Error : clientMap[" + int_to_str(it->first) + "].request = NULL", ERROR);
+			it++;
+		}
+		else if (matchPollfd && it->second.second->isKeepAliveTimeout())
+		{
+			it++;
+			server_log("- Keep Alive Timeout -", DEBUG);
+			killRequest(clientMap, pollfds, i);
+		}
+		else if (matchPollfd && it->second.second->isRequestTimeout())
+		{
+			it->second.second->setStatusCode(408);
+			it++;
+			server_log("- Request Timeout -", DEBUG);
+			pollfds[i].revents = POLLOUT;
+			// killRequest(clientMap, pollfds, i);
+		}
+		else
+			it++;
 	}
 }
 
 void	removeRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds, std::vector<Server> servers)
 {
+	std::size_t index;
 	for (std::size_t i = pollfds.size(); i > 0; --i)
     {
-        std::size_t index = i - 1;
+        index = i - 1;
+
         if (pollfds[index].fd == -1)
         {
             server_log("RemoveRequest pollfds[" + int_to_str(index) + "].fd = -1", ERROR);
@@ -65,34 +86,45 @@ void	removeRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > 
             if (clientMap[pollfds[index].fd].second == NULL)
             {
                 server_log("RemoveRequest Error : clientMap[pollfds[" + int_to_str(index)
-                + "].fd].second = NULL, pollfds[" + int_to_str(index) + "] shouldn't exist", ERROR);
+                + "].fd].request = NULL, pollfds[" + int_to_str(index) + "] shouldn't exist", ERROR);
                 close(pollfds[index].fd);
                 pollfds.erase(pollfds.begin() + index);
             }
             else if (clientMap[pollfds[index].fd].second->getStatusCode() == KILL_ME)
+			{
+				server_log("- Remove Request -", DEBUG);
             	killRequest(clientMap, pollfds, index);
+			}
         }
     }
 }
 
 bool    killRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds, std::size_t i)
 {
+	if (pollfds[i].fd == -1)
+	{
+		server_log("KillRequest Error pollfds[" + int_to_str(i) + "].fd = -1", ERROR);
+		return (false);
+	}
 	if (i < pollfds.size())
 	{
 		if (clientMap[pollfds[i].fd].second != NULL)
 		{
 			clientMap[pollfds[i].fd].second->setMyserver(NULL);
-    		delete clientMap[pollfds[i].fd].second;
-			clientMap[pollfds[i].fd].second = NULL;
+			try{
+    			delete clientMap[pollfds[i].fd].second;
+				clientMap[pollfds[i].fd].second = NULL;
+			} catch(const std::exception& e) {
+				server_log("Delete HttpRequest fail clientMap[pollfds[" + int_to_str(i) + "].fd] pollfds[" + int_to_str(i) + "].fd = ", ERROR);
+			}
 		}
 		clientMap.erase(pollfds[i].fd);
 		std::string strPollfd = int_to_str(pollfds[i].fd);
-		if (pollfds[i].fd != -1)
-			close(pollfds[i].fd);
+		close(pollfds[i].fd);
 		pollfds.erase(pollfds.begin() + i);
 		server_log("clientMap[pollfds[" + int_to_str(i) + "].fd] removed : pollfds[" + int_to_str(i) + "].fd = " + strPollfd, DEBUG);
 		return (true);
 	}
-	server_log(std::string(REDD) + "KillRequest Error -> possible invalid read on clientMap " + int_to_str(i), ERROR);
+	server_log("KillRequest Error -> possible invalid read on clientMap " + int_to_str(i), ERROR);
 	return (false);
 }
