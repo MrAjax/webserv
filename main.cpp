@@ -62,7 +62,7 @@ int main(int ac, char **av)
 
 		std::vector<Server>			servers;
 		std::vector<struct pollfd>	pollfds;
-		std::map<int, Server*>		serversMap;
+		std::map<int, Server*>		serversMap;//http://localhost:18000/
 		std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > clientMap;
 		std::string					dot[3] = {".  ", ".. ", "..."};
 		int							n = 0;
@@ -97,61 +97,15 @@ int main(int ac, char **av)
 			{
 				if (pollfds[i].revents & POLLIN) //EVENT!
 				{
-					if (isListener(pollfds[i].fd, servers)) //socketfd is listener == 1st co
-					{
-						server_log("--------- SocketFd " + int_to_str(pollfds[i].fd) + " accept new client ---------", DIALOG);
-						struct sockaddr_in clientAddr;
-						socklen_t tempAddrlen = sizeof(clientAddr);
-						int clientFd = accept(pollfds[i].fd, (struct sockaddr *)&clientAddr, &tempAddrlen); 
-						if (clientFd == -1) {
-							server_log("Accept error for socketfd " + int_to_str(pollfds[i].fd), ERROR);
-						}
-						else {
-							try
-							{
-								HttpRequest *clientRequest = new HttpRequest(clientFd, servers, pollfds[i].fd);
-								check.allowRequest(pollfds, *clientRequest);
-								addingNewClient(&clientRequest, clientAddr, clientMap, pollfds);
-							}
-							catch (const std::exception &e)
-							{
-								server_log("HttpRequest allocation fail clientfd " + int_to_str(clientFd), ERROR);
-							}
-						}
-					}
-					else // socketfd aldready set c/p from HttpRequest
-					{
-						server_log("--------- Processing request clientFd " + int_to_str(pollfds[i].fd) + " ---------", DIALOG);
-						if (clientMap[pollfds[i].fd].second->processingRequest() >= 200)
-						{
-							pollfds[i].events = POLLOUT;
-							pollfds[i].revents = 0;
-						}
-					}
-					
+					handlePollin(pollfds, clientMap, servers, check, i); 	
 				}
 				if (pollfds[i].revents & POLLOUT)
 				{
-					server_log("--------- Sending response to clientFd " + int_to_str(pollfds[i].fd) + " ---------", DIALOG);
-					if (clientMap[pollfds[i].fd].second->getStatusCode() != KILL_ME)
-						send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second);
-					if (clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)
-						server_log("Set clientFd " + int_to_str(pollfds[i].fd) + " to close", DEBUG);
-					else
-					{
-						server_log("Reset clientFd " + int_to_str(pollfds[i].fd) + " for other requests (keep-alive)", DEBUG);
-						pollfds[i].events = POLLIN;
-						pollfds[i].revents = 0;
-						clientMap[pollfds[i].fd].second->resetRequest();
-					}
+					handlePollout(pollfds, clientMap, i); 	
 				}
 				if (pollfds[i].events & POLLERR)
 				{
-					server_log("--------- Timeout clientFd " + int_to_str(pollfds[i].fd) + " ---------", DIALOG);
-					send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second);
-					if (fcntl(pollfds[i].fd, F_SETFL, fcntl(pollfds[i].fd, F_GETFL) & ~O_NONBLOCK) == -1) {
-						server_log("fcntl pollfds[" + int_to_str(i) + "].fd failed to set back blocking behavior", ERROR);
-    				}
+					handlePollerr(pollfds, clientMap, i);
 				}
 
 			}

@@ -24,6 +24,7 @@ SRC = 	main.cpp \
 		parsing/readConfigFile.cpp \
 		parsing/Server.cpp \
 		parsing/Location.cpp \
+		parsing/handlePoll.cpp \
 		signal/signal.cpp \
 		cgi/Cgi.cpp
 
