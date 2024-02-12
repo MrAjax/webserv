@@ -13,46 +13,61 @@ HttpRequestChecking::~HttpRequestChecking() {}
 int HttpRequestChecking::GET(void)
 {
 	findCgi();
-	isGoodProtocol("HTTP/1.1");
-	if (!findRootPath() && !findOtherPath())
+	if (!isGoodProtocol("HTTP/1.1"))
 		return (1);
+	if (!findRootPath() && !findOtherPath())
+		return (2);
 	return (0);
 }
 
 int HttpRequestChecking::POST(void)
 {
 	findCgi();
-	isGoodProtocol("HTTP/1.1");
+	if (!isGoodProtocol("HTTP/1.1"))
+		return (3);
 	if (_request.getContentType().empty())
 	{
 		server_log("Reqest fd " + _debugFd + " method POST whitout content type", ERROR);
 		_request.setStatusCode(411);
-		return (2);
+		return (4);
 	}
-	if (_request.getContentLength() == 0)
+	if (_request.getStrContentLength().empty())
 	{
 		server_log("Reqest fd " + _debugFd + " method POST whitout content lenght", ERROR);
 		_request.setStatusCode(411);
-		return (3);
+		return (5);
+	}
+	if (_request.getPath() == "/") //remove for accepting root POST
+	{
+		server_log("Reqest fd " + _debugFd + " method POST with path /", ERROR);
+		_request.setStatusCode(400);
+		return (6);
 	}
 	if (!findRootPath() && !findOtherPath())
-		return (4);
+		return (7);
 	return (0);   
 }
 
 int HttpRequestChecking::DELETE(void)
 {
 	findCgi();
-	isGoodProtocol("HTTP/1.1");
+	if (!isGoodProtocol("HTTP/1.1"))
+		return (8);
+	if (_request.getPath() == "/") //remove for accepting root DELETE
+	{
+		server_log("Reqest fd " + _debugFd + " method POST with path /", ERROR);
+		_request.setStatusCode(400);
+		return (9);
+	}
 	if (!findRootPath() && !findOtherPath())
-		return (5);
+		return (10);
 	return (0);
 }
 
 int HttpRequestChecking::BuildAndCheckHeader(void)
 {
 	if (_request.getMyserver() == NULL)
-		return (6);
+		return (11);
 	_request.setMaxBodySize(_request.getMyserver()->getMaxBodySize());
 	int		(HttpRequestChecking::*f[3])(void) = {&HttpRequestChecking::GET, 
 				&HttpRequestChecking::POST, &HttpRequestChecking::DELETE};
@@ -73,9 +88,9 @@ int HttpRequestChecking::BuildAndCheckHeader(void)
 			server_log("Request fd " + _debugFd + " method "
 				+ _request.getMethod() + " not allowed", ERROR);
 			_request.setStatusCode(405);
-			return (7);
+			return (12);
 	}
-	return (8);
+	return (13);
 }
 
 bool HttpRequestChecking::isGoodProtocol(std::string const &http)

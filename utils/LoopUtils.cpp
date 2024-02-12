@@ -95,6 +95,8 @@ void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 	}
 	catch (std::string &s) {
 		response = s;
+		server_log(Req.getHeaderRequest() + "\n\n", DIALOG);
+		server_log(Req.getBodyRequest() + "\n\n", DIALOG);
 		server_log(response, DIALOG);
 		send_response_to_client(connfd, response);
 		Req.setStatusCode(KILL_ME);
