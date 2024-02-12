@@ -6,14 +6,12 @@
 #include "../utils/utils.hpp"
 #include "../response/StatusSender.hpp"
 
-enum	{KILL_ME = -1, NEW_BORN, 
-		NEW, PROCESSING_HEADER, DONE_HEADER,
-		DONE_HEADER_CHECKING, PROCESSING_BODY,
-		DONE_ALL};
+enum	{KILL_ME = -1, NEW, PROCESSING_HEADER, DONE_HEADER,
+		DONE_HEADER_CHECKING, PROCESSING_BODY, DONE_ALL};
 
 #define NBPARAM 17
 #define KEEP_ALIVE_TIMEOUT 10 // en seconds
-#define REQUEST_TIMEOUT 2 // en seconds
+#define REQUEST_TIMEOUT 15 // en seconds
 
 class HttpRequest
 {

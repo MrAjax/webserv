@@ -3,7 +3,7 @@
 
 #include "HttpRequest.hpp"
 
-#define MAX_HEADER_SIZE 1024
+#define MAX_HEADER_SIZE 50
 
 class HttpRequestParsing
 {

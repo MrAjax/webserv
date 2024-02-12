@@ -28,6 +28,8 @@ HttpRequest::~HttpRequest(void)	{/*std::cout << BLUE << _connfd << " Destructor 
 
 bool	HttpRequest::isKeepAliveTimeout(void) // permet de check si on doit kill la requette car timout
 {
+	if (KEEP_ALIVE_TIMEOUT <= 0)
+		return (false);
 	struct timespec end;
 	clock_gettime(CLOCK_REALTIME, &end);
 	int timeSec = end.tv_sec - _keepAliveTimeout.tv_sec;
@@ -39,11 +41,8 @@ bool	HttpRequest::isKeepAliveTimeout(void) // permet de check si on doit kill la
 
 bool	HttpRequest::isRequestTimeout(void) 
 {
-	if (_statusCode == NEW_BORN)
-	{
-		clock_gettime(CLOCK_REALTIME, &_requestTimeout);
+	if (REQUEST_TIMEOUT <= 0)
 		return (false);
-	}
 	struct timespec end;
 	clock_gettime(CLOCK_REALTIME, &end);
 	int timeSec = end.tv_sec - _requestTimeout.tv_sec;
@@ -77,7 +76,7 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
 
 void		HttpRequest::resetRequest(void)
 {
-	_statusCode = NEW_BORN;
+	_statusCode = NEW;
 	_method = "";
 	_path = "";
 	_http = "";
@@ -123,21 +122,21 @@ int	HttpRequest::recvfd(int & fd)
 		_statusCode = 400;
 	}
 	if (numbytes == 0)
+	{
+		server_log("Request clientFd " + _debugFd + " has close the connection", DEBUG);
 		_statusCode = KILL_ME;
+	}
 	return (numbytes);
 }
 
 int    HttpRequest::processingRequest(void)
 {
-	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
-	if (_statusCode == NEW_BORN)
-	{
-		clock_gettime(CLOCK_REALTIME, &_requestTimeout);
-		_statusCode = NEW;
-	}
 	if (_statusCode > 200 || _statusCode == KILL_ME)
 		return (_statusCode);
-	server_log("Request clientFd " + _debugFd + " starting processing...", DEBUG);
+	server_log("Request clientFd " + _debugFd + " enter processing...", DEBUG);
+	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
+	if (_statusCode == NEW)
+		clock_gettime(CLOCK_REALTIME, &_requestTimeout);
 	recvfd(_connfd);
 	HttpRequestParsing	parsing(*this);
 	if (_statusCode == NEW || _statusCode == PROCESSING_HEADER)
@@ -150,9 +149,7 @@ int    HttpRequest::processingRequest(void)
 		HttpRequestChecking checking(*this);
 		server_log("Request clientFd " + _debugFd + " Header has been found", DEBUG);
 		_myServer = checking.findMyServer(_servers);
-		if (_myServer == NULL || checking.BuildAndCheckHeader() != 0)
-			return (_statusCode);
-		else
+		if (_myServer != NULL && checking.BuildAndCheckHeader() == 0)
 		{
 			_statusCode = DONE_HEADER_CHECKING;
 			server_log("Request clientFd " + _debugFd + " checking Header succeed", DEBUG);
@@ -165,6 +162,7 @@ int    HttpRequest::processingRequest(void)
 		if (parsing.parsingBody() == true)
 			server_log("Request clientFd " + _debugFd + " succesful status code " + int_to_str(_statusCode), INFO);
 	}
+	server_log("Request clientFd " + _debugFd + " status code = " + int_to_str(_statusCode) + " quitting processing...", DEBUG);
 	return (_statusCode);
 }
 

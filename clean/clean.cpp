@@ -30,13 +30,12 @@ void	exitClean(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &cli
 void removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
 {
 	std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >::iterator it = clientMap.begin();
-	for(; it != clientMap.end();)
+	for(; it != clientMap.end(); it++)
 	{
-		int i = 0;
 		bool matchPollfd = false;
-		for (int index = pollfds.size(); index > 0; --index)
+		std::size_t i = 0;
+		for (; i < pollfds.size(); i++)
 		{
-			i = index - 1;
 			if (it->first == pollfds[i].fd)
 			{
 				matchPollfd = true;
@@ -46,26 +45,22 @@ void removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > 
 		if (matchPollfd == false)
 			server_log("No match clientMap[val = " + int_to_str(it->first) + " ] and pollfds[x].fd = val", ERROR);
 		if (it->second.second == NULL)
-		{
 			server_log("RemoveTimeout Error : clientMap[" + int_to_str(it->first) + "].request = NULL", ERROR);
-			it++;
-		}
 		else if (matchPollfd && it->second.second->isKeepAliveTimeout())
 		{
-			it++;
-			server_log("- Keep Alive Timeout -", DEBUG);
-			killRequest(clientMap, pollfds, i);
+			it->second.second->setStatusCode(408);
+			server_log("- ClientFd " + int_to_str(it->first) + " Keep Alive Timeout -", DEBUG);
+			pollfds[i].events = POLLOUT;
+			pollfds[i].revents = 0;
 		}
 		else if (matchPollfd && it->second.second->isRequestTimeout())
 		{
 			it->second.second->setStatusCode(408);
-			it++;
-			server_log("- Request Timeout -", DEBUG);
-			pollfds[i].revents = POLLOUT;
-			// killRequest(clientMap, pollfds, i);
+			server_log("- ClientFd " + int_to_str(it->first) + " Request Timeout -", DEBUG);
+			pollfds[i].events = POLLERR;
+			pollfds[i].revents = 0;
+			fcntl(pollfds[i].fd, F_SETFL, O_NONBLOCK);
 		}
-		else
-			it++;
 	}
 }
 
