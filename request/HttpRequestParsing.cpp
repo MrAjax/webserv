@@ -111,7 +111,7 @@ bool	HttpRequestParsing::parsingHeader_method_path_http(std::string &line)
 	{                // La clé
     	void (HttpRequest::*setter)(const std::string&);
 	};
-	_tab tab[3] = {&HttpRequest::setMethod, &HttpRequest::setPath, &HttpRequest::setHttp};
+	_tab tab[3] = {{&HttpRequest::setMethod}, {&HttpRequest::setPath}, {&HttpRequest::setHttp}};
 	std::stringstream	ss(line);
 	std::string			output;
 
