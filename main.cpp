@@ -4,7 +4,7 @@
 #include "inc/webserv.hpp"
 #include "inc/parsing.hpp"
 #include "utils/LoopUtils.hpp"
-#include "clean/clean.hpp"
+#include "clear/clear.hpp"
 
 volatile int	g_sig;
 

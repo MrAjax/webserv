@@ -19,7 +19,7 @@ SRC = 	main.cpp \
 		utils/HttpStatusCode.cpp \
 		utils/LoopUtils.cpp \
 		utils/utils.cpp \
-		clean/clean.cpp \
+		clear/clear.cpp \
 		parsing/allocateSTL.cpp \
 		parsing/readConfigFile.cpp \
 		parsing/Server.cpp \

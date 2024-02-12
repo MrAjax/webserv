@@ -1,4 +1,4 @@
-#include "clean.hpp"
+#include "clear.hpp"
 
 void	exitClean(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds)
 {

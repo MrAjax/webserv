@@ -1,5 +1,5 @@
-#ifndef CLEAN_HPP
-#define CLEAN_HPP
+#ifndef CLEAR_HPP
+#define CLEAR_HPP
 
 #include "../inc/webserv.hpp"
 #include "../parsing/Server.hpp"
