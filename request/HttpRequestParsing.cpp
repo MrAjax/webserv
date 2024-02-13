@@ -53,36 +53,78 @@ bool    HttpRequestParsing::parsingHeader(void)
 		return (false);
     if (!_request.getStrContentLength().empty())
 	{
-		try{
-        	_request.setContentLength(strToSize_t(_request.getStrContentLength()));
-		} catch (std::exception &e) {
+		ssize_t temp = strToSsize_t(_request.getStrContentLength());
+        if (temp == -1)
+		{
 			server_log("Request fd " + _debugFd + " bad synthax content-length : "
 			+ _request.getStrContentLength(), ERROR);
 			_request.setStatusCode(400);
 			return (false);
 		}
+		_request.setContentLength(temp);
 	}
     _request.setStatusCode(DONE_HEADER);
 	return (true);
+}
+
+int	HttpRequestParsing::chunked()
+{
+	std::string copy = _request.getSaveString();
+	std::string delimiteur = "\r\n";
+
+	std::string	hexa1;
+	std::size_t end_pos1 = findLine(copy, hexa1, delimiteur);
+	
+	std::string	data2;
+	std::size_t end_pos2 = findLine(copy, data2, delimiteur);
+	if (end_pos1 == std::string::npos || end_pos2 == std::string::npos)
+		return -1;
+	ssize_t size;
+	std::stringstream(hexa1) >> std::hex >> size;
+	if (size < 0)
+	{
+		server_log("Request fd " + _debugFd + " bad synthax in body: " + hexa1, ERROR);
+		_request.setStatusCode(400);
+		return (-1);
+	}
+	if (size == 0)
+		return (true);
+	_request.setBodyRequest(_request.getBodyRequest() + data2.substr(0, end_pos2));
+	_request.setSaveString(copy);
+	return (false);
 }
 
 bool    HttpRequestParsing::parsingBody(void)
 {
 	if (_request.getStatusCode() != DONE_HEADER_CHECKING && _request.getStatusCode() != PROCESSING_BODY)
 		return (false);
-	if (_request.getContentLength() == 0)
+	if (_request.getContentLength() <= 0 && _request.getTransferEncoding().empty())
 	{
 		_request.setStatusCode(202);
 		return (true);
 	}
-	if (isMaxSize(_request.getSaveString().size()) == true)
-		return (false);
-	if (_request.getSaveString().size() >= _request.getContentLength())
+	if (_request.getTransferEncoding() == "chunked")
 	{
-		_request.setBodyRequest(_request.getSaveString().substr(0, _request.getContentLength()));
-		_request.setSaveString("");
-		_request.setStatusCode(202);
-		return (true);
+		int status;
+		while ((status = chunked()) == false)
+		if (status == true)
+		{
+			_request.setSaveString("");
+			_request.setStatusCode(202);
+			return (true);
+		}
+	}
+	else
+	{
+		if (isMaxSize(_request.getSaveString().size()) == true)
+			return (false);
+		if (_request.getSaveString().size() >= static_cast< std::size_t >(_request.getContentLength()))
+		{
+			_request.setBodyRequest(_request.getSaveString().substr(0, _request.getContentLength()));
+			_request.setSaveString("");
+			_request.setStatusCode(202);
+			return (true);
+		}
 	}
 	_request.setStatusCode(PROCESSING_BODY);
 	return (false);
@@ -160,18 +202,19 @@ bool	HttpRequestParsing::parsingHeader_rest(std::string &line, std::string const
 
 bool    HttpRequestParsing::parseAllAttributes(std::string header)
 {
-	std::size_t nbParam = 14;
+	std::size_t nbParam = NBPARAM - 3;
 	std::size_t end_pos;
 	std::string delimiteur = "\r\n";
 	std::string	line;
 
-	struct _tab tab[NBPARAM] = {{"Host:", &HttpRequest::getHost, &HttpRequest::setHost}, {"User-Agent:", &HttpRequest::getUserAgent, &HttpRequest::setUserAgent},
+	struct _tab tab[nbParam] = {{"Host:", &HttpRequest::getHost, &HttpRequest::setHost}, {"User-Agent:", &HttpRequest::getUserAgent, &HttpRequest::setUserAgent},
 		{"Accept:", &HttpRequest::getAccept, &HttpRequest::setAccept}, {"Accept-Language:", &HttpRequest::getAcceptLanguage, &HttpRequest::setAcceptLanguage},
 		{"Accept-Encoding:", &HttpRequest::getAcceptEncoding, &HttpRequest::setAcceptEncoding}, {"Connection:", &HttpRequest::getConnection, &HttpRequest::setConnection},
 		{"Upgrade-Insecure-Requests:", &HttpRequest::getUpInsecureRqst, &HttpRequest::setUpInsecureRqst}, {"Referer:", &HttpRequest::getReferer, &HttpRequest::setReferer},
 		{"Sec-Fetch-Dest:", &HttpRequest::getSecFetchDest, &HttpRequest::setSecFetchDest}, {"Sec-Fetch-Mode:", &HttpRequest::getSecFetchMode, &HttpRequest::setSecFetchMode},
 		{"Sec-Fetch-Site:", &HttpRequest::getSecFetchSite, &HttpRequest::setSecFetchSite}, {"Content-Length:", &HttpRequest::getStrContentLength, &HttpRequest::setStrContentLength},
-		{"Content-Type:", &HttpRequest::getContentType, &HttpRequest::setContentType}, {"Cookie:", &HttpRequest::getCookie, &HttpRequest::setCookie}};
+		{"Content-Type:", &HttpRequest::getContentType, &HttpRequest::setContentType}, {"Cookie:", &HttpRequest::getCookie, &HttpRequest::setCookie},
+		{"Transfer-Encoding:", &HttpRequest::getTransferEncoding, &HttpRequest::setTransferEncoding}};
 	
 	end_pos = findLine(header, line, delimiteur);
 	if (parsingHeader_method_path_http(line) == false)

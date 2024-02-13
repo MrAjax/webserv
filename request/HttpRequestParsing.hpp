@@ -25,6 +25,8 @@ class HttpRequestParsing
 
 		bool		isMaxSize(std::size_t SIZE);
 
+		int			chunked();
+
 		//---------Utils---------------------
 		std::size_t findLine(std::string &header, std::string &line, std::string &delimiteur);
 

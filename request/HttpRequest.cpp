@@ -8,7 +8,7 @@
 HttpRequest::HttpRequest(int connfd, std::vector<Server> &servers, int listenFd) : _method(""), _path(""), _http(""),
 _host(""), _userAgent(""), _accept(""), _acceptLanguage(""), _acceptEncoding(""),
 _connection(""), _upInsecureRqst(""), _referer(""), _secFetchDest(""), _secFetchMode(""),
-_secFetchSite(""), _contentLength(0), _contentType(""), _cookie(""),
+_secFetchSite(""), _contentLength(-1), _contentType(""), _cookie(""), _transferEncoding(""),
 _bodyRequest(""), _headerRequest(""),
 _connfd(connfd), saveString(""), _strContentLength(""),
 _servers(servers), _myServer(NULL),
@@ -69,7 +69,8 @@ void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que to
 		{"Upgrade-Insecure-Requests:", &HttpRequest::getUpInsecureRqst}, {"Referer:", &HttpRequest::getReferer},
 		{"Sec-Fetch-Dest:", &HttpRequest::getSecFetchDest}, {"Sec-Fetch-Mode:", &HttpRequest::getSecFetchMode},
 		{"Sec-Fetch-Site:", &HttpRequest::getSecFetchSite}, {"Content-Length:", &HttpRequest::getStrContentLength},
-		{"Content-Type:", &HttpRequest::getContentType}, {"Cookie:", &HttpRequest::getCookie}};
+		{"Content-Type:", &HttpRequest::getContentType}, {"Cookie:", &HttpRequest::getCookie},
+		{"Transfer-Encoding:", &HttpRequest::getTransferEncoding}};
 	for (std::size_t i = 0; i < NBPARAM; i++)
 		std::cout << YELLOW << tab[i].key << RESET << (this->*(tab[i].getter))() << std::endl;
 }
@@ -91,9 +92,10 @@ void		HttpRequest::resetRequest(void)
 	_secFetchDest = "";
 	_secFetchMode = "";
 	_secFetchSite = "";
-	_contentLength = 0;
+	_contentLength = -1;
 	_contentType = "";
 	_cookie = "";
+	_transferEncoding = "";
 
 	_bodyRequest = "";
 	_headerRequest = "";
@@ -182,9 +184,10 @@ std::string HttpRequest::getReferer() 			{return (this->_referer);}
 std::string HttpRequest::getSecFetchDest()		{return (this->_secFetchDest);}
 std::string HttpRequest::getSecFetchMode()		{return (this->_secFetchMode);}
 std::string HttpRequest::getSecFetchSite()		{return (this->_secFetchSite);}
-std::size_t HttpRequest::getContentLength()		{return (this->_contentLength);}
+ssize_t		HttpRequest::getContentLength()		{return (this->_contentLength);}
 std::string	HttpRequest::getContentType()		{return (this->_contentType);}
 std::string	HttpRequest::getCookie()			{return (this->_cookie);}
+std::string	HttpRequest::getTransferEncoding()	{return (this->_transferEncoding);}
 
 std::string HttpRequest::getBodyRequest()		{return (this->_bodyRequest);}
 std::string HttpRequest::getHeaderRequest()		{return (this->_headerRequest);}
@@ -218,9 +221,10 @@ void	HttpRequest::setReferer(const std::string &value) 			{_referer = value;}
 void	HttpRequest::setSecFetchDest(const std::string &value)		{_secFetchDest = value;}
 void	HttpRequest::setSecFetchMode(const std::string &value)		{_secFetchMode = value;}
 void	HttpRequest::setSecFetchSite(const std::string &value)		{_secFetchSite = value;}
-void	HttpRequest::setContentLength(const std::size_t &value)		{_contentLength = value;}
+void	HttpRequest::setContentLength(const ssize_t &value)			{_contentLength = value;}
 void	HttpRequest::setContentType(const std::string &value)		{_contentType = value;}
 void	HttpRequest::setCookie(const std::string &value)			{_cookie = value;}
+void	HttpRequest::setTransferEncoding(const std::string &value)	{_transferEncoding = value;}
 
 void	HttpRequest::setBodyRequest(const std::string &value)		{_bodyRequest = value;}
 void	HttpRequest::setHeaderRequest(const std::string &value)		{_headerRequest = value;}

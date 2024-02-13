@@ -31,10 +31,23 @@ int HttpRequestChecking::POST(void)
 		_request.setStatusCode(411);
 		return (4);
 	}
-	if (_request.getStrContentLength().empty())
+	if (_request.getContentLength() != -1 && !_request.getTransferEncoding().empty())
 	{
-		server_log("Reqest fd " + _debugFd + " method POST whitout content lenght", ERROR);
+		server_log("Reqest fd " + _debugFd + " method POST with a content lenght and transfer-encoding", ERROR);
+		_request.setStatusCode(400);
+		return (5);
+	}
+	if (_request.getContentLength() == -1 && _request.getTransferEncoding().empty())
+	{
+		server_log("Reqest fd " + _debugFd + " method POST whitout content lenght or transfer-encoding", ERROR);
 		_request.setStatusCode(411);
+		return (5);
+	}
+	if (!_request.getTransferEncoding().empty() && _request.getContentLength() == -1)
+	{
+		if (_request.getTransferEncoding() != "chunked")
+		server_log("Reqest fd " + _debugFd + " method POST bad synthax transfer-encoding: " + _request.getTransferEncoding(), ERROR);
+		_request.setStatusCode(400);
 		return (5);
 	}
 	if (_request.getPath() == "/") //remove for accepting root POST
@@ -85,8 +98,7 @@ int HttpRequestChecking::BuildAndCheckHeader(void)
 		case 2:
 			return ((this->*f[2])());
 		default :
-			server_log("Request fd " + _debugFd + " method "
-				+ _request.getMethod() + " not allowed", ERROR);
+			server_log("Request fd " + _debugFd + " method " + _request.getMethod() + " not allowed", ERROR);
 			_request.setStatusCode(405);
 			return (12);
 	}
@@ -97,8 +109,7 @@ bool HttpRequestChecking::isGoodProtocol(std::string const &http)
 {
 	if (_request.getHttp() == http)
 		return (true);
-	server_log("Request clientFd " + _debugFd + " protocol "
-		+ _request.getHttp() + " not allowed", ERROR);
+	server_log("Request clientFd " + _debugFd + " protocol " + _request.getHttp() + " not allowed", ERROR);
 	_request.setStatusCode(400);
 	return (false);
 }
@@ -152,7 +163,7 @@ bool HttpRequestChecking::findCgi()
 		return (false);
 	_request.setIsCgi(true);
 	_request.setPath(trimString(_request.getPath(), ".cgi", END));
-	server_log(std::string(GREEN) + "Request fd " + _debugFd + " find cgi", DEBUG);
+	server_log("Request fd " + _debugFd + " find cgi", DEBUG);
 	return (true);
 }
 

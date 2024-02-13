@@ -9,7 +9,7 @@
 enum	{KILL_ME = -1, NEW, PROCESSING_HEADER, DONE_HEADER,
 		DONE_HEADER_CHECKING, PROCESSING_BODY, DONE_ALL};
 
-#define NBPARAM 17
+#define NBPARAM 18
 #define KEEP_ALIVE_TIMEOUT 10 // en seconds
 #define REQUEST_TIMEOUT 15 // en seconds
 
@@ -48,9 +48,10 @@ class HttpRequest
 		std::string getSecFetchDest();
 		std::string getSecFetchMode();
 		std::string getSecFetchSite();
-		std::size_t getContentLength();
+		ssize_t		getContentLength();
 		std::string getContentType();
 		std::string getCookie();
+		std::string getTransferEncoding();
 
 		std::string getBodyRequest();
 		std::string getHeaderRequest();
@@ -84,9 +85,10 @@ class HttpRequest
 		void	setSecFetchDest(const std::string &value);
 		void	setSecFetchMode(const std::string &value);
 		void	setSecFetchSite(const std::string &value);
-		void	setContentLength(const std::size_t &value);
+		void	setContentLength(const ssize_t &value);
 		void	setContentType(const std::string &value);
 		void	setCookie(const std::string &value);
+		void	setTransferEncoding(const std::string &value);
 
 		void	setBodyRequest(const std::string &value);
 		void	setHeaderRequest(const std::string &value);
@@ -119,9 +121,10 @@ class HttpRequest
 		std::string _secFetchDest;
 		std::string _secFetchMode;
 		std::string _secFetchSite;
-		std::size_t _contentLength;
+		ssize_t		_contentLength;
 		std::string _contentType;
 		std::string _cookie;
+		std::string _transferEncoding;
 
 		std::string _bodyRequest;
 		std::string _headerRequest;
