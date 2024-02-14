@@ -23,6 +23,8 @@ int HttpRequestChecking::GET(void)
 int HttpRequestChecking::POST(void)
 {
 	findCgi();
+	if (!_request.getTransferEncoding().empty())
+		server_log("Reqest fd " + _debugFd + " method POST transfert-encoding detected: " + _request.getTransferEncoding(), DEBUG);
 	if (!isGoodProtocol("HTTP/1.1"))
 		return (3);
 	if (_request.getContentType().empty())
@@ -31,31 +33,26 @@ int HttpRequestChecking::POST(void)
 		_request.setStatusCode(411);
 		return (4);
 	}
-	if (_request.getContentLength() != -1 && !_request.getTransferEncoding().empty())
+	if ((_request.getContentLength() != -1 && !_request.getTransferEncoding().empty())
+		|| (_request.getContentLength() == -1 && _request.getTransferEncoding().empty()))
 	{
-		server_log("Reqest fd " + _debugFd + " method POST with a content lenght and transfer-encoding", ERROR);
+		server_log("Reqest fd " + _debugFd + " method POST content lenght and transfer-encoding empty/full at the same time", ERROR);
 		_request.setStatusCode(400);
 		return (5);
 	}
-	if (_request.getContentLength() == -1 && _request.getTransferEncoding().empty())
+	if (_request.getTransferEncoding() != "chunked" && _request.getContentLength() == -1)
 	{
-		server_log("Reqest fd " + _debugFd + " method POST whitout content lenght or transfer-encoding", ERROR);
-		_request.setStatusCode(411);
-		return (5);
-	}
-	if (!_request.getTransferEncoding().empty() && _request.getContentLength() == -1)
-	{
-		if (_request.getTransferEncoding() != "chunked")
 		server_log("Reqest fd " + _debugFd + " method POST bad synthax transfer-encoding: " + _request.getTransferEncoding(), ERROR);
 		_request.setStatusCode(400);
 		return (5);
 	}
-	if (_request.getPath() == "/") //remove for accepting root POST
-	{
-		server_log("Reqest fd " + _debugFd + " method POST with path /", ERROR);
-		_request.setStatusCode(400);
-		return (6);
-	}
+
+	// if (_request.getPath() == "/") //remove for accepting root POST
+	// {
+	// 	server_log("Reqest fd " + _debugFd + " method POST with path /", ERROR);
+	// 	_request.setStatusCode(400);
+	// 	return (6);
+	// }
 	if (!findRootPath() && !findOtherPath())
 		return (7);
 	return (0);   

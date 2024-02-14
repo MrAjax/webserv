@@ -42,18 +42,28 @@ void    addingNewClient(HttpRequest **clientRequest, struct sockaddr_in &clientA
 	server_log("New connexion on fd " + int_to_str((*clientRequest)->getConnfd()) , DEBUG);
 }
 
-//---------- SEND RESPONSe ---------
+//---------- SEND RESPONSE ---------
 
-void	send_response_to_client(int connfd, std::string response) {
+int	send_response_to_client(int connfd, std::string response, HttpRequest &Req) {
 	server_log("Sending response...", DEBUG);
-	int numbytes;
+	ssize_t numbytes;
 	numbytes = send(connfd, response.c_str(), response.length(), 0);
 	if (numbytes == -1)
 		server_log("Client fd " + int_to_str(connfd) + " send failed client has closed connexion", ERROR);
 	else if (numbytes == 0)
 		server_log("Client fd " + int_to_str(connfd) + " no bytes send", ERROR);
+	else if (static_cast<size_t>(numbytes) < response.length())
+	{
+		server_log("Client fd " + int_to_str(connfd) + " send not complete " + int_to_str(numbytes) + " bytes send over " + int_to_str(response.length()), DEBUG);
+		Req.setSaveString(response.substr(0, numbytes));
+		return (false);
+	}
 	else
+	{
 		server_log("Response sent bytes numbers = " + int_to_str(numbytes), INFO);
+		return (true);
+	}
+	return (-1);
 }
 
 void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
@@ -89,7 +99,7 @@ void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 
 		response = Rep.get_response(serv);
 		server_log(Rep.get_header(), DIALOG);
-		send_response_to_client(connfd, response);
+		send_response_to_client(connfd, response, Req);
 		if (Req.getConnection() == "close" || Req.getStatusCode() >= 400)
 			Req.setStatusCode(KILL_ME);
 	}
@@ -98,7 +108,7 @@ void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 		server_log(Req.getHeaderRequest() + "\n\n", DIALOG);
 		server_log(Req.getBodyRequest() + "\n\n", DIALOG);
 		server_log(response, DIALOG);
-		send_response_to_client(connfd, response);
+		send_response_to_client(connfd, response, Req);
 		Req.setStatusCode(KILL_ME);
 	}
 }

@@ -107,7 +107,6 @@ int main(int ac, char **av)
 				{
 					handlePollerr(pollfds, clientMap, i);
 				}
-
 			}
 			removeRequest(clientMap, pollfds, servers);
 			removeTimeout(clientMap, pollfds);

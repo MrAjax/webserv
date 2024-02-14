@@ -59,7 +59,7 @@ void removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > 
 			server_log("- ClientFd " + int_to_str(it->first) + " Request Timeout -", DEBUG);
 			pollfds[i].events = POLLERR;
 			pollfds[i].revents = 0;
-			fcntl(pollfds[i].fd, F_SETFL, O_NONBLOCK);
+			fcntl(pollfds[i].fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
 		}
 	}
 }

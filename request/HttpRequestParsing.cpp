@@ -77,20 +77,29 @@ int	HttpRequestParsing::chunked()
 	
 	std::string	data2;
 	std::size_t end_pos2 = findLine(copy, data2, delimiteur);
+	// server_log("Request fd " + _debugFd + " hexa [" + hexa1 + "] data [" + data2 + "]", ERROR);
 	if (end_pos1 == std::string::npos || end_pos2 == std::string::npos)
 		return -1;
 	ssize_t size;
 	std::stringstream(hexa1) >> std::hex >> size;
-	if (size < 0)
+	if (size == 0)
+		return (true);
+	else if (size < 0)
 	{
 		server_log("Request fd " + _debugFd + " bad synthax in body: " + hexa1, ERROR);
 		_request.setStatusCode(400);
 		return (-1);
 	}
-	if (size == 0)
-		return (true);
-	_request.setBodyRequest(_request.getBodyRequest() + data2.substr(0, end_pos2));
+	else if (size > static_cast<ssize_t>(data2.size()))
+	{
+		server_log("Request fd " + _debugFd + " bad synthax in body: body chunk size" + hexa1 + " > chunk data.size() " + int_to_str(data2.size()), ERROR);
+		server_log("Request fd " + _debugFd + " data : " + data2, ERROR);
+		_request.setStatusCode(400);
+		return (-1);
+	}
+	_request.setBodyRequest(_request.getBodyRequest() + data2.substr(0, size));
 	_request.setSaveString(copy);
+	_request.setContentLength(_request.getContentLength() + size);
 	return (false);
 }
 
@@ -105,8 +114,11 @@ bool    HttpRequestParsing::parsingBody(void)
 	}
 	if (_request.getTransferEncoding() == "chunked")
 	{
-		int status;
-		while ((status = chunked()) == false)
+		if (_request.getContentLength() == -1)
+			_request.setContentLength(0);
+		int status = false;
+		for (;status == false;)
+			status = chunked();
 		if (status == true)
 		{
 			_request.setSaveString("");

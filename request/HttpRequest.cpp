@@ -125,7 +125,7 @@ int	HttpRequest::recvfd(int & fd)
 	}
 	if (numbytes == 0)
 	{
-		server_log("Request clientFd " + _debugFd + " has close the connection", DEBUG);
+		server_log("Request clientFd " + _debugFd + " has close the connection", ERROR);
 		_statusCode = KILL_ME;
 	}
 	return (numbytes);
@@ -135,7 +135,7 @@ int    HttpRequest::processingRequest(void)
 {
 	if (_statusCode > 200 || _statusCode == KILL_ME)
 		return (_statusCode);
-	server_log("Request clientFd " + _debugFd + " enter processing...", DEBUG);
+	server_log("Request clientFd " + _debugFd + " status code " + int_to_str(_statusCode) + " enter processing...", DEBUG);
 	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
 	if (_statusCode == NEW)
 		clock_gettime(CLOCK_REALTIME, &_requestTimeout);
@@ -143,13 +143,13 @@ int    HttpRequest::processingRequest(void)
 	HttpRequestParsing	parsing(*this);
 	if (_statusCode == NEW || _statusCode == PROCESSING_HEADER)
 	{
-		server_log("Request clientFd " + _debugFd + " getHeader in process", DEBUG);
+		server_log("Request clientFd " + _debugFd + " 1st step getting Header in process...", DEBUG);
 		parsing.parsingHeader();
 	}
 	if (_statusCode == DONE_HEADER)
 	{
+		server_log("Request clientFd " + _debugFd + " 2nd step cheking Header in process...", DEBUG);
 		HttpRequestChecking checking(*this);
-		server_log("Request clientFd " + _debugFd + " Header has been found", DEBUG);
 		_myServer = checking.findMyServer(_servers);
 		if (_myServer != NULL && checking.BuildAndCheckHeader() == 0)
 		{
@@ -161,10 +161,11 @@ int    HttpRequest::processingRequest(void)
 	}
 	if (_statusCode == DONE_HEADER_CHECKING || _statusCode == PROCESSING_BODY)
 	{
+		server_log("Request clientFd " + _debugFd + " last step getting Body in process...", DEBUG);
 		if (parsing.parsingBody() == true)
 			server_log("Request clientFd " + _debugFd + " succesful status code " + int_to_str(_statusCode), INFO);
 	}
-	server_log("Request clientFd " + _debugFd + " status code = " + int_to_str(_statusCode) + " quitting processing...", DEBUG);
+	server_log("Request clientFd " + _debugFd + " status code " + int_to_str(_statusCode) + " quitting processing...", DEBUG);
 	return (_statusCode);
 }
 
