@@ -17,7 +17,7 @@ bool    isListener(int fd, std::vector<Server> servers);
 void    addingNewClient(HttpRequest **clientRequest, struct sockaddr_in &clientAddr, 
     std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &clientMap, std::vector<struct pollfd> &pollfds);
 
-void	send_response_to_client(int connfd, std::string response);
+int	send_response_to_client(int connfd, std::string response, HttpRequest &Req);
 void	send_response(int connfd, Server &serv ,HttpRequest &Req);
 
 #endif
