@@ -98,8 +98,11 @@ void	send_response(int connfd, Server &serv ,HttpRequest &Req) {
 		HttpResponse	Rep(Req, serv);
 
 		response = Rep.get_response(serv);
-		server_log(Rep.get_header(), DIALOG);
-		send_response_to_client(connfd, response, Req);
+		if (!Rep.get_header().empty())
+			server_log(Rep.get_header(), DIALOG);
+		else
+			server_log(response, DIALOG);
+		send_response_to_client(connfd, response);
 		if (Req.getConnection() == "close" || Req.getStatusCode() >= 400)
 			Req.setStatusCode(KILL_ME);
 	}

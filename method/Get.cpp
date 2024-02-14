@@ -8,8 +8,14 @@ void	Get::execute_method(Server &serv) {
 	std::string			file_name(this->get_path());
 	std::ifstream		file_requested(file_name.c_str());
 	std::stringstream	file_content;
+	struct stat			stat_struct;
 
 	if (!file_requested.is_open()) {
+		server_log("Cannot open " + file_name, ERROR);
+		throw	StatusSender::send_status(404, serv, true);
+	}
+	else if (stat(file_name.c_str(), &stat_struct) == 0 && S_ISDIR(stat_struct.st_mode)) {
+		file_requested.close();
 		server_log("Cannot open " + file_name, ERROR);
 		throw	StatusSender::send_status(404, serv, true);
 	}
