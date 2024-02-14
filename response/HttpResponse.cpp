@@ -56,7 +56,7 @@ Method	*HttpResponse::_execute_method(int method_code,Server &serv) {
 		m = new Get(_path, _contentType, _connection_status);
 		break;
 	case POST:
-		m = new Post(_path, _contentType, _body_request, _connection_status);
+		m = new Post(_path, _contentType, _connection_status, _body_request);
 		break;
 	case DELETE:
 		m = new Delete(_path, _contentType, _connection_status);

@@ -7,7 +7,7 @@ server {
 
     root website_exmpl/Zzewebsite;
     index /index/index.html;
-	allow_methods GET			POST;
+	allow_methods GET	DELETE		POST;
 
 	error_page 404 502 503 /errorpages;
 
