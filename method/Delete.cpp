@@ -17,7 +17,8 @@ void	Delete::execute_method(Server &serv) {
 	server_log("Delete", DEBUG);
 	remove_file(serv);
 	set_statuscode(200);
-	set_header(" " + int_to_str(get_status_code()) + " " + HttpStatusCode::get_error_msg(get_status_code()) \
+	set_header("HTTP/1.1 " + int_to_str(get_status_code()) + " " + HttpStatusCode::get_error_msg(get_status_code()) \
 	+ "\r\nConnection: " + get_connection_status() \
+	+ "\r\nContent-Length: 0"
 	+ "\r\n\r\n");
 }
