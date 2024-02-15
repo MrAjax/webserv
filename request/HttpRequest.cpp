@@ -12,7 +12,7 @@ _secFetchSite(""), _contentLength(-1), _contentType(""), _cookie(""), _transferE
 _bodyRequest(""), _headerRequest(""),
 _connfd(connfd), saveString(""), _strContentLength(""),
 _servers(servers), _myServer(NULL),
-_statusCode(NEW), _isCgi(false), _listenFd(listenFd), _maxBodySize(0)
+_statusCode(NEW), _isCgi(false), _isChunked(false), _listenFd(listenFd), _maxBodySize(0)
 {
 	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
 	clock_gettime(CLOCK_REALTIME, &_requestTimeout);
@@ -105,6 +105,7 @@ void		HttpRequest::resetRequest(void)
 
 	_myServer = NULL;
 	_isCgi = false;
+	_isChunked = false;
 	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
 	clock_gettime(CLOCK_REALTIME, &_requestTimeout);
 }
@@ -201,6 +202,7 @@ int			HttpRequest::getStatusCode()		{return (this->_statusCode);}
 Server		*HttpRequest::getMyserver()			{return (this->_myServer);}
 
 bool		HttpRequest::getIsCgi()				{return (this->_isCgi);}
+bool		HttpRequest::getIsChunked()			{return (this->_isChunked);}
 
 int			HttpRequest::getListenFd()			{return (this->_listenFd);}
 
@@ -238,5 +240,6 @@ void	HttpRequest::setStatusCode(const int &value)				{_statusCode = value;}
 void	HttpRequest::setMyserver(Server **value)					{if (value == NULL){_myServer = NULL;}else{_myServer= *value;}}
 
 void	HttpRequest::setIsCgi(const bool &value)					{_isCgi = value;}
+void	HttpRequest::setIsChunked(const bool &value)				{_isChunked = value;}
 
 void	HttpRequest::setMaxBodySize(const std::size_t &value)		{_maxBodySize = value;}

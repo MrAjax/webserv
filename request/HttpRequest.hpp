@@ -62,6 +62,8 @@ class HttpRequest
 
 		int			getStatusCode();
 		bool		getIsCgi();
+		bool		getIsChunked();
+
 
 		Server		*getMyserver();
 
@@ -101,6 +103,7 @@ class HttpRequest
 
 		void	setStatusCode(const int &value);
 		void	setIsCgi(const bool &value);
+		void	setIsChunked(const bool &value);
 
 		void	setMaxBodySize(const std::size_t &value);
 
@@ -139,6 +142,7 @@ class HttpRequest
 		int         		_statusCode;
 
 		bool				_isCgi;
+		bool				_isChunked;
 		int 				_listenFd;
 
 		std::size_t			_maxBodySize;
