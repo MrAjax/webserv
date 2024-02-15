@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/15 13:13:09 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/15 14:24:18 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,8 +151,14 @@ void Server::configServer(void) {
 	hints.ai_family = AF_UNSPEC; // can be IPV4 or IPV6
 	hints.ai_socktype = SOCK_STREAM;
 
-	if (_ip.empty() == true || _port.empty() == true || _root.empty())
-		throw error_throw("host, port and root must be specified - config file", false);
+	if (_ip.empty() == true)
+		throw error_throw("host must be specified - config file", false);
+	if (_port.empty() == true)
+		throw error_throw("port must be specified - config file", false);
+	if (_root.empty() == true)
+		throw error_throw("root must be specified - config file", false);
+	if (_index.empty() == true)
+		throw error_throw("index must be specified - config file", false);
 
 	int ret = getaddrinfo(_ip.c_str(), _port.c_str(), &hints, &_res);
 	if (ret != 0) {
