@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/15 13:10:12 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/15 13:13:09 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,8 +186,6 @@ void Server::setDefaultValue(void) {
 		_error_pages.push_back(404);
 	if (_location_error_page.empty() == true)
 		_location_error_page = "/errorpages";
-//	if (_index.empty() == true)
-//		_index.push_back("/index.html");
 	server_log("Server " + int_to_str(_i) + " set up and ready to listen", INFO);
 }		
 
