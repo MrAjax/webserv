@@ -161,7 +161,7 @@ std::string	StatusSender::_error_500() {
 
 std::string	StatusSender::_error_generic(int err) {
 	_body = basic_page(int_to_str(err) + " " + HttpStatusCode::get_error_msg(err), "");
-	_header = build_header(_status_code, "text/html", _body.length(), "close");
+	_header = build_header(err, "text/html", _body.length(), "close");
 	return _header + _body;
 }
 
