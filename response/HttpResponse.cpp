@@ -9,7 +9,8 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 										_status_code(req.getStatusCode()), \
 										_is_cgi(req.getIsCgi()), \
 										_cookie(req.getCookie()), \
-										_connection_status(req.getConnection()) {
+										_connection_status(req.getConnection()), \
+										_contentType(req.getContentType()) {
 	if (_status_code != 202)
 		throw StatusSender::send_status(_status_code, serv, true);
 	if (_is_cgi) {
@@ -72,9 +73,9 @@ std::string	HttpResponse::get_response(Server &serv) {
 	if (_is_cgi)
 		return _response;
 	Method *m;
-	if (_method_code == DELETE)
+	if (_method_code == DELETE && _contentType.empty())
 		_contentType = "text/html";
-	else
+	else if (_contentType.empty())
 		_contentType = ContentTypeFinder::get_content_type(_path);
 	if (_contentType.empty())
 		throw StatusSender::send_status(404, serv, true);
