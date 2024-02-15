@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/09 20:38:47 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/15 13:10:12 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,8 +151,8 @@ void Server::configServer(void) {
 	hints.ai_family = AF_UNSPEC; // can be IPV4 or IPV6
 	hints.ai_socktype = SOCK_STREAM;
 
-	if (_ip.empty() == true || _port.empty() == true)
-		throw error_throw("host and port must be specified - config file", false);
+	if (_ip.empty() == true || _port.empty() == true || _root.empty())
+		throw error_throw("host, port and root must be specified - config file", false);
 
 	int ret = getaddrinfo(_ip.c_str(), _port.c_str(), &hints, &_res);
 	if (ret != 0) {
@@ -186,8 +186,8 @@ void Server::setDefaultValue(void) {
 		_error_pages.push_back(404);
 	if (_location_error_page.empty() == true)
 		_location_error_page = "/errorpages";
-	if (_index.empty() == true)
-		_index.push_back("/index.html");
+//	if (_index.empty() == true)
+//		_index.push_back("/index.html");
 	server_log("Server " + int_to_str(_i) + " set up and ready to listen", INFO);
 }		
 
