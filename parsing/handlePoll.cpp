@@ -1,6 +1,8 @@
 #include "../request/HttpRequest.hpp"
 #include "../request/HttpRequestAllow.hpp"
 #include "../response/HttpResponse.hpp"
+#include "../response/ResponseSender.hpp"
+
 #include "../inc/webserv.hpp"
 #include "../inc/parsing.hpp"
 #include "../utils/LoopUtils.hpp"
@@ -49,16 +51,17 @@ void handlePollout(std::vector< struct pollfd> & pollfds, std::map<int, std::pai
 {
 	server_log("--------- Sending response to clientFd " + int_to_str(pollfds[i].fd) + " ---------", DIALOG);
 	if (clientMap[pollfds[i].fd].second->getStatusCode() != KILL_ME)
-		send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second);
-	if (clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)
-		server_log("Set clientFd " + int_to_str(pollfds[i].fd) + " to close", DEBUG);
-	else
-		{
-			server_log("Reset clientFd " + int_to_str(pollfds[i].fd) + " for other requests (keep-alive)", DEBUG);
-			pollfds[i].events = POLLIN;
-			pollfds[i].revents = 0;
-			clientMap[pollfds[i].fd].second->resetRequest();
-		}
+		ResponseSender SendingResponse(*clientMap[pollfds[i].fd].second, pollfds[i], clientMap[pollfds[i].fd].second->getMyserver());
+		// send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second);
+	// if (clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)
+	// 	server_log("Set clientFd " + int_to_str(pollfds[i].fd) + " to close", DEBUG);
+	// else
+	// 	{
+	// 		server_log("Reset clientFd " + int_to_str(pollfds[i].fd) + " for other requests (keep-alive)", DEBUG);
+	// 		pollfds[i].events = POLLIN;
+	// 		pollfds[i].revents = 0;
+	// 		clientMap[pollfds[i].fd].second->resetRequest();
+	// 	}
 }
 
 void handlePollerr(std::vector< struct pollfd> & pollfds, std::map<int, std::pair<struct sockaddr_in, HttpRequest*> > & clientMap, size_t i)

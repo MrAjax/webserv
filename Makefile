@@ -14,6 +14,7 @@ SRC = 	main.cpp \
 		method/Method.cpp \
 		method/Post.cpp \
 		response/HttpResponse.cpp \
+		response/ResponseSender.cpp \
 		response/StatusSender.cpp \
 		utils/ContentTypeFinder.cpp \
 		utils/HttpStatusCode.cpp \
