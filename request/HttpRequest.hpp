@@ -9,9 +9,10 @@
 enum	{KILL_ME = -1, NEW, PROCESSING_HEADER, DONE_HEADER,
 		DONE_HEADER_CHECKING, PROCESSING_BODY, DONE_ALL};
 
+#define MAXDATA_RECV 5000000
 #define NBPARAM 18
-#define KEEP_ALIVE_TIMEOUT 10 // en seconds
-#define REQUEST_TIMEOUT 15 // en seconds
+#define KEEP_ALIVE_TIMEOUT 500 // en seconds
+#define REQUEST_TIMEOUT 6000 // en seconds
 
 class HttpRequest
 {
@@ -26,7 +27,7 @@ class HttpRequest
 		//------------OPERATOR------------------//
 
 		int     processingRequest(void); //on recupere le header et le boby + parsing
-		int		recvfd(int & fd); //on read buffer[MAXLINE -1] du fd
+		int		recvfd(int & fd); //on read buffer[MAXDATA_RECVE -1] du fd
 
 		//------------UTIL----------------------
 		void		resetTimeout(void);

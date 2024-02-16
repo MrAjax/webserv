@@ -119,11 +119,12 @@ void		HttpRequest::resetRequest(void)
 
 int	HttpRequest::recvfd(int & fd)
 {
-	u_int8_t recvline[MAXLINE + 1];
-	memset(recvline, 0, MAXLINE);
+	u_int8_t recvline[MAXDATA_RECV + 1];
+	memset(recvline, 0, MAXDATA_RECV);
 	int numbytes;
-	numbytes = recv(fd, recvline, MAXLINE - 1, 0);
-	saveString += reinterpret_cast< char * >(recvline); 
+	numbytes = recv(fd, recvline, MAXDATA_RECV - 1, 0);
+	saveString += reinterpret_cast< char * >(recvline);
+	server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(numbytes), INFO);
 	if (numbytes < 0)
 	{
 		server_log("Request clientFd " + _debugFd + " recv error", ERROR);

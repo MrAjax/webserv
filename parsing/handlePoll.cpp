@@ -44,6 +44,11 @@ void handlePollin(std::vector< struct pollfd> & pollfds, std::map<int, std::pair
 			pollfds[i].events = POLLOUT;
 			pollfds[i].revents = 0;
 		}
+		else
+		{
+			pollfds[i].events = POLLIN;
+			pollfds[i].revents = 0;
+		}
 	}
 }
 

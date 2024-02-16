@@ -3,7 +3,7 @@ server {
 	listen 18000;
 	host localhost;
     server_name Zzewebsite;
-	client_max_body_size 1024;            
+	client_max_body_size 5000000;            
 
     root website_exmpl/Zzewebsite;
     index /index/index.html;
@@ -37,7 +37,7 @@ server {
 	listen 18003;
 	host localhost;
     server_name Hellooo;
-	client_max_body_size 1024;            
+	client_max_body_size 5000000;            
 
     root /website_exmpl/Hellooo;
     index /index.html;
