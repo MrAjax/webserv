@@ -1,12 +1,12 @@
 #include "Location.hpp"
 #include "../utils/utils.hpp"
 
-Location::Location(std::vector<std::string> config) : _autoindex(false) 
+Location::Location(std::vector<std::string> config) : _autoindex(false), _get(true), _post(true), _delete(true) 
 {
 	void (Location::*ptr[PARAM_LOC])(std::string const&) =
 		{&Location::p_allow_methods, &Location::p_httpRedirection, &Location::p_root, &Location::p_autoindex,
-			&Location::p_index, &Location::p_cgi_path, &Location::p_cgi_ext	};
-	std::string keyword[] = {"allow_methods", "return", "root", "autoindex", "index", "cgi_path", "cgi_ext"};
+			&Location::p_index, &Location::p_cgi_path, &Location::p_cgi_ext, &Location::p_alias	};
+	std::string keyword[] = {"allow_methods", "return", "root", "autoindex", "index", "cgi_path", "cgi_ext", "alias" };
 
 	for (size_t i = 0; i < config.size() ; i++) {
 		int j = 0;
@@ -31,6 +31,10 @@ Location::Location( Location const& a) {
 	_autoindex = a._autoindex;
 	_cgi_path = a._cgi_path;
 	_cgi_ext = a._cgi_ext;
+	_get = a._get;
+	_post = a._post;
+	_delete = a._delete;
+	_alias = a._alias;
 }
 
 Location& Location::operator= (Location const& a) {
@@ -43,6 +47,10 @@ Location& Location::operator= (Location const& a) {
 		_autoindex = a._autoindex;
 		_cgi_path = a._cgi_path;
 		_cgi_ext = a._cgi_ext;
+		_get = a._get;
+		_post = a._post;
+		_delete = a._delete;
+		_alias = a._alias;
 	}
 	return *this;
 }	
@@ -80,6 +88,27 @@ void Location::p_allow_methods(std::string const& line) {
 			_allow_methods.push_back(line.substr(pos, end - pos));
 		pos = end;	
 	}
+
+	std::vector<std::string>::iterator it;
+
+	for (it = _allow_methods.begin(); it != _allow_methods.end(); ++it) {
+		if (*it == "GET")
+			break;
+	}
+	if (it == _allow_methods.end())
+		_get = false;
+	for (it = _allow_methods.begin(); it != _allow_methods.end(); ++it) {
+		if (*it == "POST")
+			break;
+	}
+	if (it == _allow_methods.end())
+		_post = false;
+	for (it = _allow_methods.begin(); it != _allow_methods.end(); ++it) {
+		if (*it == "DELETE")
+			break;
+	}
+	if (it == _allow_methods.end())
+		_delete = false;
 }	
 
 void Location::p_httpRedirection(std::string const& line) {
@@ -167,6 +196,19 @@ void Location::p_cgi_ext(std::string const& line) {
 	}
 }	
 
+void Location::p_alias(std::string const& line) {
+
+	if (_alias.empty() == false) {
+		throw error_throw ("On server Location alias setup twice", false);
+	}
+
+	size_t pos = std::string("alias").length();
+	while (pos < line.length() && std::isspace(line[pos])) {
+		++pos;
+	}
+	_alias = line.substr(pos, line.length() - pos);
+}
+
 std::vector<std::string> Location::getallow_methods(void) const {
 	return _allow_methods;
 }
@@ -193,4 +235,19 @@ bool	Location::getAutoindex(void) const {
 
 std::string Location::getIndex(void) const {
 	return _index;
-}	
+}
+
+std::string Location::getAlias(void) const {
+	return _alias;
+}
+
+bool Server::getIsAllowed(void) const {
+	return _get;
+}
+bool Server::postIsAllowed(void) const {
+	return _post;
+}
+bool Server::deleteIsAllowed(void) const {
+	return _delete;
+}
+
