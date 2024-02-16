@@ -241,13 +241,13 @@ std::string Location::getAlias(void) const {
 	return _alias;
 }
 
-bool Server::getIsAllowed(void) const {
+bool Location::getIsAllowed(void) const {
 	return _get;
 }
-bool Server::postIsAllowed(void) const {
+bool Location::postIsAllowed(void) const {
 	return _post;
 }
-bool Server::deleteIsAllowed(void) const {
+bool Location::deleteIsAllowed(void) const {
 	return _delete;
 }
 
