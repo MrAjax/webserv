@@ -55,18 +55,6 @@ ResponseSender::ResponseSender(HttpRequest &Req, struct pollfd &mypoll) : _respo
 
 ResponseSender::~ResponseSender() {}
 
-void    ResponseSender::processingChunk()
-{
-    server_log("Sending next chunk to clientFd " + int_to_str(_mypoll.fd), DEBUG);
-    _request.resetTimeout();
-    if (createChunk() == true)
-        _request.setIsChunked(false);
-    if (send_response_to_client() == false)
-        return (_request.setStatusCode(KILL_ME));
-    if (_request.getIsChunked() == false)
-        closeRequest();
-}
-
 void    ResponseSender::closeRequest()
 {
     if (_request.getIsChunked() == true || _request.getStatusCode() == KILL_ME)
@@ -83,52 +71,6 @@ void    ResponseSender::closeRequest()
 		_mypoll.revents = 0;
 		_request.resetRequest();
 	}
-}
-
-std::string chunk(std::string &str)
-{
-    std::string delimiteur = "\r\n";
-    std::string sizeHexa;
-    std::string response;
-    std::stringstream ss;
-    ss << std::hex << str.size();
-    ss >> sizeHexa;
-    response = sizeHexa + delimiteur + str + delimiteur;
-    return (response);
-}
-
-std::size_t	sizeConvert(std::size_t strSize)
-{
-    std::size_t hexaSize = 1;
-    for(std::size_t i = 16; i < strSize; i *= 16)
-        hexaSize++;
-    return (hexaSize);
-}
-
-bool ResponseSender::createChunk()
-{
-    std::string strChunk;
-    std::size_t maxLine = (SEND_MAX - 4) - _response.size();
-    std::size_t temp = sizeConvert(maxLine);
-    if (sizeConvert(maxLine - temp) == temp)
-        maxLine -= temp;
-    else
-        maxLine -= temp -1;
-    if (maxLine < _request.getSaveString().size() + 5)
-    {
-        strChunk = _request.getSaveString().substr(0, maxLine);
-        _request.setSaveString(_request.getSaveString().substr(maxLine));
-        _response += chunk(strChunk);
-        return (false);
-    }
-    else
-    {
-        strChunk = _request.getSaveString();
-        _request.setSaveString("");
-        _response += chunk(strChunk);
-        _response += "0\r\n\r\n";
-        return (true);
-    }
 }
 
 
@@ -167,9 +109,11 @@ void    ResponseSender::putTransfertEncoding()
     {
         std::size_t pos_end = _response.find("\r\n", pos_toFind + toFind.size());
         if (pos_end != std::string::npos)
-            _response.replace(pos_toFind, (pos_toFind - pos_end), toInsert);
+            _response.replace(pos_toFind, (pos_end - pos_toFind), toInsert);
     }
 }
+
+//----------UTILS----------------
 
 bool    ResponseSender::isMaxSize(std::size_t const &size)
 {
@@ -178,17 +122,85 @@ bool    ResponseSender::isMaxSize(std::size_t const &size)
     else
         return (false);
 }
+
+std::size_t	ResponseSender::sizeConvert(std::size_t strSize)
+{
+    std::size_t hexaSize = 1;
+    for(std::size_t i = 16; i < strSize; i *= 16)
+        hexaSize++;
+    return (hexaSize);
+}
+
+// ----------Get chunked---------------
+
+void    ResponseSender::processingChunk()
+{
+    server_log("Sending next chunk to clientFd " + int_to_str(_mypoll.fd), DEBUG);
+    _request.resetTimeout();
+    if (createChunk() == true)
+    {
+        server_log("Last chunk found clientFd " + int_to_str(_mypoll.fd), DIALOG);
+        _request.setIsChunked(false);
+    }
+    if (send_response_to_client() == false)
+        return (_request.setStatusCode(KILL_ME));
+    _mypoll.revents = 0;
+    _mypoll.events = POLLOUT;
+    if (_request.getIsChunked() == false)
+        closeRequest();
+}
+
+std::string ResponseSender::chunk(std::string &str)
+{
+    std::string delimiteur = "\r\n";
+    std::string sizeHexa;
+    std::string response;
+    std::stringstream ss;
+    ss << std::hex << str.size();
+    ss >> sizeHexa;
+    response = sizeHexa + delimiteur + str + delimiteur;
+    return (response);
+}
+
+bool ResponseSender::createChunk()
+{
+    std::string strChunk;
+    std::size_t maxLine = (SEND_MAX - 4) - _response.size();
+    std::size_t temp = sizeConvert(maxLine);
+    if (sizeConvert(maxLine - temp) == temp)
+        maxLine -= temp;
+    else
+        maxLine -= temp -1;
+    if (maxLine < _request.getSaveString().size() + 5)
+    {
+        strChunk = _request.getSaveString().substr(0, maxLine);
+        _request.setSaveString(_request.getSaveString().substr(maxLine));
+        _response += chunk(strChunk);
+        return (false);
+    }
+    else
+    {
+        strChunk = _request.getSaveString();
+        _request.setSaveString("");
+        _response += chunk(strChunk);
+        _response += "0\r\n\r\n";
+        return (true);
+    }
+}
+
 // ----------SENDING RESPONSE---------------
 void	ResponseSender::send_first_response_to_client()
 {
     server_log("Client fd " + int_to_str(_mypoll.fd) + " preparing 1st response...", DEBUG);
     if (_request.getIsChunked() == false && isMaxSize(_response.size()))
     {
-        server_log("Client fd " + int_to_str(_mypoll.fd) + " send.size()" + int_to_str(_response.size()) + " > send Max size "
+        server_log("Client fd " + int_to_str(_mypoll.fd) + " response length " + int_to_str(_response.size()) + " > send Max size "
             + int_to_str(SEND_MAX) + " starting chunked transfer encoding", DEBUG);
+        // server_log("Client fd " + int_to_str(_mypoll.fd) + "entire response [" + _response + "]", DIALOG);
         if (catchHeader() == false)
             return (_request.setStatusCode(KILL_ME)); //TODO
         putTransfertEncoding();
+        server_log("Client fd " + int_to_str(_mypoll.fd) + "entire response \"" + _response + "\"", DIALOG);
         _request.setIsChunked(true);
     }
     if (_request.getIsChunked() == true)
@@ -203,8 +215,10 @@ void	ResponseSender::send_first_response_to_client()
 int	ResponseSender::send_response_to_client()
 {
 	server_log("Sending response...", DEBUG);
+    // server_log("Client fd " + int_to_str(_mypoll.fd) + "entire response \"" + _response + "\"", DIALOG);
+
 	ssize_t numbytes;
-	numbytes = send(_mypoll.fd, _response.c_str(), _response.size(), 0);
+	numbytes = send(_mypoll.fd, _response.c_str(), _response.size(), MSG_NOSIGNAL);
 	if (numbytes == -1)
     {
 		server_log("Client fd " + int_to_str(_mypoll.fd) + " send failed client has closed connexion", ERROR);

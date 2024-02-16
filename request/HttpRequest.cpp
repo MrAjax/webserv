@@ -10,7 +10,7 @@ _host(""), _userAgent(""), _accept(""), _acceptLanguage(""), _acceptEncoding("")
 _connection(""), _upInsecureRqst(""), _referer(""), _secFetchDest(""), _secFetchMode(""),
 _secFetchSite(""), _contentLength(-1), _contentType(""), _cookie(""), _transferEncoding(""),
 _bodyRequest(""), _headerRequest(""),
-_connfd(connfd), saveString(""), _strContentLength(""),
+_connfd(connfd), saveString(""), _strContentLength(""), _brutPath(""),
 _servers(servers), _myServer(NULL),
 _statusCode(NEW), _isCgi(false), _isChunked(false), _listenFd(listenFd), _maxBodySize(0)
 {
@@ -107,6 +107,7 @@ void		HttpRequest::resetRequest(void)
 	
 	saveString = "";
 	_strContentLength = "";
+	_brutPath = "";
 
 	_myServer = NULL;
 	_isCgi = false;
@@ -203,6 +204,8 @@ int			HttpRequest::getConnfd()			{return (this->_connfd);}
 std::string HttpRequest::getSaveString()		{return (this->saveString);}
 
 std::string HttpRequest::getStrContentLength()	{return (this->_strContentLength);}
+std::string HttpRequest::getBrutPath()			{return (this->_brutPath);}
+
 int			HttpRequest::getStatusCode()		{return (this->_statusCode);}
 Server		*HttpRequest::getMyserver()			{return (this->_myServer);}
 
@@ -241,6 +244,8 @@ void	HttpRequest::setConnfd(const int &value)					{_connfd = value;}
 void	HttpRequest::setSaveString(const std::string &value)		{saveString = value;}
 
 void	HttpRequest::setStrContentLength(const std::string &value)	{_strContentLength = value;}
+void	HttpRequest::setBrutPath(const std::string &value)			{_brutPath = value;}
+
 void	HttpRequest::setStatusCode(const int &value)				{_statusCode = value;}
 void	HttpRequest::setMyserver(Server **value)					{if (value == NULL){_myServer = NULL;}else{_myServer= *value;}}
 

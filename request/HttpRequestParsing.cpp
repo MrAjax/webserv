@@ -252,5 +252,6 @@ bool    HttpRequestParsing::parseAllAttributes(std::string header)
 			}
 		}
 	}
+	_request.setBrutPath(_request.getPath());
 	return (true);
 }
