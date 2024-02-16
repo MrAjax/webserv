@@ -48,7 +48,8 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 HttpResponse::~HttpResponse() {}
 
 std::string	&HttpResponse::_get_cgi_path(std::string &path, Server &serv) {
-	
+	//checker method
+	//checker path - droits
 	Location *loc = serv.getLocation("cgi-bin");
 	if (loc == NULL)
 		return path;

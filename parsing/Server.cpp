@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/15 14:24:18 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/16 16:47:37 by mferracc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,7 +240,7 @@ void Server::p_bodySize(std::string const& line) {
 		++pos;
 	}
 	_max_body_size = atoi(line.substr(pos).c_str());
-	if (_max_body_size < 1024 || _max_body_size > 15000) {
+	if (_max_body_size < 1024 || _max_body_size > 5000000) {
 		throw error_throw("max_body_size must be set between 1024 and 15000 - config file", false);
 	}	
 	server_log("Server " + int_to_str(_i) + " max_body_size is " + int_to_str(_max_body_size), INFO);

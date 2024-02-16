@@ -15,14 +15,14 @@ bool	HttpRequestParsing::isMaxSize(std::size_t SIZE)
 	if (SIZE > MAX_HEADER_SIZE &&
 		(_request.getStatusCode() == PROCESSING_HEADER || _request.getStatusCode() == NEW))
 	{
-		server_log("Request fd " + _debugFd + " Header > max_size_header", ERROR);
+		server_log("Request fd " + _debugFd + " Header > max_size_header "  + int_to_str(SIZE), ERROR);
 		_request.setStatusCode(431);
 		return (true);
 	}
 	if (_request.getMyserver() != NULL && SIZE > _request.getMaxBodySize() &&
 		(_request.getStatusCode() == DONE_HEADER_CHECKING || _request.getStatusCode() == PROCESSING_BODY))
 	{
-		server_log("Request fd " + _debugFd + " Body > max_size", ERROR);
+		server_log("Request fd " + _debugFd + " Body > max_size " + int_to_str(SIZE) + " max size is " + int_to_str(_request.getMaxBodySize()), ERROR);
 		_request.setStatusCode(413);
 		return (true);
 	}
@@ -105,8 +105,6 @@ int	HttpRequestParsing::chunked()
 
 bool    HttpRequestParsing::parsingBody(void)
 {
-	if (_request.getStatusCode() != DONE_HEADER_CHECKING && _request.getStatusCode() != PROCESSING_BODY)
-		return (false);
 	if (_request.getContentLength() <= 0 && _request.getTransferEncoding().empty())
 	{
 		_request.setStatusCode(202);
@@ -128,8 +126,9 @@ bool    HttpRequestParsing::parsingBody(void)
 	}
 	else
 	{
-		if (isMaxSize(_request.getSaveString().size()) == true)
+		if (isMaxSize(_request.getSaveString().size()) == true) {
 			return (false);
+		}
 		if (_request.getSaveString().size() >= static_cast< std::size_t >(_request.getContentLength()))
 		{
 			_request.setBodyRequest(_request.getSaveString().substr(0, _request.getContentLength()));
