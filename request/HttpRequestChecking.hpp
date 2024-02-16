@@ -28,7 +28,7 @@ class HttpRequestChecking
 
 		int         checkSockfdPortIP(Server &servers);
 
-		int        modifiePath(Server &server);
+		int			modifiePath(Server &server);
 
 		bool		getFinalPath(void);
 
@@ -36,7 +36,8 @@ class HttpRequestChecking
 		bool 		findOtherPath();
 
 		bool		findCgi();
-		void		cgiPath();
+		bool		cgiPath();
+		int			checkPath(std::string const &path, Server const &serv, std::string &finalPath, bool addRoot);
 
 		int			isGoodPath(std::string &str);
 
