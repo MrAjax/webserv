@@ -9,12 +9,12 @@ HttpRequestChecking::HttpRequestChecking(HttpRequest &request) : _request(reques
 
 HttpRequestChecking::~HttpRequestChecking() {}
 
-
 int HttpRequestChecking::GET(void)
 {
-	findCgi();
 	if (!isGoodProtocol("HTTP/1.1"))
 		return (1);
+
+	findCgi();
 	if (!findRootPath() && !findOtherPath())
 		return (2);
 	return (0);
@@ -22,11 +22,12 @@ int HttpRequestChecking::GET(void)
 
 int HttpRequestChecking::POST(void)
 {
+	if (!isGoodProtocol("HTTP/1.1"))
+		return (3);
+	
 	findCgi();
 	if (!_request.getTransferEncoding().empty())
 		server_log("Reqest fd " + _debugFd + " method POST transfert-encoding detected: " + _request.getTransferEncoding(), DEBUG);
-	if (!isGoodProtocol("HTTP/1.1"))
-		return (3);
 	if (_request.getContentType().empty())
 	{
 		server_log("Reqest fd " + _debugFd + " method POST whitout content type", ERROR);
@@ -60,13 +61,14 @@ int HttpRequestChecking::POST(void)
 
 int HttpRequestChecking::DELETE(void)
 {
-	findCgi();
 	if (!isGoodProtocol("HTTP/1.1"))
 		return (8);
+	
+	findCgi();
 	if (_request.getPath() == "/") //remove for accepting root DELETE
 	{
 		server_log("Reqest fd " + _debugFd + " method POST with path /", ERROR);
-		_request.setStatusCode(400);
+		_request.setStatusCode(403);
 		return (9);
 	}
 	if (!findRootPath() && !findOtherPath())
@@ -152,6 +154,11 @@ Server  *HttpRequestChecking::findMyServer(std::vector<Server> &servers)
 		server_log("Request fd " + _debugFd + " cannot find any server", ERROR);
 	}
 	return (findServer);
+}
+
+void HttpRequestChecking::cgiPath()
+{
+	_request.getPath() = "";
 }
 
 bool HttpRequestChecking::findCgi()

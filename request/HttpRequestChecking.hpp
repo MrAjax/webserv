@@ -36,6 +36,7 @@ class HttpRequestChecking
 		bool 		findOtherPath();
 
 		bool		findCgi();
+		void		cgiPath();
 
 		int			isGoodPath(std::string &str);
 
