@@ -29,6 +29,7 @@ class HttpResponse {
 	
 	std::string	_find_index_path(Server &serv);
 	Method		*_execute_method(int method_code, Server &serv);
+	std::string	&_get_cgi_path(std::string &path, Server &serv);
 public:
 	HttpResponse(HttpRequest &req, Server &serv);
 

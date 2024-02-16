@@ -61,6 +61,8 @@ class HttpRequest
 		std::string getSaveString();
 		std::string getStrContentLength();
 
+		std::string getBrutPath();
+
 		int			getStatusCode();
 		bool		getIsCgi();
 		bool		getIsChunked();
@@ -102,6 +104,8 @@ class HttpRequest
 
 		void	setStrContentLength(const std::string &value);
 
+		void	setBrutPath(const std::string &value);
+
 		void	setStatusCode(const int &value);
 		void	setIsCgi(const bool &value);
 		void	setIsChunked(const bool &value);
@@ -136,6 +140,8 @@ class HttpRequest
 		int         _connfd;
 		std::string saveString;
 		std::string _strContentLength;
+
+		std::string _brutPath;
 
 		std::vector<Server> &_servers;
 		Server				*_myServer;

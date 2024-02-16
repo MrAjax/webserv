@@ -7,7 +7,7 @@
 #include "HttpResponse.hpp"
 
 
-#define SEND_MAX 10000000
+#define SEND_MAX 40000
 
 class ResponseSender
 {
@@ -15,11 +15,12 @@ class ResponseSender
 		ResponseSender(HttpRequest &Req, struct pollfd &mypoll);
 		~ResponseSender();
 
-		bool	createChunk();
-		void	putTransfertEncoding();
-		bool	catchHeader();
-		bool	isMaxSize(std::size_t const &size);
-		bool	isLastChunk();
+		bool		createChunk();
+		void		putTransfertEncoding();
+		bool		catchHeader();
+		bool		isLastChunk();
+
+		std::string chunk(std::string &str);
 
 		void	send_first_response_to_client();
 		int		send_response_to_client();
@@ -28,6 +29,10 @@ class ResponseSender
 		void    closeRequest();
 
 		void    processingChunk();
+
+		// -----UTILS------
+		std::size_t	sizeConvert(std::size_t strSize);
+		bool		isMaxSize(std::size_t const &size);
 
 	private:
 		std::string 	_response;
