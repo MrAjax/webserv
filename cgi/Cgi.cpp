@@ -67,10 +67,13 @@ int	Cgi::exec_cgi(std::string &path, std::string &output, std::string &input, st
 		}
 		close(fd[0]);
         waitpid(pid, &status, 0);
+		if (bytes_read < 0) {
+			server_log("read error in cgi", ERROR);
+			return 500;
+		}
 		server_log("child finished", DEBUG);
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
 			server_log("Cgi script execution SUCCESS", DEBUG);
-			//std::cout << "Output:\n" << output << "\n";
             return 200;
 		}
 		else {
