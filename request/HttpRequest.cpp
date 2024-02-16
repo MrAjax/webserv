@@ -52,6 +52,11 @@ bool	HttpRequest::isRequestTimeout(void)
 		return (false);
 }
 
+void	HttpRequest::resetTimeout(void) 
+{
+	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
+}
+
 void		HttpRequest::printAttribute(void) //pour pouvoir print et vérifier que tout est bien parse
 {
 	struct _tab 

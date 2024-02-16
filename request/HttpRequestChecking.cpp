@@ -123,8 +123,8 @@ int HttpRequestChecking::checkSockfdPortIP(Server &server)
 	std::string serverIp = server.getIp();
 	if (serverIp == "127.0.0.1" || serverIp == "::1")
 		serverIp = "localhost";
-	if (requestIp == serverIp && port == server.getPort()
-		&& _request.getListenFd() == server.getSocketfd())
+	if (_request.getListenFd() == server.getSocketfd() && port == server.getPort()
+		&& (requestIp == serverIp || requestIp == server.getServerName()))
 		return (1);
 	return (0);
 }

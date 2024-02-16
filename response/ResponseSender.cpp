@@ -1,6 +1,6 @@
 #include "ResponseSender.hpp"
 
-ResponseSender::ResponseSender(HttpRequest &Req, struct pollfd &mypoll, Server &serv) : _response(""), _request(Req), _mypoll(mypoll)
+ResponseSender::ResponseSender(HttpRequest &Req, struct pollfd &mypoll) : _response(""), _request(Req), _mypoll(mypoll)
 {
     server_log("Sending response to clientFd " + int_to_str(mypoll.fd) + "...", DEBUG);
     if (Req.getIsChunked() == true)
@@ -8,36 +8,36 @@ ResponseSender::ResponseSender(HttpRequest &Req, struct pollfd &mypoll, Server &
         processingChunk();
         return ;
     }
-
+    Server *serv = Req.getMyserver();
 	try {
 		if (mypoll.fd < 0)
 		{
 			server_log("pollfds[i].fd = -1 HttpRequest fd = " + int_to_str(Req.getConnfd()), ERROR);
-			throw	StatusSender::send_status(500, serv, false);
+			throw	StatusSender::send_status(500, *serv, false);
 		}
-		if (Req.getMyserver() == NULL && Req.getStatusCode() >= 400)
-			throw	StatusSender::send_status(Req.getStatusCode(), serv, false);
+		if (serv == NULL && Req.getStatusCode() >= 400)
+			throw	StatusSender::send_status(Req.getStatusCode(), *serv, false);
 		else if (Req.getStatusCode() >= 400)
-			throw	StatusSender::send_status(Req.getStatusCode(), serv, true);
-		else if (Req.getMyserver() == NULL)
+			throw	StatusSender::send_status(Req.getStatusCode(), *serv, true);
+		else if (serv == NULL)
 		{
 			server_log("No server in request clientFd " + int_to_str(mypoll.fd) + " status code = " + int_to_str(Req.getStatusCode()), ERROR);
-			throw	StatusSender::send_status(500, serv, false);
+			throw	StatusSender::send_status(500, *serv, false);
 		}
 		if (Req.getHeaderRequest().empty()) {
 			server_log("ClientFd " + int_to_str(mypoll.fd) + " invalid request : no header", ERROR);
 			server_log("ClientFd " + int_to_str(mypoll.fd) + " request status code : " + int_to_str(Req.getStatusCode()), ERROR);
-			throw	StatusSender::send_status(400, serv, true);
+			throw	StatusSender::send_status(400, *serv, true);
 		}
-		server_log("ClientFd " + int_to_str(mypoll.fd) + " server name is " + serv.getServerName(), DEBUG);
+		server_log("ClientFd " + int_to_str(mypoll.fd) + " server name is " + serv->getServerName(), DEBUG);
 		server_log("Request is valid", DEBUG);
 		server_log(Req.getHeaderRequest() + "\n\n", DIALOG);
 		server_log(Req.getBodyRequest() + "\n\n", DIALOG);
 		server_log("Building Response...", DEBUG);
 
-		HttpResponse	Rep(Req, serv);
+		HttpResponse	Rep(Req, *serv);
 
-		_response = Rep.get_response(serv);
+		_response = Rep.get_response(*serv);
 		if (!Rep.get_header().empty())
 			server_log(Rep.get_header(), DIALOG);
 		else
@@ -58,6 +58,7 @@ ResponseSender::~ResponseSender() {}
 void    ResponseSender::processingChunk()
 {
     server_log("Sending next chunk to clientFd " + int_to_str(_mypoll.fd), DEBUG);
+    _request.resetTimeout();
     if (createChunk() == true)
         _request.setIsChunked(false);
     if (send_response_to_client() == false)
@@ -107,7 +108,7 @@ std::size_t	sizeConvert(std::size_t strSize)
 bool ResponseSender::createChunk()
 {
     std::string strChunk;
-    std::size_t maxLine = (SEND_MAX - 4);
+    std::size_t maxLine = (SEND_MAX - 4) - _response.size();
     std::size_t temp = sizeConvert(maxLine);
     if (sizeConvert(maxLine - temp) == temp)
         maxLine -= temp;
@@ -139,6 +140,11 @@ bool ResponseSender::catchHeader()
     {
         _request.setSaveString(_response.substr(pos_toFind + toFind.size()));
         _response = _response.substr(0, pos_toFind + toFind.size());
+        if (_response.size() > SEND_MAX)
+        {
+            server_log("ResponseSender Header size clientFd " + int_to_str(_mypoll.fd) + " > send max size", ERROR);
+            return (false);
+        }
         return (true);
     }
     server_log("ResponseSender can't catch response header clientFd " + int_to_str(_mypoll.fd), ERROR);
@@ -175,11 +181,12 @@ bool    ResponseSender::isMaxSize(std::size_t const &size)
 
 void	ResponseSender::send_first_response_to_client()
 {
+    server_log("Client fd " + int_to_str(_mypoll.fd) + " preparing 1st response...", DEBUG);
     if (_request.getIsChunked() == false && isMaxSize(_response.size()))
     {
-        server_log("Client fd " + int_to_str(_mypoll.fd) + " send.size() > send Max size" + int_to_str(SEND_MAX) + " starting chunked transfer encoding", DEBUG);
+        server_log("Client fd " + int_to_str(_mypoll.fd) + " send.size() > send Max size " + int_to_str(SEND_MAX) + " starting chunked transfer encoding", DEBUG);
         if (catchHeader() == false)
-            return (_request.setStatusCode(KILL_ME));
+            return (_request.setStatusCode(KILL_ME)); //TODO
         putTransfertEncoding();
         _request.setIsChunked(true);
     }
@@ -192,24 +199,24 @@ void	ResponseSender::send_first_response_to_client()
         closeRequest();
 }
 
-// int	ResponseSender::send_response_to_client()
-// {
-// 	server_log("Sending response...", DEBUG);
-// 	ssize_t numbytes;
-// 	numbytes = send(_mypoll.fd, _response.c_str(), _response.size(), 0);
-// 	if (numbytes == -1)
-//     {
-// 		server_log("Client fd " + int_to_str(_mypoll.fd) + " send failed client has closed connexion", ERROR);
-//         return (false);
-//     }
-// 	else if (numbytes == 0)
-//     {
-// 		server_log("Client fd " + int_to_str(_mypoll.fd) + " no bytes send", ERROR);
-//         return (false);
-//     }
-// 	server_log("Response sent bytes numbers = " + int_to_str(numbytes), INFO);
-// 	return (true);
-// }
+int	ResponseSender::send_response_to_client()
+{
+	server_log("Sending response...", DEBUG);
+	ssize_t numbytes;
+	numbytes = send(_mypoll.fd, _response.c_str(), _response.size(), 0);
+	if (numbytes == -1)
+    {
+		server_log("Client fd " + int_to_str(_mypoll.fd) + " send failed client has closed connexion", ERROR);
+        return (false);
+    }
+	else if (numbytes == 0)
+    {
+		server_log("Client fd " + int_to_str(_mypoll.fd) + " no bytes send", ERROR);
+        return (false);
+    }
+	server_log("Response sent bytes numbers = " + int_to_str(numbytes), INFO);
+	return (true);
+}
 
 // void	ResponseSender::send_response(int connfd, Server &serv, HttpRequest &Req)
 // {

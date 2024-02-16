@@ -51,7 +51,7 @@ void handlePollout(std::vector< struct pollfd> & pollfds, std::map<int, std::pai
 {
 	server_log("--------- Sending response to clientFd " + int_to_str(pollfds[i].fd) + " ---------", DIALOG);
 	if (clientMap[pollfds[i].fd].second->getStatusCode() != KILL_ME)
-		ResponseSender SendingResponse(*clientMap[pollfds[i].fd].second, pollfds[i], clientMap[pollfds[i].fd].second->getMyserver());
+		ResponseSender SendingResponse(*clientMap[pollfds[i].fd].second, pollfds[i]);
 		// send_response(pollfds[i].fd, *clientMap[pollfds[i].fd].second->getMyserver(), *clientMap[pollfds[i].fd].second);
 	// if (clientMap[pollfds[i].fd].second->getStatusCode() == KILL_ME)
 	// 	server_log("Set clientFd " + int_to_str(pollfds[i].fd) + " to close", DEBUG);

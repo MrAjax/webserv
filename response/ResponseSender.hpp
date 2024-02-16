@@ -3,15 +3,16 @@
 
 #include "../inc/webserv.hpp"
 #include "../request/HttpRequest.hpp"
+#include "../parsing/Server.hpp"
 #include "HttpResponse.hpp"
 
 
-#define SEND_MAX 500
+#define SEND_MAX 500000
 
 class ResponseSender
 {
 	public:
-		ResponseSender(HttpRequest &Req, struct pollfd &mypoll, Server &serv);
+		ResponseSender(HttpRequest &Req, struct pollfd &mypoll);
 		~ResponseSender();
 
 		bool	createChunk();

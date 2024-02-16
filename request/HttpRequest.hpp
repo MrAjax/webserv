@@ -29,6 +29,7 @@ class HttpRequest
 		int		recvfd(int & fd); //on read buffer[MAXLINE -1] du fd
 
 		//------------UTIL----------------------
+		void		resetTimeout(void);
 		bool		isKeepAliveTimeout(void);
 		bool		isRequestTimeout(void);
 		void		printAttribute(void);
