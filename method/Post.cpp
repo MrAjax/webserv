@@ -38,12 +38,8 @@ static	void	post_encoded_text(std::string &query_string, std::fstream &post_file
 }
 
 void	Post::fill_post_file(Server &serv, std::string body) {
-	// server_log("Query string: " + query_string, DEBUG);
 	std::string					path = set_post_path(this->get_path());
 	std::fstream				post_file(path.c_str(), std::ios::out | std::ios::app);
-	// std::string					key, value, token;
-	// std::istringstream			query_stream(query_string);
-	// std::vector<std::string>	values;
 
 	if (!post_file.is_open()) {
 		server_log("Cannot open post file - Post.cpp", ERROR);
@@ -53,17 +49,6 @@ void	Post::fill_post_file(Server &serv, std::string body) {
 		post_encoded_text(body, post_file);
 	else
 		post_file << body;
-	/* while (getline(query_stream, token, '&')) {
-		std::istringstream	token_stream(token);
-		if (getline(token_stream, key, '=') && getline(token_stream, value))
-			values.push_back(value);
-	}
-	std::cout << query_string << "\n";
-	for (size_t i = 0; i < values.size(); i++) {
-		post_file << values[i];
-		if (i < values.size() - 1)
-			post_file << ",";
-	} */
 	post_file << "\n";
 	post_file.close();
 }

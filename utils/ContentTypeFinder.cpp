@@ -50,12 +50,6 @@ std::string	ContentTypeFinder::get_content_type(std::string path) {
 	}
 	extension = path.substr(extension_pos, path.size());
 
-/* 	for (std::map<std::string, std::string>::iterator it = type_map.begin(); it != type_map.end(); ++it) {
-		if (it->first == extension) {
-			server_log(std::string(WHITEE) + "Map key: " + it->first + ", Map value: " + it->second, DEBUG);
-			break;
-		}
-	} */
 	content_type = type_map.find(extension);
 	if (content_type != type_map.end())
 		type = content_type->second;
