@@ -178,13 +178,14 @@ bool    ResponseSender::isMaxSize(std::size_t const &size)
     else
         return (false);
 }
-
+// ----------SENDING RESPONSE---------------
 void	ResponseSender::send_first_response_to_client()
 {
     server_log("Client fd " + int_to_str(_mypoll.fd) + " preparing 1st response...", DEBUG);
     if (_request.getIsChunked() == false && isMaxSize(_response.size()))
     {
-        server_log("Client fd " + int_to_str(_mypoll.fd) + " send.size() > send Max size " + int_to_str(SEND_MAX) + " starting chunked transfer encoding", DEBUG);
+        server_log("Client fd " + int_to_str(_mypoll.fd) + " send.size()" + int_to_str(_response.size()) + " > send Max size "
+            + int_to_str(SEND_MAX) + " starting chunked transfer encoding", DEBUG);
         if (catchHeader() == false)
             return (_request.setStatusCode(KILL_ME)); //TODO
         putTransfertEncoding();
@@ -217,54 +218,4 @@ int	ResponseSender::send_response_to_client()
 	server_log("Response sent bytes numbers = " + int_to_str(numbytes), INFO);
 	return (true);
 }
-
-// void	ResponseSender::send_response(int connfd, Server &serv, HttpRequest &Req)
-// {
-// 	server_log("Sending response to clientFd " + int_to_str(connfd) + "...", DEBUG);
-//     if (Req.getIsChunked() == true)
-//         return (processingChunk());
-
-// 	try {
-// 		if (connfd < 0)
-// 		{
-// 			server_log("pollfds[i].fd = -1 HttpRequest fd = " + int_to_str(Req.getConnfd()), ERROR);
-// 			throw	StatusSender::send_status(500, serv, false);
-// 		}
-// 		if (Req.getMyserver() == NULL && Req.getStatusCode() >= 400)
-// 			throw	StatusSender::send_status(Req.getStatusCode(), serv, false);
-// 		else if (Req.getStatusCode() >= 400)
-// 			throw	StatusSender::send_status(Req.getStatusCode(), serv, true);
-// 		else if (Req.getMyserver() == NULL)
-// 		{
-// 			server_log("No server in request clientFd " + int_to_str(connfd) + " status code = " + int_to_str(Req.getStatusCode()), ERROR);
-// 			throw	StatusSender::send_status(500, serv, false);
-// 		}
-// 		if (Req.getHeaderRequest().empty()) {
-// 			server_log("ClientFd " + int_to_str(connfd) + " invalid request : no header", ERROR);
-// 			server_log("ClientFd " + int_to_str(connfd) + " request status code : " + int_to_str(Req.getStatusCode()), ERROR);
-// 			throw	StatusSender::send_status(400, serv, true);
-// 		}
-// 		server_log("ClientFd " + int_to_str(connfd) + " server name is " + serv.getServerName(), DEBUG);
-// 		server_log("Request is valid", DEBUG);
-// 		server_log(Req.getHeaderRequest() + "\n\n", DIALOG);
-// 		server_log(Req.getBodyRequest() + "\n\n", DIALOG);
-// 		server_log("Building Response...", DEBUG);
-
-// 		HttpResponse	Rep(Req, serv);
-
-// 		_response = Rep.get_response(serv);
-// 		if (!Rep.get_header().empty())
-// 			server_log(Rep.get_header(), DIALOG);
-// 		else
-// 			server_log(_response, DIALOG);
-// 		send_first_response_to_client();
-// 	}
-// 	catch (std::string &s) {
-// 		_response = s;
-// 		server_log(Req.getHeaderRequest() + "\n\n", DIALOG);
-// 		server_log(Req.getBodyRequest() + "\n\n", DIALOG);
-// 		server_log(_response, DIALOG);
-// 		send_first_response_to_client();
-// 	}
-// }
 
