@@ -12,38 +12,35 @@ class HttpRequestChecking
 		~HttpRequestChecking(void);
 		//------------OPERATOR------------------//
 
-		//---------check error---------------------
-		void        checkError();
-
+		//-----------PROTOCOL---------------
+		bool        isGoodProtocol(std::string const &http);
+		//-------------METHOD--------------
 		int         GET();
 		int         POST();
 		int         DELETE();
-		bool        isGoodProtocol(std::string const &http);
 
 		int         BuildAndCheckHeader();
 		int         Path();
-
-
+		//-------------FIND PATHS--------------
 		Server      *findMyServer(std::vector<Server> &servers);
-
-		int         checkSockfdPortIP(Server &servers);
-
-		int			modifiePath(Server &server);
-
-		bool		getFinalPath(void);
-
 		bool 		findRootPath();
 		bool 		findOtherPath();
-
 		bool		findCgi();
-		bool		cgiPath();
-		int			checkPath(std::string const &path, Server const &serv, std::string &finalPath, bool addRoot);
-
+		bool		setCgiPath();
+		bool		setDownloadPath();
+		//-------------FIND PATHS UTILS--------------
+		int         checkSockfdPortIP(Server &servers);
 		int			isGoodPath(std::string &str);
-
+		int			checkPath(std::string const &path, Server const &serv, std::string &finalPath, bool addRoot);
+		//-------------PERMISSION--------------
 		bool       hasReadPermission(std::string &str);
 		bool       hasWritePermission(std::string &str);
 		bool       hasExecutePermission(std::string &str);
+
+
+
+
+
 
 		private:
 			HttpRequest &_request;

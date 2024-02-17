@@ -172,7 +172,7 @@ int    HttpRequest::processingRequest(void)
 		if (parsing.parsingBody() == true)
 			server_log("Request clientFd " + _debugFd + " succesful status code " + int_to_str(_statusCode), INFO);
 	}
-	server_log("Request clientFd " + _debugFd + " status code " + int_to_str(_statusCode) + " quitting processing...", DEBUG);
+	server_log("Request clientFd " + _debugFd + " " + _method + " status code " + int_to_str(_statusCode) + " quitting processing...", DEBUG);
 	return (_statusCode);
 }
 

@@ -13,7 +13,7 @@ int HttpRequestChecking::GET(void)
 {
 	if (!isGoodProtocol("HTTP/1.1"))
 		return (1);
-	if (findCgi() == true && cgiPath() == false)
+	if (findCgi() == true && setCgiPath() == false)
 	{
 		server_log("Request fd " + _debugFd + " GET cannot find any valide cgi path", ERROR);
 		return (_request.setStatusCode(404), 1);
@@ -58,7 +58,7 @@ int HttpRequestChecking::POST(void)
 	// 	_request.setStatusCode(400);
 	// 	return (6);
 	// }
-	if (findCgi() == true && cgiPath() == false)
+	if (findCgi() == true && setCgiPath() == false)
 	{
 		server_log("Request fd " + _debugFd + " POST cannot find any valide cgi path", ERROR);
 		return (_request.setStatusCode(404), 1);
@@ -82,7 +82,7 @@ int HttpRequestChecking::DELETE(void)
 		return (9);
 	}
 
-	if (findCgi() == true && cgiPath() == false)
+	if (findCgi() == true && setCgiPath() == false)
 	{
 		server_log("Request fd " + _debugFd + " DELETE cannot find any valide cgi path", ERROR);
 		return (_request.setStatusCode(404), 1);
@@ -173,23 +173,51 @@ Server  *HttpRequestChecking::findMyServer(std::vector<Server> &servers)
 	return (findServer);
 }
 
-bool HttpRequestChecking::cgiPath()
+bool HttpRequestChecking::setDownloadPath()
+{
+	if (_request.getPath() == "/" && findRootPath() == false)
+		return (false);
+	std::string finalPath;
+	std::size_t pos = _request.getPath().rfind(".");
+	if (pos != std::string::npos)
+		finalPath = _request.getPath().substr(0, pos);
+	else
+		finalPath = _request.getPath();
+	trimString(finalPath, "/", START);
+	Server *serv = _request.getMyserver();
+	Location *loc = serv->getLocation("download");
+	if (loc == NULL)
+		return (_request.setPath(finalPath), true);
+	pos = finalPath.rfind("/");
+	if (pos != std::string::npos)
+		finalPath = finalPath.substr(pos + 1);
+	finalPath = trimString(loc->getIndex(), "/", START) + finalPath;
+	return (_request.setPath(finalPath), true);
+}
+
+bool HttpRequestChecking::setCgiPath()
 {
 	if (_request.getIsCgi() == false)
 		return (false);
-	_request.getPath() = "";
 	Server *serv = _request.getMyserver();
-	std::string finalPath;
-	if (checkPath(_request.getPath(), *serv, finalPath, true) == true)
-		return (_request.setPath(finalPath), true);
-	std::size_t pos = _request.getPath().rfind("/");
-	if (pos == std::string::npos)
-		return (false);
+	std::string processPath;
+	if (checkPath(_request.getPath(), *serv, processPath, true) == true)
+		return (_request.setPath(processPath), true);
 	Location *loc = serv->getLocation("cgi-bin");
 	if (loc == NULL)
-		return (false);
-	finalPath = loc->getIndex() + "/" + _request.getPath().substr(pos + 1);
-	if (checkPath(_request.getPath(), *serv, finalPath, true) == true)
+		processPath = _request.getPath();
+	else
+	{
+		std::string endPath;
+		std::size_t pos = _request.getPath().rfind("/");
+		if (pos == std::string::npos)
+			endPath = _request.getPath();
+		else
+			endPath = _request.getPath().substr(pos + 1);
+		processPath = trimString(loc->getIndex(), "/", START) + "/" + endPath;
+	}
+	std::string finalPath;
+	if (checkPath(processPath, *serv, finalPath, true) == true)
 		return (_request.setPath(finalPath), true);
 	else
 		return (false);
