@@ -11,7 +11,7 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	std::string	value;
 	size_t		pos = body.find(field);
 
-	if (get_content_type() == "application/x-www-form-urlencoded" || body.find("------WebKitFormBoundary") == std::string::npos || pos == std::string::npos) {
+	if (get_content_type().find("multipart/form-data") == std::string::npos || body.find(multipart_form) == std::string::npos || pos == std::string::npos) {
 		_set_post_path(get_raw_path());
 		return "_data.csv";
 	}
@@ -22,16 +22,25 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	value = body.substr(0, pos);
 	server_log("File name: " + value, DEBUG);
 	server_log("Retrieving the body", DEBUG);
-	for (int i = 0; i < 3 && pos < body.size(); i++) {
+	for (int i = 0; i < 3 && pos < body.size(); ++i) {
 		pos = body.find_first_of('\n');
 		if (pos == std::string::npos)
 			return ".txt";
 		++pos;
+		body = body.substr(pos, body.size() - pos);
 	}
-	body = body.substr(pos, body.size() - pos);
-	
+	pos = body.find(multipart_form);
+	if (pos == std::string::npos)
+		return ".txt";
+	body = body.substr(0, pos);
+	for (int i = 0; i < 3 && !body.empty(); ++i) {
+		body.erase(body.end() - 1);
+	}
+	if (!body.empty())
+		server_log("\nBODY:\n" + body + "$\n", DEBUG);
+	else
+		server_log("\nFILE IS EMPTY", DEBUG);
 	set_path(get_path() + value);
-	std::cout << "\n" << body << "\n"; // TODO remove this line
 	return "";
 }
 
@@ -65,13 +74,19 @@ static	void	post_encoded_text(std::string &query_string, std::fstream &post_file
 		if (i < values.size() - 1)
 			post_file << ",";
 	}
+	post_file << "\n";
 }
 
 void	Post::_fill_post_file(Server &serv, std::string body) {
 	std::string		ext = _guess_mime_type(body);
-	std::string		path = get_path() + ext;/* _set_post_path(this->get_path(), body); */
+	std::string		path = get_path() + ext;
+	std::fstream	post_file;
 	server_log("Post file location: " + path, DEBUG);
-	std::fstream	post_file(path.c_str(), std::ios::out | std::ios::app);
+	server_log("Post body: " + body, DEBUG);
+	if (get_content_type().find("multipart/form-data") != std::string::npos)
+		post_file.open(path.c_str(), std::ios::out | std::ios::trunc);
+	else
+		post_file.open(path.c_str(), std::ios::out | std::ios::app);
 
 	if (!post_file.is_open()) {
 		server_log("Cannot open post file - Post.cpp", ERROR);
@@ -79,14 +94,21 @@ void	Post::_fill_post_file(Server &serv, std::string body) {
 	}
 	if (get_content_type() == "application/x-www-form-urlencoded")
 		post_encoded_text(body, post_file);
-	else
+	else if (get_content_type().find("multipart/form-data") != std::string::npos) {
+		post_file << body;
+		if (!body.empty())
+			post_file << "\n";
+	}
+	else {
 		post_file << get_body_request();
-	post_file << "\n";
+		post_file << "\n";
+	}
 	post_file.close();
 }
 
 void	Post::execute_method(Server &serv) {
 	server_log("current path: " + get_path(), DEBUG);
+	server_log("content type: " + get_content_type(), DEBUG);
 	std::string	redirect_path = get_raw_path(); /* get_path().substr(serv.getRoot().length(), this->get_path().length() - serv.getRoot().length()); */
 	_fill_post_file(serv, get_body_request());
 	set_statuscode(303);
