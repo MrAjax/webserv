@@ -1,6 +1,6 @@
 #include "Post.hpp"
 
-Post::Post(std::string path, std::string content, std::string body_request, std::string connection_status): Method(path, content, body_request, connection_status) {}
+Post::Post(std::string path, std::string raw_path, std::string root, std::string content, std::string body_request, std::string connection_status): Method(path, raw_path, root, content, body_request, connection_status) {}
 
 Post::~Post() {}
 
@@ -11,8 +11,10 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	std::string	value;
 	size_t		pos = body.find(field);
 
-	if (get_content_type() == "application/x-www-form-urlencoded" || body.find("------WebKitFormBoundary") == std::string::npos || pos == std::string::npos)
+	if (get_content_type() == "application/x-www-form-urlencoded" || body.find("------WebKitFormBoundary") == std::string::npos || pos == std::string::npos) {
+		_set_post_path(get_raw_path());
 		return "_data.csv";
+	}
 	body = body.substr(pos + field.size(), body.size() - pos - field.size());
 	pos = body.find_first_of("\"");
 	if (pos == std::string::npos)
@@ -33,22 +35,20 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	return "";
 }
 
-/* std::string	Post::_set_post_path(std::string path, std::string body) {
+void	Post::_set_post_path(std::string path) {
 	server_log("Preparing post file...", DEBUG);
 	std::string::reverse_iterator	it = path.rbegin();
 	std::string	post_path;
-	std::string	ext = _guess_mime_type(body);
 
 	while (it != path.rend()) {
 		if (*it == '.') {
 			post_path = path.substr(0, it.base() - path.begin() - 1);
-			server_log("Post file location: " + post_path + ext, DEBUG);
 			break;
 		}
 		it++;
 	}
-	return post_path + ext;
-} */
+	set_path(get_root() + post_path);
+}
 
 static	void	post_encoded_text(std::string &query_string, std::fstream &post_file) {
 	std::istringstream			query_stream(query_string);
@@ -70,6 +70,7 @@ static	void	post_encoded_text(std::string &query_string, std::fstream &post_file
 void	Post::_fill_post_file(Server &serv, std::string body) {
 	std::string		ext = _guess_mime_type(body);
 	std::string		path = get_path() + ext;/* _set_post_path(this->get_path(), body); */
+	server_log("Post file location: " + path, DEBUG);
 	std::fstream	post_file(path.c_str(), std::ios::out | std::ios::app);
 
 	if (!post_file.is_open()) {
@@ -85,7 +86,7 @@ void	Post::_fill_post_file(Server &serv, std::string body) {
 }
 
 void	Post::execute_method(Server &serv) {
-	std::string	redirect_path = get_path().substr(serv.getRoot().length(), this->get_path().length() - serv.getRoot().length());
+	std::string	redirect_path = get_raw_path(); /* get_path().substr(serv.getRoot().length(), this->get_path().length() - serv.getRoot().length()); */
 	_fill_post_file(serv, get_body_request());
 	set_statuscode(303);
 	set_header(" " \

@@ -3,6 +3,7 @@
 HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMethod()), \
 										_method_code(_method.length()), \
 										_path(req.getPath()), \
+										_raw_path(req.getBrutPath()), \
 										_server_path(serv.getRoot()), \
 										_index_list(serv.getIndex()), \
 										_body_request(req.getBodyRequest()), \
@@ -72,7 +73,7 @@ Method	*HttpResponse::_execute_method(int method_code, Server &serv) {
 		m = new Get(_path, _contentType, _connection_status);
 		break;
 	case POST:
-		m = new Post(_path, _contentType, _connection_status, _body_request);
+		m = new Post(_path, _raw_path, _server_path, _contentType, _connection_status, _body_request);
 		break;
 	case DELETE:
 		m = new Delete(_path, _contentType, _connection_status);

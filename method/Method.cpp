@@ -7,7 +7,7 @@ Method::Method(std::string path, std::string content, std::string connection_sta
 		_connection_status = "keep-alive";
 }
 
-Method::Method(std::string path, std::string content, std::string connection_status, std::string body_request): _path(path), _content_type(content), _connection_status(connection_status), _body_request(body_request), _header("HTTP/1.1"), _body(""), _status_code(0) {
+Method::Method(std::string path, std::string raw_path, std::string root, std::string content, std::string connection_status, std::string body_request): _path(path), _raw_path(raw_path), _root(root), _content_type(content), _connection_status(connection_status), _body_request(body_request), _header("HTTP/1.1"), _body(""), _status_code(0) {
 	if (_connection_status.empty())
 		_connection_status = "keep-alive";
 }
@@ -18,6 +18,14 @@ void	Method::execute_method(Server &serv) {(void)serv;}
 
 std::string	Method::get_path() {
 	return _path;
+}
+
+std::string Method::get_raw_path() {
+	return _raw_path;
+}
+
+std::string Method::get_root() {
+	return _root;
 }
 
 std::string	Method::get_content_type() {
