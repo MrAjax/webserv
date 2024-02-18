@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/16 16:47:37 by mferracc         ###   ########.fr       */
+/*   Updated: 2024/02/18 21:26:20 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,10 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 		}	
 		else if (config[i].compare(0, 8, "location") == 0) {
 			tempLocation = settempLocation(config[i]);
+			if (getLocation(tempLocation) != NULL) {
+				freeServer();
+				throw error_throw("Location " + tempLocation + " setup twice - config file", false);
+			}	
 			recording = true;
 		}	
 		else if (recording == true)
@@ -57,8 +61,10 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 				j++;
 			}
 		}	
-		if (j == PARAM && config[i][0] != '}') // no condition
+		if (j == PARAM && config[i][0] != '}') {//no condition
+			freeServer();
 			throw error_throw("unknown directive \"" + config[i] + "\" - config file", false);
+		}	
 	}
 }
 
@@ -116,12 +122,16 @@ Server::Server(Server const& a) {
 }
 
 Server::~Server(void) {
+	freeServer();
+}
+
+void Server::freeServer(void) {
 
 	std::map<std::string, Location*>::iterator it;
 	for (it = _locations.begin(); it != _locations.end(); ++it) {
 		delete it->second;
 	}	
-}
+}	
 
 void Server::openSocket(void) { 
 
@@ -162,8 +172,8 @@ void Server::configServer(void) {
 
 	int ret = getaddrinfo(_ip.c_str(), _port.c_str(), &hints, &_res);
 	if (ret != 0) {
-		server_log("getaddrinfo error - parsing/Server.cpp", ERROR);
-		throw std::runtime_error(gai_strerror(ret));
+		std::string tempError = gai_strerror(ret);
+		throw error_throw("getaddrinfo error - parsing/server.cpp: " + tempError, false);
 	}
 	openSocket();
 	if (_socketIsSet == false) { // Port + ip not already binded and listen
@@ -430,7 +440,6 @@ Location* Server::getLocation(std::string type) const {
 	if (it != _locations.end()) 
 		return it->second;
 	else {
-		server_log("This location " + type + " does not exist", ERROR);
 		return NULL;
 	}
 }

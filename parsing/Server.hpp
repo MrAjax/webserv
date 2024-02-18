@@ -6,7 +6,7 @@
 /*   By: bahommer <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 10:43:42 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/06 12:57:38 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/18 19:56:22 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ private:
 
 	void openSocket(void);
 	void setDefaultValue(void);
+	void freeServer(void);
 
 	std::string settempLocation(std::string line);
 
