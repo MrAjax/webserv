@@ -177,21 +177,14 @@ bool HttpRequestChecking::setDownloadPath()
 {
 	if (_request.getPath() == "/" && findRootPath() == false)
 		return (false);
-	std::string finalPath;
-	std::size_t pos = _request.getPath().rfind(".");
-	if (pos != std::string::npos)
-		finalPath = _request.getPath().substr(0, pos);
-	else
-		finalPath = _request.getPath();
-	trimString(finalPath, "/", START);
+
 	Server *serv = _request.getMyserver();
 	Location *loc = serv->getLocation("download");
+	std::string finalPath;
 	if (loc == NULL)
-		return (_request.setPath(finalPath), true);
-	pos = finalPath.rfind("/");
-	if (pos != std::string::npos)
-		finalPath = finalPath.substr(pos + 1);
-	finalPath = trimString(loc->getIndex(), "/", START) + finalPath;
+		checkPath("", *serv, finalPath, true);
+	else
+		checkPath(trimString(loc->getIndex(), ".", START), *serv, finalPath, true);
 	return (_request.setPath(finalPath), true);
 }
 
