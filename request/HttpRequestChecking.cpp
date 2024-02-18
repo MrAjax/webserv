@@ -52,12 +52,12 @@ int HttpRequestChecking::POST(void)
 		return (5);
 	}
 
-	// if (_request.getPath() == "/") //remove for accepting root POST
-	// {
-	// 	server_log("Reqest fd " + _debugFd + " method POST with path /", ERROR);
-	// 	_request.setStatusCode(400);
-	// 	return (6);
-	// }
+	if (_request.getPath() == "/") //remove for accepting root POST
+	{
+		server_log("Reqest fd " + _debugFd + " method POST with path / not allow", ERROR);
+		_request.setStatusCode(403);
+		return (6);
+	}
 	if (findCgi() == true && setCgiPath() == false)
 	{
 		server_log("Request fd " + _debugFd + " POST cannot find any valide cgi path", ERROR);
@@ -65,8 +65,8 @@ int HttpRequestChecking::POST(void)
 	}
 	else if (_request.getIsCgi())
 		return (0);
-	if (!findRootPath() && !findOtherPath())
-		return (7);
+	else
+		setDownloadPath();
 	return (0);   
 }
 
@@ -77,7 +77,7 @@ int HttpRequestChecking::DELETE(void)
 	
 	if (_request.getPath() == "/") //remove for accepting root DELETE
 	{
-		server_log("Reqest fd " + _debugFd + " method POST with path /", ERROR);
+		server_log("Reqest fd " + _debugFd + " method DELETE with path / not allow", ERROR);
 		_request.setStatusCode(403);
 		return (9);
 	}
