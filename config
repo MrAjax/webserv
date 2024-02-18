@@ -15,6 +15,10 @@ server {
     location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
     }
 
+	location download {
+		root website_exmpl/Zzewebsite/Download/;
+	}
+
 }
 
 server {

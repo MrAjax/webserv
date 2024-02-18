@@ -30,7 +30,7 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	}
 	body = body.substr(pos, body.size() - pos);
 	
-	set_path(value);
+	set_path(get_path() + value);
 	std::cout << "\n" << body << "\n"; // TODO remove this line
 	return "";
 }
@@ -86,6 +86,7 @@ void	Post::_fill_post_file(Server &serv, std::string body) {
 }
 
 void	Post::execute_method(Server &serv) {
+	server_log("current path: " + get_path(), DEBUG);
 	std::string	redirect_path = get_raw_path(); /* get_path().substr(serv.getRoot().length(), this->get_path().length() - serv.getRoot().length()); */
 	_fill_post_file(serv, get_body_request());
 	set_statuscode(303);
