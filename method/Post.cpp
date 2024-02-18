@@ -6,12 +6,13 @@ Post::~Post() {}
 
 std::string	Post::_guess_mime_type(std::string &body) {
 	std::string	pattern;
-	std::string	multipart_form = "------WebKitFormBoundary";
+	std::string	multipart_form = "------";
 	std::string	field("filename=\"");
 	std::string	value;
 	size_t		pos = body.find(field);
 
-	if (get_content_type().find("multipart/form-data") == std::string::npos || body.find(multipart_form) == std::string::npos || pos == std::string::npos) {
+	if (get_content_type().find("multipart/form-data") == std::string::npos || pos == std::string::npos) {
+		server_log("not a multipart", DEBUG);
 		_set_post_path(get_raw_path());
 		return "_data.csv";
 	}
@@ -32,7 +33,7 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	pos = body.find(multipart_form);
 	if (pos == std::string::npos)
 		return ".txt";
-	body = body.substr(0, pos);
+	body = body.substr(0, pos + 1);
 	for (int i = 0; i < 3 && !body.empty(); ++i) {
 		body.erase(body.end() - 1);
 	}
