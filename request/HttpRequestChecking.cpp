@@ -254,8 +254,8 @@ bool HttpRequestChecking::findRootPath()
 		int check = checkPath(*it, *serv, finalPath, true);
 		if (check == true)
 			return (_request.setPath(finalPath), true);
-		else if (check == 0)
-			status = 0;
+		else if (check == false)
+			status = false;
 	}
 	switch (status)
 	{
