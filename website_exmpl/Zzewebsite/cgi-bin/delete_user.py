@@ -52,7 +52,7 @@ def print_user_not_found(username, body):
     return  body
 
 def delete_cookie(usernmame):
-    filename="website_exmpl/Zzewebsite/user/welcome/cookie_data.csv"
+    filename="website_exmpl/Zzewebsite/data/cookie_data.csv"
     valid_cookies = []
     cookie_deleted = False
     try:
@@ -71,8 +71,8 @@ def delete_cookie(usernmame):
     	return False
 
 def delete_user(username):
-    data_file = 'website_exmpl/Zzewebsite/user/welcome/welcome_data.csv'
-    temp_file = 'website_exmpl/Zzewebsite/user/welcome/temp_welcome_data.csv'
+    data_file = 'website_exmpl/Zzewebsite/data/welcome_data.csv'
+    temp_file = 'website_exmpl/Zzewebsite/data/temp_welcome_data.csv'
     found_user = False
     try:
         with open(data_file, mode='r', newline='') as infile, open(temp_file, 'w', newline='') as outfile:

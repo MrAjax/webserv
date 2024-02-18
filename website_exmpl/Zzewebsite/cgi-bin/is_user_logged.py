@@ -29,7 +29,7 @@ def print_http_response(body):
         print("X")
 
 def check_cookie(cookie_id, current_time):
-    filename="website_exmpl/Zzewebsite/user/welcome/cookie_data.csv"
+    filename="website_exmpl/Zzewebsite/data/cookie_data.csv"
     valid_cookies = []
     user_found = ''
     try:
