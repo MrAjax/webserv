@@ -7,7 +7,7 @@
 #include "HttpResponse.hpp"
 
 
-#define SEND_MAX 40000
+#define MAXDATA_SEND 500000
 
 class ResponseSender
 {

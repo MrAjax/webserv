@@ -197,8 +197,11 @@ bool HttpRequestChecking::setCgiPath()
 	if (checkPath(_request.getPath(), *serv, processPath, true) == true)
 		return (_request.setPath(processPath), true);
 	Location *loc = serv->getLocation("cgi-bin");
-	if (loc == NULL)
-		processPath = _request.getPath();
+	if (loc == NULL || loc->getCgi_path().empty())
+	{
+		if (checkPath(_request.getPath(), *serv, processPath, true) == true)
+			return (_request.setPath(processPath), true);
+	}
 	else
 	{
 		std::string endPath;
@@ -207,13 +210,19 @@ bool HttpRequestChecking::setCgiPath()
 			endPath = _request.getPath();
 		else
 			endPath = _request.getPath().substr(pos + 1);
-		processPath = trimString(loc->getIndex(), "/", START) + "/" + endPath;
+		std::vector<std::string> temp = loc->getCgi_path();
+		std::vector<std::string>::iterator it = temp.begin();
+		for (;it != temp.end(); it++)
+		{
+			std::string str = trimString(*it, ".", START);
+			processPath = trimString(str, "/", START) + "/" + endPath;
+			std::string finalPath;
+			if (checkPath(processPath, *serv, finalPath, true) == true)
+				return (_request.setPath(finalPath), true);
+		}
 	}
-	std::string finalPath;
-	if (checkPath(processPath, *serv, finalPath, true) == true)
-		return (_request.setPath(finalPath), true);
-	else
-		return (false);
+	server_log("Request fd " + _debugFd + " no valid cgi-bin path has been found", ERROR);
+	return (false);
 }
 
 bool HttpRequestChecking::findCgi()
@@ -254,8 +263,8 @@ bool HttpRequestChecking::findRootPath()
 		int check = checkPath(*it, *serv, finalPath, true);
 		if (check == true)
 			return (_request.setPath(finalPath), true);
-		else if (check == 0)
-			status = 0;
+		else if (check == false)
+			status = false;
 	}
 	switch (status)
 	{
