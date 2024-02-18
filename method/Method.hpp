@@ -32,9 +32,10 @@ public:
 	std::string		get_body_request();
 	int				get_status_code();
 
-	void			set_header(std::string header);
-	void			set_body(std::string body);
-	void			set_statuscode(int code);
+	void			set_header(const std::string &header);
+	void			set_body(const std::string &body);
+	void			set_statuscode(const int &code);
+	void			set_path(const std::string &path);
 };
 
 #endif

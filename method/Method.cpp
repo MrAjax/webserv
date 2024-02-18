@@ -44,14 +44,10 @@ int	Method::get_status_code () {
 	return _status_code;
 }
 
-void Method::set_header(std::string header) {
-	_header += header;
-}
+void Method::set_header(const std::string &header) {_header += header;}
 
-void Method::set_body(std::string body) {
-	_body = body;
-}
+void Method::set_body(const std::string &body) {_body = body;}
 
-void	Method::set_statuscode(int code) {
-	_status_code = code;
-}
+void Method::set_statuscode(const int &code) {_status_code = code;}
+
+void Method::set_path(const std::string &path) {_path = path;}

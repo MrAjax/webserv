@@ -5,10 +5,12 @@
 #include "Method.hpp"
 
 class Post: public Method {
-	public:
+	std::string	_guess_mime_type(std::string &body);
+	// std::string	_set_post_path(std::string path, std::string body);
+	void		_fill_post_file(Server &serv, std::string body);
+public:
 	Post(std::string path, std::string content, std::string body_request, std::string connection_status);
 	~Post();
-	void	fill_post_file(Server &serv, std::string body);
 	void	execute_method(Server &serv);
 };
 
