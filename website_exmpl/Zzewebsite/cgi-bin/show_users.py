@@ -28,7 +28,7 @@ def print_http_response(body):
         print("X")
 
 def generate_html_rows():
-    filename = 'website_exmpl/Zzewebsite/user/welcome/welcome_data.csv'
+    filename = 'website_exmpl/Zzewebsite/data/welcome_data.csv'
     rows = ""
     try:
         with open(filename, newline='') as csvfile:

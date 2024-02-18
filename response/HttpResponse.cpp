@@ -17,7 +17,7 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 	if (_is_cgi) {
 		server_log("Found CGI", DEBUG);
 		server_log("Cgi file: " + _path, DEBUG);
-		_status_code = Cgi::exec_cgi(_get_cgi_path(_path, serv), _response, _body_request, _cookie);
+		_status_code = Cgi::exec_cgi(_path, _response, _body_request, _cookie);
 		if (_status_code != 200)
 			throw StatusSender::send_status(_status_code, serv, true);
 		else if (_response.empty() || _response[0] == 'X')
@@ -47,21 +47,6 @@ HttpResponse::HttpResponse(HttpRequest &req, Server &serv):  _method(req.getMeth
 }
 
 HttpResponse::~HttpResponse() {}
-
-std::string	&HttpResponse::_get_cgi_path(std::string &path, Server &serv) {
-	//checker method
-	//checker path - droits
-	Location *loc = serv.getLocation("cgi-bin");
-	if (loc == NULL)
-		return path;
-	else if (loc->getIsAllowed() == false)
-		throw StatusSender::send_status(405, serv, true);
-	std::string	root = loc->getRoot();
-	if (root.empty())
-		return path;
-	path = _server_path + root + path;
-	return path;
-} 
 
 Method	*HttpResponse::_execute_method(int method_code, Server &serv) {
 	Method	*m;

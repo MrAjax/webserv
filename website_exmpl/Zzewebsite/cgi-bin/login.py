@@ -32,7 +32,7 @@ def print_http_response(body, cookie_id):
         print("Xx-xx")
 
 
-def check_credentials(username, password, filename="website_exmpl/Zzewebsite/user/welcome/welcome_data.csv"):
+def check_credentials(username, password, filename="website_exmpl/Zzewebsite/data/welcome_data.csv"):
     with open(filename, newline='') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
@@ -45,7 +45,7 @@ def set_cookie(username):
     expiration = datetime.now() + timedelta(minutes=1)
     expiration_date = expiration.strftime('%Y-%m-%d %H:%M:%S')
     cookie_id = str(uuid.uuid4())
-    cookie_file = 'website_exmpl/Zzewebsite/user/welcome/cookie_data.csv'
+    cookie_file = 'website_exmpl/Zzewebsite/data/cookie_data.csv'
     try:
          with open(cookie_file, mode='a', newline='') as file:
                writer = csv.writer(file)

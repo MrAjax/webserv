@@ -39,7 +39,7 @@ def print_html_page(username, body):
     return body
 
 def create_user(username, password, body):
-    data_file = 'website_exmpl/Zzewebsite/user/welcome/welcome_data.csv'
+    data_file = 'website_exmpl/Zzewebsite/data/welcome_data.csv'
     creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         with open(data_file, mode='a', newline='') as file:
