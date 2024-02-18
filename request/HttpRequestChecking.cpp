@@ -198,8 +198,10 @@ bool HttpRequestChecking::setCgiPath()
 		return (_request.setPath(processPath), true);
 	Location *loc = serv->getLocation("cgi-bin");
 	if (loc == NULL || loc->getCgi_path().empty())
+	{
 		if (checkPath(_request.getPath(), *serv, processPath, true) == true)
 			return (_request.setPath(processPath), true);
+	}
 	else
 	{
 		std::string endPath;
@@ -219,6 +221,7 @@ bool HttpRequestChecking::setCgiPath()
 				return (_request.setPath(finalPath), true);
 		}
 	}
+	server_log("Request fd " + _debugFd + " no valid cgi-bin path has been found", ERROR);
 	return (false);
 }
 

@@ -11,8 +11,8 @@ enum	{KILL_ME = -1, NEW, PROCESSING_HEADER, DONE_HEADER,
 
 #define MAXDATA_RECV 5000000
 #define NBPARAM 18
-#define KEEP_ALIVE_TIMEOUT 500 // en seconds
-#define REQUEST_TIMEOUT 6000 // en seconds
+#define KEEP_ALIVE_TIMEOUT 60 // en seconds
+#define REQUEST_TIMEOUT 360 // en seconds
 
 class HttpRequest
 {

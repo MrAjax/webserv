@@ -82,7 +82,7 @@ bool ResponseSender::catchHeader()
     {
         _request.setSaveString(_response.substr(pos_toFind + toFind.size()));
         _response = _response.substr(0, pos_toFind + toFind.size());
-        if (_response.size() > SEND_MAX)
+        if (_response.size() > MAXDATA_SEND)
         {
             server_log("ResponseSender Header size clientFd " + int_to_str(_mypoll.fd) + " > send max size", ERROR);
             return (false);
@@ -117,7 +117,7 @@ void    ResponseSender::putTransfertEncoding()
 
 bool    ResponseSender::isMaxSize(std::size_t const &size)
 {
-    if (size > SEND_MAX)
+    if (size > MAXDATA_SEND)
         return (true);
     else
         return (false);
@@ -139,7 +139,7 @@ void    ResponseSender::processingChunk()
     _request.resetTimeout();
     if (createChunk() == true)
     {
-        server_log("Last chunk found clientFd " + int_to_str(_mypoll.fd), DIALOG);
+        server_log("Last chunk found clientFd " + int_to_str(_mypoll.fd), INFO);
         _request.setIsChunked(false);
     }
     if (send_response_to_client() == false)
@@ -165,7 +165,7 @@ std::string ResponseSender::chunk(std::string &str)
 bool ResponseSender::createChunk()
 {
     std::string strChunk;
-    std::size_t maxLine = (SEND_MAX - 4) - _response.size();
+    std::size_t maxLine = (MAXDATA_SEND - 4) - _response.size();
     std::size_t temp = sizeConvert(maxLine);
     if (sizeConvert(maxLine - temp) == temp)
         maxLine -= temp;
@@ -194,13 +194,12 @@ void	ResponseSender::send_first_response_to_client()
     server_log("Client fd " + int_to_str(_mypoll.fd) + " preparing 1st response...", DEBUG);
     if (_request.getIsChunked() == false && isMaxSize(_response.size()))
     {
-        server_log("Client fd " + int_to_str(_mypoll.fd) + " response length " + int_to_str(_response.size()) + " > send Max size "
-            + int_to_str(SEND_MAX) + " starting chunked transfer encoding", DEBUG);
-        // server_log("Client fd " + int_to_str(_mypoll.fd) + "entire response [" + _response + "]", DIALOG);
+        server_log("Client fd " + int_to_str(_mypoll.fd) + " response length " + int_to_str(_response.size()) + " > Max data send " + int_to_str(MAXDATA_SEND), DEBUG);
+        server_log("Client fd " + int_to_str(_mypoll.fd) + " starting chunked transfer encoding", INFO);
         if (catchHeader() == false)
             return (_request.setStatusCode(KILL_ME)); //TODO
         putTransfertEncoding();
-        server_log("Client fd " + int_to_str(_mypoll.fd) + "entire response \"" + _response + "\"", DIALOG);
+        server_log("Client fd " + int_to_str(_mypoll.fd) + " entire response\n[" + _response + "]", DIALOG);
         _request.setIsChunked(true);
     }
     if (_request.getIsChunked() == true)
