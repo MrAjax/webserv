@@ -9,12 +9,17 @@ HttpRequestChecking::HttpRequestChecking(HttpRequest &request) : _request(reques
 
 HttpRequestChecking::~HttpRequestChecking() {}
 
-
 int HttpRequestChecking::GET(void)
 {
-	findCgi();
 	if (!isGoodProtocol("HTTP/1.1"))
 		return (1);
+	if (findCgi() == true && setCgiPath() == false)
+	{
+		server_log("Request fd " + _debugFd + " GET cannot find any valide cgi path", ERROR);
+		return (_request.setStatusCode(404), 1);
+	}
+	else if (_request.getIsCgi())
+		return (0);
 	if (!findRootPath() && !findOtherPath())
 		return (2);
 	return (0);
@@ -22,11 +27,11 @@ int HttpRequestChecking::GET(void)
 
 int HttpRequestChecking::POST(void)
 {
-	findCgi();
-	if (!_request.getTransferEncoding().empty())
-		server_log("Reqest fd " + _debugFd + " method POST transfert-encoding detected: " + _request.getTransferEncoding(), DEBUG);
 	if (!isGoodProtocol("HTTP/1.1"))
 		return (3);
+	
+	if (!_request.getTransferEncoding().empty())
+		server_log("Reqest fd " + _debugFd + " method POST transfert-encoding detected: " + _request.getTransferEncoding(), DEBUG);
 	if (_request.getContentType().empty())
 	{
 		server_log("Reqest fd " + _debugFd + " method POST whitout content type", ERROR);
@@ -47,28 +52,43 @@ int HttpRequestChecking::POST(void)
 		return (5);
 	}
 
-	// if (_request.getPath() == "/") //remove for accepting root POST
-	// {
-	// 	server_log("Reqest fd " + _debugFd + " method POST with path /", ERROR);
-	// 	_request.setStatusCode(400);
-	// 	return (6);
-	// }
-	if (!findRootPath() && !findOtherPath())
-		return (7);
+	if (_request.getPath() == "/") //remove for accepting root POST
+	{
+		server_log("Reqest fd " + _debugFd + " method POST with path / not allow", ERROR);
+		_request.setStatusCode(403);
+		return (6);
+	}
+	if (findCgi() == true && setCgiPath() == false)
+	{
+		server_log("Request fd " + _debugFd + " POST cannot find any valide cgi path", ERROR);
+		return (_request.setStatusCode(404), 1);
+	}
+	else if (_request.getIsCgi())
+		return (0);
+	else
+		setDownloadPath();
 	return (0);   
 }
 
 int HttpRequestChecking::DELETE(void)
 {
-	findCgi();
 	if (!isGoodProtocol("HTTP/1.1"))
 		return (8);
+	
 	if (_request.getPath() == "/") //remove for accepting root DELETE
 	{
-		server_log("Reqest fd " + _debugFd + " method POST with path /", ERROR);
-		_request.setStatusCode(400);
+		server_log("Reqest fd " + _debugFd + " method DELETE with path / not allow", ERROR);
+		_request.setStatusCode(403);
 		return (9);
 	}
+
+	if (findCgi() == true && setCgiPath() == false)
+	{
+		server_log("Request fd " + _debugFd + " DELETE cannot find any valide cgi path", ERROR);
+		return (_request.setStatusCode(404), 1);
+	}
+	else if (_request.getIsCgi())
+		return (0);
 	if (!findRootPath() && !findOtherPath())
 		return (10);
 	return (0);
@@ -96,8 +116,7 @@ int HttpRequestChecking::BuildAndCheckHeader(void)
 			return ((this->*f[2])());
 		default :
 			server_log("Request fd " + _debugFd + " method " + _request.getMethod() + " not allowed", ERROR);
-			_request.setStatusCode(405);
-			return (12);
+			return (_request.setStatusCode(405), 12);
 	}
 	return (13);
 }
@@ -154,6 +173,56 @@ Server  *HttpRequestChecking::findMyServer(std::vector<Server> &servers)
 	return (findServer);
 }
 
+bool HttpRequestChecking::setDownloadPath()
+{
+	if (_request.getPath() == "/" && findRootPath() == false)
+		return (false);
+	std::string finalPath;
+	std::size_t pos = _request.getPath().rfind(".");
+	if (pos != std::string::npos)
+		finalPath = _request.getPath().substr(0, pos);
+	else
+		finalPath = _request.getPath();
+	trimString(finalPath, "/", START);
+	Server *serv = _request.getMyserver();
+	Location *loc = serv->getLocation("download");
+	if (loc == NULL)
+		return (_request.setPath(finalPath), true);
+	pos = finalPath.rfind("/");
+	if (pos != std::string::npos)
+		finalPath = finalPath.substr(pos + 1);
+	finalPath = trimString(loc->getIndex(), "/", START) + finalPath;
+	return (_request.setPath(finalPath), true);
+}
+
+bool HttpRequestChecking::setCgiPath()
+{
+	if (_request.getIsCgi() == false)
+		return (false);
+	Server *serv = _request.getMyserver();
+	std::string processPath;
+	if (checkPath(_request.getPath(), *serv, processPath, true) == true)
+		return (_request.setPath(processPath), true);
+	Location *loc = serv->getLocation("cgi-bin");
+	if (loc == NULL)
+		processPath = _request.getPath();
+	else
+	{
+		std::string endPath;
+		std::size_t pos = _request.getPath().rfind("/");
+		if (pos == std::string::npos)
+			endPath = _request.getPath();
+		else
+			endPath = _request.getPath().substr(pos + 1);
+		processPath = trimString(loc->getIndex(), "/", START) + "/" + endPath;
+	}
+	std::string finalPath;
+	if (checkPath(processPath, *serv, finalPath, true) == true)
+		return (_request.setPath(finalPath), true);
+	else
+		return (false);
+}
+
 bool HttpRequestChecking::findCgi()
 {
 	if (!is_cgi(_request.getPath()))
@@ -166,74 +235,74 @@ bool HttpRequestChecking::findCgi()
 
 //------------------ find PATHS -------------------------------
 
+int HttpRequestChecking::checkPath(std::string const &path, Server const &serv, std::string &finalPath, bool addRoot)
+{
+	if (addRoot == true)
+	{
+		std::string tempStr = trimString(path, "/", START);
+		finalPath = trimString(serv.getRoot() + "/" + tempStr, "/", START);
+	}
+	else
+		finalPath = trimString(path, "/", START);
+	return (isGoodPath(finalPath));
+}
+
 bool HttpRequestChecking::findRootPath()
 {
-	if (_request.getPath() != "/")
+	if (_request.getPath() != "/" || _request.getMyserver() == NULL)
 		return (false);
 	int status = -1;
+	Server *serv = _request.getMyserver();
 	std::string finalPath;
 	std::vector<std::string> temp = _request.getMyserver()->getIndex();
 	std::vector<std::string>::iterator it = temp.begin();
 	for (;it != temp.end(); it++)
 	{
-		std::string tempStr = trimString(*it, "/", START);
-		finalPath = trimString(_request.getMyserver()->getRoot() + "/" + tempStr, "/", START);
-		int check = isGoodPath(finalPath);
+		int check = checkPath(*it, *serv, finalPath, true);
 		if (check == true)
-		{
-			_request.setPath(finalPath);
-			return (true);
-		}
+			return (_request.setPath(finalPath), true);
 		else if (check == 0)
 			status = 0;
 	}
-	if (status == -2)
+	switch (status)
 	{
-		server_log("Request fd " + _debugFd + " method "
-			+ _request.getMethod() + " not allowed", ERROR);
-		_request.setStatusCode(405);
-	}
-	if (status == -1)
-	{
-		_request.setStatusCode(404);
-		server_log("Request fd " + _debugFd + " cannot find any valide path root/index", ERROR);
-	}
-	if (status == 0)
-	{
-		_request.setStatusCode(403);
-		server_log("Request fd " + _debugFd + " cannot access any path root/index", ERROR);
+		case -2:
+			server_log("Request fd " + _debugFd + " method " + _request.getMethod() + " not allowed", ERROR);
+			return (_request.setStatusCode(405), false);
+		case -1:
+			server_log("Request fd " + _debugFd + " cannot find any valide path root/index", ERROR);
+			return (_request.setStatusCode(404), false);
+		case false:
+			server_log("Request fd " + _debugFd + " cannot access any path root/index", ERROR);
+			return (_request.setStatusCode(403), false);
+		default :
+			return (false);
 	}
 	return (false);
 }
 
 bool HttpRequestChecking::findOtherPath()
 {
-	if (_request.getPath() == "/")
+	if (_request.getPath() == "/" || _request.getMyserver() == NULL)
 		return (false);
-	std::string tempStr = trimString(_request.getPath(), "/", START);
+	Server *serv = _request.getMyserver();
 	std::string finalPath;
-	finalPath = trimString(_request.getMyserver()->getRoot() + "/" + tempStr, "/", START);
-	int status = isGoodPath(finalPath);
-	if (status == true)
+	int status = checkPath(_request.getPath(), *serv, finalPath, true);
+	switch (status)
 	{
-		_request.setPath(finalPath);
-		return (true);
-	}
-	else if (status == -2)
-	{
-		server_log("Request fd " + _debugFd + " method "
-			+ _request.getMethod() + " not allowed", ERROR);
-		_request.setStatusCode(405);
-	}
-	else if (status == -1)
-	{
-		_request.setStatusCode(404);
-		server_log("Request fd " + _debugFd + " cannot find the path : " + finalPath, ERROR);
-	}
-	else if (status == 0)
-	{
-		_request.setStatusCode(403);
-		server_log("Request fd " + _debugFd + " cannot access path : " + finalPath, ERROR);
+		case true:
+			return (_request.setPath(finalPath), true);
+		case false:
+			server_log("Request fd " + _debugFd + " cannot access path : " + finalPath, ERROR);
+			return (_request.setStatusCode(403), false);
+		case -1:
+			server_log("Request fd " + _debugFd + " cannot find the path : " + finalPath, ERROR);
+			return (_request.setStatusCode(404), false);
+		case -2:
+			server_log("Request fd " + _debugFd + " method " + _request.getMethod() + " not allowed", ERROR);
+			return (_request.setStatusCode(405), false);
+		default :
+			return (false);
 	}
 	return (false);
 }
