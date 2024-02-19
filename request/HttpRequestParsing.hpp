@@ -27,7 +27,7 @@ class HttpRequestParsing
 
 		int			chunked();
 
-		void		startingBody();
+		void		setHeaderBeginBody(std::size_t pos, std::size_t delimiteurSize);
 		//---------Utils---------------------
 		std::size_t findLine(std::string &header, std::string &line, std::string &delimiteur);
 

@@ -132,8 +132,7 @@ int	HttpRequest::recvfd(int & fd)
 	saveString += reinterpret_cast< char * >(&temp[0]);
 	temp.pop_back();
 	temp.erase(temp.begin() + _numbytes, temp.end());
-	_recvline.clear();
-	_recvline = temp;
+	_recvline.insert(_recvline.end(), temp.begin(), temp.end());
 	server_log("Request clientFd " + _debugFd + " size temp after = " + int_to_str(temp.size()), INFO);
 	server_log("Request clientFd " + _debugFd + " size recvline = " + int_to_str(temp.size()), INFO);
 
