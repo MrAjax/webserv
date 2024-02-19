@@ -15,7 +15,6 @@ _servers(servers), _myServer(NULL),
 _statusCode(NEW), _isCgi(false), _isChunked(false), _listenFd(listenFd), _maxBodySize(0),
 _numbytes(0)
 {
-	memset(_recvline, 0, MAXDATA_RECV + 1);
 	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
 	clock_gettime(CLOCK_REALTIME, &_requestTimeout);
 	std::stringstream ss;
@@ -115,7 +114,7 @@ void		HttpRequest::resetRequest(void)
 	_isCgi = false;
 	_isChunked = false;
 	_numbytes = 0;
-	memset(_recvline, 0, MAXDATA_RECV + 1);
+	_recvline.clear();
 	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
 	clock_gettime(CLOCK_REALTIME, &_requestTimeout);
 }
@@ -124,9 +123,22 @@ void		HttpRequest::resetRequest(void)
 
 int	HttpRequest::recvfd(int & fd)
 {
-	memset(_recvline, 0, MAXDATA_RECV + 1);
-	_numbytes = recv(fd, _recvline, MAXDATA_RECV, 0);
-	saveString += reinterpret_cast< char * >(_recvline);
+	std::vector<unsigned char>	temp(MAXDATA_RECV);
+	
+	server_log("Request clientFd " + _debugFd + " size temp before = " + int_to_str(temp.size()), INFO);
+
+	_numbytes = recv(fd, &temp[0], MAXDATA_RECV, 0);
+	temp.push_back('\0');
+	saveString += reinterpret_cast< char * >(&temp[0]);
+	temp.pop_back();
+	temp.erase(temp.begin() + _numbytes, temp.end());
+	_recvline.clear();
+	_recvline = temp;
+	server_log("Request clientFd " + _debugFd + " size temp after = " + int_to_str(temp.size()), INFO);
+	server_log("Request clientFd " + _debugFd + " size recvline = " + int_to_str(temp.size()), INFO);
+
+	server_log("Request clientFd " + _debugFd + " string = " + saveString, INFO);
+
 	server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_numbytes), INFO);
 	if (_numbytes < 0)
 	{
@@ -219,9 +231,9 @@ int			HttpRequest::getListenFd()			{return (this->_listenFd);}
 
 std::size_t	HttpRequest::getMaxBodySize()		{return (this->_maxBodySize);}
 
-u_int8_t	*HttpRequest::getRecvLine()			{return (this->_recvline);}
+std::vector<unsigned char>	&HttpRequest::getRecvLine()			{return (this->_recvline);}
 ssize_t		HttpRequest::getNumBytes()			{return (this->_numbytes);}
-
+std::vector<unsigned char>	&HttpRequest::getNewBody()	{return (this->_newBody);}
 //-------------------STETTEUR-------------------
 
 void	HttpRequest::setMethod(const std::string &value)			{_method = value;}
@@ -260,11 +272,7 @@ void	HttpRequest::setIsChunked(const bool &value)				{_isChunked = value;}
 
 void	HttpRequest::setMaxBodySize(const std::size_t &value)		{_maxBodySize = value;}
 
-void	HttpRequest::setRecvLine(const u_int8_t **recvline)
+void	HttpRequest::setNewBody(std::vector<unsigned char>	&partBody)
 {
-	memset(_recvline, 0, MAXDATA_RECV + 1);
-	for (int i = 0; i < MAXDATA_RECV + 1; i++)
-	{
-		_recvline[i] = *recvline[i];
-	}//TODO maybe 1 octet missing
+	_newBody.insert(_newBody.end(), partBody.begin(), partBody.end());
 }
