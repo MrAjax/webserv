@@ -1,6 +1,7 @@
 #include "HttpRequest.hpp"
 #include "HttpRequestChecking.hpp"
-#include "HttpRequestParsing.hpp"
+#include "HttpRequestHeader.hpp"
+#include "HttpRequestBody.hpp"
 
 //throw StatusSender::send_status(500, serv, true); quand le server et la requete n'est pas conforme il faut envoyer ca et pas un autre truc avec erreur 500 le server ne doit pas s arreter
 
@@ -137,7 +138,13 @@ int	HttpRequest::recvfd(int & fd)
 
 	server_log("Request clientFd " + _debugFd + " size temp after = " + int_to_str(temp.size()), INFO);
 	server_log("Request clientFd " + _debugFd + " size recvline = " + int_to_str(temp.size()), INFO);
+<<<<<<< HEAD
 	server_log("Request clientFd " + _debugFd + " string = " + saveString, INFO);
+=======
+
+	//server_log("Request clientFd " + _debugFd + " string = " + saveString, INFO);
+
+>>>>>>> main
 	server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_numbytes), INFO);
 	
 	if (_numbytes < 0)
@@ -162,14 +169,15 @@ int    HttpRequest::processingRequest(void)
 	if (_statusCode == NEW)
 		clock_gettime(CLOCK_REALTIME, &_requestTimeout);
 	recvfd(_connfd);
-	HttpRequestParsing	parsing(*this);
 	if (_statusCode == NEW || _statusCode == PROCESSING_HEADER)
 	{
 		server_log("Request clientFd " + _debugFd + " 1st step getting Header in process...", DEBUG);
-		parsing.parsingHeader();
+		HttpRequestHeader	Header(*this);
+		Header.parsingHeader();
 	}
 	if (_statusCode == DONE_HEADER)
 	{
+		server_log("Request clientFd " + _debugFd + " header size " + int_to_str(_bodyRequest.size()), INFO);
 		server_log("Request clientFd " + _debugFd + " 2nd step cheking Header in process...", DEBUG);
 		HttpRequestChecking checking(*this);
 		_myServer = checking.findMyServer(_servers);
@@ -184,8 +192,12 @@ int    HttpRequest::processingRequest(void)
 	if (_statusCode == DONE_HEADER_CHECKING || _statusCode == PROCESSING_BODY)
 	{
 		server_log("Request clientFd " + _debugFd + " last step getting Body in process...", DEBUG);
-		if (parsing.parsingBody() == true)
+		HttpRequestBody Body(*this);
+		if (Body.parsingBody() == true)
+		{
 			server_log("Request clientFd " + _debugFd + " succesful status code " + int_to_str(_statusCode), INFO);
+			server_log("Request clientFd " + _debugFd + " body size " + int_to_str(_bodyRequest.size()) + " vs header info " + _strContentLength, INFO);
+		}
 	}
 	server_log("Request clientFd " + _debugFd + " " + _method + " status code " + int_to_str(_statusCode) + " quitting processing...", DEBUG);
 	return (_statusCode);

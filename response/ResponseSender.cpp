@@ -32,7 +32,7 @@ ResponseSender::ResponseSender(HttpRequest &Req, struct pollfd &mypoll) : _respo
 		server_log("ClientFd " + int_to_str(mypoll.fd) + " server name is " + serv->getServerName(), DEBUG);
 		server_log("Request is valid", DEBUG);
 		server_log(Req.getHeaderRequest() + "\n\n", DIALOG);
-		server_log(Req.getBodyRequest() + "\n\n", DIALOG);
+		//server_log(Req.getBodyRequest() + "\n\n", DIALOG);
 		server_log("Building Response...", DEBUG);
 
 		HttpResponse	Rep(Req, *serv);

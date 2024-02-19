@@ -24,6 +24,11 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	if (pos == std::string::npos)
 		return ".txt";
 	value = body.substr(0, pos);
+	if (value.empty()) {
+		server_log("No file to upload", DEBUG);
+		set_path("");
+		return "";
+	}
 	server_log("File name: " + value, DEBUG);
 	server_log("Retrieving the body", DEBUG);
 	for (int i = 0; i < 3 && pos < body.size(); ++i) {
@@ -39,10 +44,10 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	for (int i = 0; i < 3 && !body.empty(); ++i) {
 		body.erase(body.end() - 1);
 	}
-	if (!body.empty())
+	/* if (!body.empty())
 		server_log("\nBODY:\n" + body + "$\n", DEBUG);
 	else
-		server_log("\nFILE IS EMPTY", DEBUG);
+		server_log("\nFILE IS EMPTY", DEBUG); */
 	set_path(get_path() + value);
 	return "";
 }
@@ -96,11 +101,16 @@ void	Post::_fill_post_file(Server &serv, std::string body) {
 	std::string		ext = _guess_mime_type(body);
 	std::string		path = get_path() + ext;
 	std::fstream	post_file;
+<<<<<<< HEAD
 
 	server_log("ext = " + ext + " getRaw " + get_raw_path() + " path " + get_path(), ERROR);
 	
+=======
+	if (path.empty())
+		return;
+>>>>>>> main
 	server_log("Post file location: " + path, DEBUG);
-	server_log("Post body: " + body, DEBUG);
+	//server_log("Post body: " + body, DEBUG);
 	if (get_content_type().find("multipart/form-data") != std::string::npos)
 		post_file.open(path.c_str(), std::ios::out | std::ios::trunc);
 	else

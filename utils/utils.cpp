@@ -160,3 +160,16 @@ ssize_t	strToSsize_t(std::string const &toConvert)
 	}
 	return (value);
 }
+
+std::size_t	findLine(std::string &header, std::string &line, std::string &delimiteur)
+{
+	std::size_t	end_pos = header.find(delimiteur);
+	if (end_pos == std::string::npos)
+	{
+		line = header;
+		return (end_pos);
+	}
+	line = header.substr(0, end_pos);
+	header = header.substr(end_pos + delimiteur.size());
+	return (end_pos);
+}

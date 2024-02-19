@@ -11,6 +11,7 @@ enum	{KILL_ME = -1, NEW, PROCESSING_HEADER, DONE_HEADER,
 
 #define MAXDATA_RECV 5000
 #define NBPARAM 18
+#define NBPARAMLESS3 18 - 3
 #define KEEP_ALIVE_TIMEOUT 300 // en seconds
 #define REQUEST_TIMEOUT 600 // en seconds
 
