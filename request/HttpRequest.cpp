@@ -128,7 +128,7 @@ int	HttpRequest::recvfd(int & fd)
 	server_log("Request clientFd " + _debugFd + " size temp before = " + int_to_str(temp.size()), INFO);
 
 	char buffer[MAXDATA_RECV + 1];
-	_numbytes = recv(fd, /* &temp[0] */&buffer, sizeof(buffer), 0);
+	_numbytes = recv(fd, &buffer, sizeof(buffer), 0);
 	temp.push_back('\0');
 	saveString.append(buffer, _numbytes);
 	//saveString += reinterpret_cast< char * >(&temp[0]);
@@ -138,7 +138,7 @@ int	HttpRequest::recvfd(int & fd)
 	server_log("Request clientFd " + _debugFd + " size temp after = " + int_to_str(temp.size()), INFO);
 	server_log("Request clientFd " + _debugFd + " size recvline = " + int_to_str(temp.size()), INFO);
 
-	server_log("Request clientFd " + _debugFd + " string = " + saveString, INFO);
+	//server_log("Request clientFd " + _debugFd + " string = " + saveString, INFO);
 
 	server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_numbytes), INFO);
 	if (_numbytes < 0)

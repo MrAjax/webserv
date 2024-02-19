@@ -29,7 +29,6 @@ class StatusSender {
 	std::string		_get_response();
 public:
 	static	std::string		send_status(int err, Server &serv, bool is_serv);
-	static	std::string		send_status(int err, Server &serv, bool is_serv, int method_code);
 };
 
 #endif
