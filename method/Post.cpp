@@ -14,6 +14,7 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	if (get_content_type().find("multipart/form-data") == std::string::npos || pos == std::string::npos) {
 		server_log("not a multipart", DEBUG);
 		_set_post_path(get_raw_path());
+		//_set_post_path_Test(); //in process to fix download path
 		return "_data.csv";
 	}
 	body = body.substr(pos + field.size(), body.size() - pos - field.size());
@@ -45,6 +46,10 @@ std::string	Post::_guess_mime_type(std::string &body) {
 		server_log("\nBODY:\n" + body + "$\n", DEBUG);
 	else
 		server_log("\nFILE IS EMPTY", DEBUG); */
+	server_log("AAAAAAA" + value, ERROR);
+	server_log("value = " + value, DEBUG);
+	server_log("path = " + get_path(), DEBUG);
+
 	set_path(get_path() + value);
 	return "";
 }
@@ -61,7 +66,21 @@ void	Post::_set_post_path(std::string path) {
 		}
 		it++;
 	}
+	server_log("BBBBBB", ERROR);
+	server_log("get_root() = " + get_root(), DEBUG);
+	server_log("post_path = " + post_path, DEBUG);
 	set_path(get_root() + post_path);
+}
+
+void	Post::_set_post_path_Test()
+{
+	server_log("CCCCCCC", ERROR);
+	std::string str = trimString(get_path(), "/", END);
+	server_log("get_path() str = " + str, DEBUG);
+	int status = access(str.c_str(), F_OK);
+	if (status == -1)
+		server_log("ERROR no download file" + str, ERROR);
+	
 }
 
 static	void	post_encoded_text(std::string &query_string, std::fstream &post_file) {
