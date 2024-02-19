@@ -1,6 +1,9 @@
 #include "Post.hpp"
 
-Post::Post(std::string path, std::string raw_path, std::string root, std::string content, std::string body_request, std::string connection_status): Method(path, raw_path, root, content, body_request, connection_status) {}
+Post::Post(std::string path, std::string raw_path, std::string root, std::string content, std::string body_request, std::string connection_status): Method(path, raw_path, root, content, body_request, connection_status)
+{
+	server_log("TEST sur POST getRaw " + raw_path + " path " + path, ERROR);
+}
 
 Post::~Post() {}
 
@@ -77,10 +80,25 @@ static	void	post_encoded_text(std::string &query_string, std::fstream &post_file
 	post_file << "\n";
 }
 
+int	checkCreate(std::string path)
+{
+	return (access(path.c_str(), F_OK));
+}
+
+int createDir(std::string path)
+{
+	return (mkdir(path.c_str(), 0777));
+}
+
 void	Post::_fill_post_file(Server &serv, std::string body) {
+
+
 	std::string		ext = _guess_mime_type(body);
 	std::string		path = get_path() + ext;
 	std::fstream	post_file;
+
+	server_log("ext = " + ext + " getRaw " + get_raw_path() + " path " + get_path(), ERROR);
+	
 	server_log("Post file location: " + path, DEBUG);
 	server_log("Post body: " + body, DEBUG);
 	if (get_content_type().find("multipart/form-data") != std::string::npos)
