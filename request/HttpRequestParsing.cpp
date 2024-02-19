@@ -142,21 +142,17 @@ bool    HttpRequestParsing::parsingBody(void)
 	}
 	else
 	{
-
-
 		server_log("Request fd " + _debugFd + " head length " + int_to_str(_request.getHeaderRequest().size()), ERROR);
 		server_log("Request fd " + _debugFd + " content-length BODY " + int_to_str(_request.getNewBody().size()), ERROR);
 		server_log("Request fd " + _debugFd + " savestring length " + int_to_str(_request.getSaveString().size()), ERROR);
 		server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_request.getNumBytes()), INFO);
 		server_log("Request clientFd " + _debugFd + " recvline size = " + int_to_str(_request.getRecvLine().size()), INFO);
 
-
 		if (isMaxSize(_request.getSaveString().size()) == true) {
 			return (false);
 		}
 		if (_request.getSaveString().size() >= static_cast< std::size_t >(_request.getContentLength()))
 		{
-
 			std::vector<unsigned char> temp =_request.getRecvLine();
 			temp.erase(temp.begin(), temp.begin() + _request.getContentLength());
 			_request.setNewBody(temp);
