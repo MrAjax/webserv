@@ -131,16 +131,15 @@ int	HttpRequest::recvfd(int & fd)
 	_numbytes = recv(fd, /* &temp[0] */&buffer, sizeof(buffer), 0);
 	temp.push_back('\0');
 	saveString.append(buffer, _numbytes);
-	//saveString += reinterpret_cast< char * >(&temp[0]);
 	temp.pop_back();
 	temp.erase(temp.begin() + _numbytes, temp.end());
 	_recvline.insert(_recvline.end(), temp.begin(), temp.end());
+
 	server_log("Request clientFd " + _debugFd + " size temp after = " + int_to_str(temp.size()), INFO);
 	server_log("Request clientFd " + _debugFd + " size recvline = " + int_to_str(temp.size()), INFO);
-
 	server_log("Request clientFd " + _debugFd + " string = " + saveString, INFO);
-
 	server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_numbytes), INFO);
+	
 	if (_numbytes < 0)
 	{
 		server_log("Request clientFd " + _debugFd + " recv error", ERROR);

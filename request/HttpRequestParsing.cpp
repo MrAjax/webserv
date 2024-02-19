@@ -149,10 +149,12 @@ bool    HttpRequestParsing::parsingBody(void)
 		server_log("Request fd " + _debugFd + " savestring length " + int_to_str(_request.getSaveString().size()), ERROR);
 		server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_request.getNumBytes()), INFO);
 		server_log("Request clientFd " + _debugFd + " recvline size = " + int_to_str(_request.getRecvLine().size()), INFO);
-		if (isMaxSize(_request.getRecvLine().size()) == true) {
+
+
+		if (isMaxSize(_request.getSaveString().size()) == true) {
 			return (false);
 		}
-		if (_request.getRecvLine().size() >= static_cast< std::size_t >(_request.getContentLength()))
+		if (_request.getSaveString().size() >= static_cast< std::size_t >(_request.getContentLength()))
 		{
 
 			std::vector<unsigned char> temp =_request.getRecvLine();
