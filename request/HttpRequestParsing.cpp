@@ -29,6 +29,24 @@ bool	HttpRequestParsing::isMaxSize(std::size_t SIZE)
 	return (false);
 }
 
+void	HttpRequestParsing::setHeaderBeginBody(std::size_t pos, std::size_t delimiteurSize)
+{
+	_request.setHeaderRequest(_request.getSaveString().substr(0, pos + delimiteurSize));
+
+	_request.setSaveString(_request.getSaveString().substr(pos  + delimiteurSize));
+	
+	server_log("Request fd " + _debugFd + " pos delimiteur " + int_to_str(pos), ERROR);
+
+	std::vector<unsigned char> temp = _request.getRecvLine();
+	temp.erase(temp.begin(), temp.begin() + pos + delimiteurSize);
+	server_log("Request clientFd " + _debugFd + " size temp after = " + int_to_str(temp.size()), INFO);
+	_request.setNewBody(temp);
+	_request.getRecvLine().clear();
+	_request.getRecvLine() = temp;
+
+	
+}
+
 bool    HttpRequestParsing::parsingHeader(void)
 {
 	if (_request.getStatusCode() != NEW && _request.getStatusCode() != PROCESSING_HEADER)
@@ -42,11 +60,7 @@ bool    HttpRequestParsing::parsingHeader(void)
 		_request.setStatusCode(PROCESSING_HEADER);
 		return (false);
 	}
-	_request.setHeaderRequest(_request.getSaveString().substr(0, pos));
-	if (_request.getSaveString().size() > pos + delimiteur.size())
-		_request.setSaveString(_request.getSaveString().substr(pos + delimiteur.size()));
-	else
-		_request.getSaveString() = "";
+	setHeaderBeginBody(pos, delimiteur.size());
 	if (isMaxSize(_request.getHeaderRequest().size()) == true)
 		return (false);
 	if (parseAllAttributes(_request.getHeaderRequest()) == false)
@@ -110,6 +124,8 @@ bool    HttpRequestParsing::parsingBody(void)
 		_request.setStatusCode(202);
 		return (true);
 	}
+
+	
 	if (_request.getTransferEncoding() == "chunked")
 	{
 		if (_request.getContentLength() == -1)
@@ -126,12 +142,31 @@ bool    HttpRequestParsing::parsingBody(void)
 	}
 	else
 	{
-		if (isMaxSize(_request.getSaveString().size()) == true) {
+
+		std::vector<unsigned char> temp =_request.getRecvLine();
+		_request.setNewBody(temp);
+
+		server_log("Request fd " + _debugFd + " head length " + int_to_str(_request.getHeaderRequest().size()), ERROR);
+		server_log("Request fd " + _debugFd + " content-length BODY " + int_to_str(_request.getNewBody().size()), ERROR);
+		server_log("Request fd " + _debugFd + " savestring length " + int_to_str(_request.getSaveString().size()), ERROR);
+		// server_log(_debugFd + " [" + _request.getSaveString() + "]", ERROR);
+		server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_request.getNumBytes()), INFO);
+		server_log("Request clientFd " + _debugFd + " recvline size = " + int_to_str(_request.getRecvLine().size()), INFO);
+		if (isMaxSize(_request.getNewBody().size()) == true) {
 			return (false);
 		}
-		if (_request.getSaveString().size() >= static_cast< std::size_t >(_request.getContentLength()))
+		if (_request.getRecvLine().size() >= static_cast< std::size_t >(_request.getContentLength()))
 		{
+			while (_request.getNewBody().size() > static_cast< std::size_t >(_request.getContentLength()))
+				_request.getNewBody().pop_back();
+
+			std::vector<unsigned char> temp =_request.getRecvLine();
+			temp.erase(temp.begin(), temp.begin() + _request.getContentLength());
+			_request.setNewBody(temp);
+
 			_request.setBodyRequest(_request.getSaveString().substr(0, _request.getContentLength()));
+			server_log("Request fd " + _debugFd + " YOUHOU ", ERROR);
+
 			_request.setSaveString("");
 			_request.setStatusCode(202);
 			return (true);

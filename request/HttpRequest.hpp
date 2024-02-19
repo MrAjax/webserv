@@ -9,10 +9,10 @@
 enum	{KILL_ME = -1, NEW, PROCESSING_HEADER, DONE_HEADER,
 		DONE_HEADER_CHECKING, PROCESSING_BODY, DONE_ALL};
 
-#define MAXDATA_RECV 5000000
+#define MAXDATA_RECV 5000
 #define NBPARAM 18
-#define KEEP_ALIVE_TIMEOUT 60 // en seconds
-#define REQUEST_TIMEOUT 360 // en seconds
+#define KEEP_ALIVE_TIMEOUT 300 // en seconds
+#define REQUEST_TIMEOUT 600 // en seconds
 
 class HttpRequest
 {
@@ -75,6 +75,9 @@ class HttpRequest
 
 		std::size_t	getMaxBodySize();
 		
+		std::vector<unsigned char>	&getRecvLine();
+		ssize_t		getNumBytes();
+		std::vector<unsigned char>	&getNewBody();
 		// ----------------------Setter--------------
 
 		void	setMethod(const std::string &value);
@@ -114,6 +117,8 @@ class HttpRequest
 		void	setMaxBodySize(const std::size_t &value);
 
 		void	setMyserver(Server **value);
+
+		void	setNewBody(std::vector<unsigned char> &recvline);
 
 	private:
 		std::string _method;
@@ -160,6 +165,9 @@ class HttpRequest
 		struct timespec _keepAliveTimeout;
 		struct timespec _requestTimeout;
 
+		std::vector<unsigned char>	_recvline;
+		ssize_t						_numbytes;
+		std::vector<unsigned char>	_newBody;
 };
 
 #endif
