@@ -143,22 +143,17 @@ bool    HttpRequestParsing::parsingBody(void)
 	else
 	{
 
-		std::vector<unsigned char> temp =_request.getRecvLine();
-		_request.setNewBody(temp);
 
 		server_log("Request fd " + _debugFd + " head length " + int_to_str(_request.getHeaderRequest().size()), ERROR);
 		server_log("Request fd " + _debugFd + " content-length BODY " + int_to_str(_request.getNewBody().size()), ERROR);
 		server_log("Request fd " + _debugFd + " savestring length " + int_to_str(_request.getSaveString().size()), ERROR);
-		// server_log(_debugFd + " [" + _request.getSaveString() + "]", ERROR);
 		server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_request.getNumBytes()), INFO);
 		server_log("Request clientFd " + _debugFd + " recvline size = " + int_to_str(_request.getRecvLine().size()), INFO);
-		if (isMaxSize(_request.getNewBody().size()) == true) {
+		if (isMaxSize(_request.getRecvLine().size()) == true) {
 			return (false);
 		}
 		if (_request.getRecvLine().size() >= static_cast< std::size_t >(_request.getContentLength()))
 		{
-			while (_request.getNewBody().size() > static_cast< std::size_t >(_request.getContentLength()))
-				_request.getNewBody().pop_back();
 
 			std::vector<unsigned char> temp =_request.getRecvLine();
 			temp.erase(temp.begin(), temp.begin() + _request.getContentLength());
