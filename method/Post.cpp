@@ -31,9 +31,8 @@ std::string	Post::_guess_mime_type(std::string &body) {
 		body = body.substr(pos, body.size() - pos);
 	}
 	pos = body.find(multipart_form);
-	if (pos == std::string::npos)
-		return ".txt";
-	body = body.substr(0, pos + 1);
+	if (pos != std::string::npos)
+		body = body.substr(0, pos + 1);
 	for (int i = 0; i < 3 && !body.empty(); ++i) {
 		body.erase(body.end() - 1);
 	}
