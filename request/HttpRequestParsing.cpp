@@ -42,11 +42,11 @@ bool    HttpRequestParsing::parsingHeader(void)
 		_request.setStatusCode(PROCESSING_HEADER);
 		return (false);
 	}
-	_request.setHeaderRequest(_request.getSaveString().substr(0, pos));
-	if (_request.getSaveString().size() > pos + delimiteur.size())
-		_request.setSaveString(_request.getSaveString().substr(pos + delimiteur.size()));
-	else
-		_request.getSaveString() = "";
+	_request.setHeaderRequest(_request.getSaveString().substr(0, pos /**/+delimiteur.size()/**/));
+	// if (_request.getSaveString().size() > pos /*+delimiteur.size()*/)
+	// 	_request.setSaveString(_request.getSaveString().substr(pos  /**/+delimiteur.size()/**/));
+	// else
+	// 	_request.getSaveString() = "";
 	if (isMaxSize(_request.getHeaderRequest().size()) == true)
 		return (false);
 	if (parseAllAttributes(_request.getHeaderRequest()) == false)
@@ -126,12 +126,20 @@ bool    HttpRequestParsing::parsingBody(void)
 	}
 	else
 	{
+		server_log("Request fd " + _debugFd + " content-length " + int_to_str(_request.getContentLength()), ERROR);
+		server_log("Request fd " + _debugFd + " head length " + int_to_str(_request.getHeaderRequest().size()), ERROR);
+		server_log("Request fd " + _debugFd + " savestring length " + int_to_str(_request.getSaveString().size()), ERROR);
+		// server_log(_debugFd + " [" + _request.getSaveString() + "]", ERROR);
+		server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_request.getNumBytes()), INFO);
+		server_log("Request clientFd " + _debugFd + " unitd8 size = " + int_to_str(sizeof(_request.getRecvLine())), INFO);
 		if (isMaxSize(_request.getSaveString().size()) == true) {
 			return (false);
 		}
 		if (_request.getSaveString().size() >= static_cast< std::size_t >(_request.getContentLength()))
 		{
 			_request.setBodyRequest(_request.getSaveString().substr(0, _request.getContentLength()));
+			server_log("Request fd " + _debugFd + " save_string " + _request.getSaveString(), ERROR);
+
 			_request.setSaveString("");
 			_request.setStatusCode(202);
 			return (true);

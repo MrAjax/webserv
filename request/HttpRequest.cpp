@@ -12,8 +12,10 @@ _secFetchSite(""), _contentLength(-1), _contentType(""), _cookie(""), _transferE
 _bodyRequest(""), _headerRequest(""),
 _connfd(connfd), saveString(""), _strContentLength(""), _brutPath(""),
 _servers(servers), _myServer(NULL),
-_statusCode(NEW), _isCgi(false), _isChunked(false), _listenFd(listenFd), _maxBodySize(0)
+_statusCode(NEW), _isCgi(false), _isChunked(false), _listenFd(listenFd), _maxBodySize(0),
+_numbytes(0)
 {
+	memset(_recvline, 0, MAXDATA_RECV + 1);
 	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
 	clock_gettime(CLOCK_REALTIME, &_requestTimeout);
 	std::stringstream ss;
@@ -112,6 +114,8 @@ void		HttpRequest::resetRequest(void)
 	_myServer = NULL;
 	_isCgi = false;
 	_isChunked = false;
+	_numbytes = 0;
+	memset(_recvline, 0, MAXDATA_RECV + 1);
 	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
 	clock_gettime(CLOCK_REALTIME, &_requestTimeout);
 }
@@ -120,23 +124,21 @@ void		HttpRequest::resetRequest(void)
 
 int	HttpRequest::recvfd(int & fd)
 {
-	u_int8_t recvline[MAXDATA_RECV + 1];
-	memset(recvline, 0, MAXDATA_RECV);
-	int numbytes;
-	numbytes = recv(fd, recvline, MAXDATA_RECV - 1, 0);
-	saveString += reinterpret_cast< char * >(recvline);
-	server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(numbytes), INFO);
-	if (numbytes < 0)
+	memset(_recvline, 0, MAXDATA_RECV + 1);
+	_numbytes = recv(fd, _recvline, MAXDATA_RECV, 0);
+	saveString += reinterpret_cast< char * >(_recvline);
+	server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_numbytes), INFO);
+	if (_numbytes < 0)
 	{
 		server_log("Request clientFd " + _debugFd + " recv error", ERROR);
 		_statusCode = 400;
 	}
-	if (numbytes == 0)
+	if (_numbytes == 0)
 	{
 		server_log("Request clientFd " + _debugFd + " has close the connection", ERROR);
 		_statusCode = KILL_ME;
 	}
-	return (numbytes);
+	return (_numbytes);
 }
 
 int    HttpRequest::processingRequest(void)
@@ -217,6 +219,9 @@ int			HttpRequest::getListenFd()			{return (this->_listenFd);}
 
 std::size_t	HttpRequest::getMaxBodySize()		{return (this->_maxBodySize);}
 
+u_int8_t	*HttpRequest::getRecvLine()			{return (this->_recvline);}
+ssize_t		HttpRequest::getNumBytes()			{return (this->_numbytes);}
+
 //-------------------STETTEUR-------------------
 
 void	HttpRequest::setMethod(const std::string &value)			{_method = value;}
@@ -254,3 +259,12 @@ void	HttpRequest::setIsCgi(const bool &value)					{_isCgi = value;}
 void	HttpRequest::setIsChunked(const bool &value)				{_isChunked = value;}
 
 void	HttpRequest::setMaxBodySize(const std::size_t &value)		{_maxBodySize = value;}
+
+void	HttpRequest::setRecvLine(const u_int8_t **recvline)
+{
+	memset(_recvline, 0, MAXDATA_RECV + 1);
+	for (int i = 0; i < MAXDATA_RECV + 1; i++)
+	{
+		_recvline[i] = *recvline[i];
+	}//TODO maybe 1 octet missing
+}
