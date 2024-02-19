@@ -7,8 +7,9 @@ LOG_FILE = server/server.log
 SRC = 	main.cpp \
 		request/HttpRequest.cpp \
 		request/HttpRequestAllow.cpp \
+		request/HttpRequestBody.cpp \
 		request/HttpRequestChecking.cpp \
-		request/HttpRequestParsing.cpp \
+		request/HttpRequestHeader.cpp \
 		method/Delete.cpp \
 		method/Get.cpp \
 		method/Method.cpp \
