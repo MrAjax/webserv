@@ -6,8 +6,6 @@
 #include "../response/StatusSender.hpp"
 #include "../cgi/Cgi.hpp"
 
-enum {ZERO, ONE, TWO, GET, POST, FIVE, DELETE};
-
 class Method {
 	std::string	_path;
 	std::string	_raw_path;

@@ -40,6 +40,7 @@
 #define MAXLINE 4096
 // Other
 #define EXT_SIZE 4
+enum {ZERO, ONE, TWO, GET, POST, FIVE, DELETE};
 // Log file config
 #define LOG_FILE "server/server.log"
 enum {NOLOG, ERROR, DIALOG, INFO, DEBUG};
