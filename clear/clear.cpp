@@ -59,7 +59,6 @@ void removeTimeout(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > 
 			it++;
 			pollfds[i].events = POLLOUT;
 			pollfds[i].revents = 0;
-			// killRequest(clientMap, pollfds, i); //other way to kill request
 		}
 		else if (it->second.second->isRequestTimeout())
 		{

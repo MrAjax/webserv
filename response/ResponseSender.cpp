@@ -32,7 +32,6 @@ ResponseSender::ResponseSender(HttpRequest &Req, struct pollfd &mypoll) : _respo
 		server_log("ClientFd " + int_to_str(mypoll.fd) + " server name is " + serv->getServerName(), DEBUG);
 		server_log("Request is valid", DEBUG);
 		server_log(Req.getHeaderRequest() + "\n\n", DIALOG);
-		//server_log(Req.getBodyRequest() + "\n\n", DIALOG);
 		server_log("Building Response...", DEBUG);
 
 		HttpResponse	Rep(Req, *serv);
@@ -214,7 +213,6 @@ void	ResponseSender::send_first_response_to_client()
 int	ResponseSender::send_response_to_client()
 {
 	server_log("Sending response...", DEBUG);
-    // server_log("Client fd " + int_to_str(_mypoll.fd) + "entire response \"" + _response + "\"", DIALOG);
 
 	ssize_t numbytes;
 	numbytes = send(_mypoll.fd, _response.c_str(), _response.size(), MSG_NOSIGNAL);

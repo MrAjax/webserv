@@ -14,7 +14,6 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	if (get_content_type().find("multipart/form-data") == std::string::npos || pos == std::string::npos) {
 		server_log("not a multipart", DEBUG);
 		_set_post_path(get_raw_path());
-		//_set_post_path_Test(); //in process to fix download path
 		return "_data.csv";
 	}
 	body = body.substr(pos + field.size(), body.size() - pos - field.size());
@@ -42,11 +41,6 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	for (int i = 0; i < 3 && !body.empty(); ++i) {
 		body.erase(body.end() - 1);
 	}
-	/* if (!body.empty())
-		server_log("\nBODY:\n" + body + "$\n", DEBUG);
-	else
-		server_log("\nFILE IS EMPTY", DEBUG); */
-	server_log("AAAAAAA" + value, ERROR);
 	server_log("value = " + value, DEBUG);
 	server_log("path = " + get_path(), DEBUG);
 
@@ -66,7 +60,6 @@ void	Post::_set_post_path(std::string path) {
 		}
 		it++;
 	}
-	server_log("BBBBBB", ERROR);
 	server_log("get_root() = " + get_root(), DEBUG);
 	server_log("post_path = " + post_path, DEBUG);
 	set_path(get_root() + post_path);
@@ -74,7 +67,6 @@ void	Post::_set_post_path(std::string path) {
 
 void	Post::_set_post_path_Test()
 {
-	server_log("CCCCCCC", ERROR);
 	std::string str = trimString(get_path(), "/", END);
 	server_log("get_path() str = " + str, DEBUG);
 	int status = access(str.c_str(), F_OK);
@@ -108,7 +100,6 @@ void	Post::_fill_post_file(Server &serv, std::string body) {
 	if (path.empty())
 		return;
 	server_log("Post file location: " + path, DEBUG);
-	//server_log("Post body: " + body, DEBUG);
 	if (get_content_type().find("multipart/form-data") != std::string::npos)
 		post_file.open(path.c_str(), std::ios::out | std::ios::trunc);
 	else
@@ -135,7 +126,7 @@ void	Post::_fill_post_file(Server &serv, std::string body) {
 void	Post::execute_method(Server &serv) {
 	server_log("current path: " + get_path(), DEBUG);
 	server_log("content type: " + get_content_type(), DEBUG);
-	std::string	redirect_path = get_raw_path(); /* get_path().substr(serv.getRoot().length(), this->get_path().length() - serv.getRoot().length()); */
+	std::string	redirect_path = get_raw_path();
 	_fill_post_file(serv, get_body_request());
 	set_statuscode(303);
 	set_header(" " \

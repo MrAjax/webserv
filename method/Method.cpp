@@ -1,7 +1,5 @@
 #include "Method.hpp"
 
-//Method::Method() {};
-
 Method::Method(std::string path, std::string content, std::string connection_status): _path(path), _content_type(content), _connection_status(connection_status), _header(""), _body(""), _status_code(0) {
 	if (_connection_status.empty())
 		_connection_status = "keep-alive";

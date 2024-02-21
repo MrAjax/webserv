@@ -1,7 +1,5 @@
 #include "StatusSender.hpp"
 
-// rediriger vers les pages d'erreur si besoin
-
 StatusSender::StatusSender(int err, Server &serv, bool is_serv) {
 	_status_code = 0;
 	if (is_serv) {
