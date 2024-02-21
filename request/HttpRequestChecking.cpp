@@ -35,28 +35,23 @@ int HttpRequestChecking::POST(void)
 	if (_request.getContentType().empty())
 	{
 		server_log("Reqest fd " + _debugFd + " method POST whitout content type", ERROR);
-		_request.setStatusCode(411);
-		return (4);
+		return (_request.setStatusCode(411), 4);
 	}
 	if ((_request.getContentLength() != -1 && !_request.getTransferEncoding().empty())
 		|| (_request.getContentLength() == -1 && _request.getTransferEncoding().empty()))
 	{
 		server_log("Reqest fd " + _debugFd + " method POST content lenght and transfer-encoding empty/full at the same time", ERROR);
-		_request.setStatusCode(400);
-		return (5);
+		return (_request.setStatusCode(400), 5);
 	}
 	if (_request.getTransferEncoding() != "chunked" && _request.getContentLength() == -1)
 	{
 		server_log("Reqest fd " + _debugFd + " method POST bad synthax transfer-encoding: " + _request.getTransferEncoding(), ERROR);
-		_request.setStatusCode(400);
-		return (5);
+		return (_request.setStatusCode(400), 5);
 	}
-
 	if (_request.getPath() == "/") //remove for accepting root POST
 	{
 		server_log("Reqest fd " + _debugFd + " method POST with path / not allow", ERROR);
-		_request.setStatusCode(403);
-		return (6);
+		return (_request.setStatusCode(403), 6);
 	}
 	if (findCgi() == true && setCgiPath() == false)
 	{
@@ -187,8 +182,14 @@ bool HttpRequestChecking::setDownloadPath()
 	}
 	else
 	{
-		server_log("Request fd " + _debugFd + " Download location find, creating path", DEBUG);
-		checkPath(loc->getRoot(), *serv, finalPath, false);
+		std::string root = loc->getRoot();
+		// root = trimString(loc->getRoot(), "/", END);
+		if (checkPath(root, *serv, finalPath, false) == -1)
+		{
+			server_log("Request clientFd " + _debugFd + " no download file on location : " + finalPath, ERROR);
+			finalPath = trimString(serv->getRoot(), "/", START);
+			server_log("Request clientFd " + _debugFd + " download file set on root site : " + finalPath, INFO);
+		}
 	}
 	return (_request.setPath(finalPath), true);
 }
@@ -323,7 +324,7 @@ bool HttpRequestChecking::findOtherPath()
 
 int	HttpRequestChecking::isGoodPath(std::string &str)
 {
-	int status = access(str.c_str(), F_OK);
+	int status = access(str.c_str(), R_OK);
 	if (status == -1)
 		return (-1);
 	std::string tabMethod[3] = {"GET", "POST", "DELETE"};
@@ -343,6 +344,15 @@ int	HttpRequestChecking::isGoodPath(std::string &str)
 			return (-2);
 	}
 	return (false);
+}
+
+bool    HttpRequestChecking::fileExiste(std::string &str)
+{
+	int status = access(str.c_str(), F_OK);
+	if (status < 0)
+		return (false);
+	else
+		return (true);
 }
 
 bool    HttpRequestChecking::hasReadPermission(std::string &str)

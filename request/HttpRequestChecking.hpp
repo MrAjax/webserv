@@ -33,9 +33,10 @@ class HttpRequestChecking
 		int			isGoodPath(std::string &str);
 		int			checkPath(std::string const &path, Server const &serv, std::string &finalPath, bool addRoot);
 		//-------------PERMISSION--------------
-		bool       hasReadPermission(std::string &str);
-		bool       hasWritePermission(std::string &str);
-		bool       hasExecutePermission(std::string &str);
+		bool		fileExiste(std::string &str);
+		bool		hasReadPermission(std::string &str);
+		bool		hasWritePermission(std::string &str);
+		bool		hasExecutePermission(std::string &str);
 
 
 
