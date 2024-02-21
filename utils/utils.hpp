@@ -7,6 +7,8 @@
 
 #define START  		0
 #define END 		1
+#define ALL 		2
+
 
 std::string			int_to_str(long int n);
 std::string			getTimestamp(void);
@@ -18,5 +20,6 @@ bool				is_cgi(std::string file_name);
 std::string	        trimString(std::string str, std::string const &toTrim, int STARTorEND);
 ssize_t             strToSsize_t(std::string const &toConvert);
 std::size_t         findLine(std::string &header, std::string &line, std::string &delimiteur);
+std::string         uploadPrint(std::size_t current, std::size_t total);
 
 #endif

@@ -75,10 +75,7 @@ class HttpRequest
 		int			getListenFd();
 
 		std::size_t	getMaxBodySize();
-		
-		std::vector<unsigned char>	&getRecvLine();
-		ssize_t		getNumBytes();
-		std::vector<unsigned char>	&getNewBody();
+
 		// ----------------------Setter--------------
 
 		void	setMethod(const std::string &value);
@@ -118,8 +115,6 @@ class HttpRequest
 		void	setMaxBodySize(const std::size_t &value);
 
 		void	setMyserver(Server **value);
-
-		void	setNewBody(std::vector<unsigned char> &recvline);
 
 	private:
 		std::string _method;
@@ -166,9 +161,7 @@ class HttpRequest
 		struct timespec _keepAliveTimeout;
 		struct timespec _requestTimeout;
 
-		std::vector<unsigned char>	_recvline;
-		ssize_t						_numbytes;
-		std::vector<unsigned char>	_newBody;
+		ssize_t			_numbytes;
 };
 
 #endif

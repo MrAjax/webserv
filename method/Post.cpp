@@ -41,9 +41,7 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	for (int i = 0; i < 3 && !body.empty(); ++i) {
 		body.erase(body.end() - 1);
 	}
-	server_log("value = " + value, DEBUG);
-	server_log("path = " + get_path(), DEBUG);
-
+	server_log("set_path = value [" + value + "] + path [" + get_path()+ "]", DEBUG);
 	set_path(get_path() + value);
 	return "";
 }
@@ -67,6 +65,7 @@ void	Post::_set_post_path(std::string path) {
 
 void	Post::_set_post_path_Test()
 {
+	server_log("CCCCCCC", ERROR);
 	std::string str = trimString(get_path(), "/", END);
 	server_log("get_path() str = " + str, DEBUG);
 	int status = access(str.c_str(), F_OK);
@@ -93,10 +92,23 @@ static	void	post_encoded_text(std::string &query_string, std::fstream &post_file
 	post_file << "\n";
 }
 
+int	checkCreate(std::string path)
+{
+	return (access(path.c_str(), F_OK));
+}
+
+int createDir(std::string path)
+{
+	return (mkdir(path.c_str(), 0777));
+}
+
 void	Post::_fill_post_file(Server &serv, std::string body) {
+
+
 	std::string		ext = _guess_mime_type(body);
 	std::string		path = get_path() + ext;
 	std::fstream	post_file;
+
 	if (path.empty())
 		return;
 	server_log("Post file location: " + path, DEBUG);

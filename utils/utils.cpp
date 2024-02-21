@@ -136,6 +136,11 @@ std::string	trimString(std::string str, std::string const &toTrim, int STARTorEN
 				return (str);
 		return (str.substr(0, (str.size() - toTrim.size())));
 	}
+	if (STARTorEND == ALL){
+		std::string doubleTrim = trimString(str, toTrim, START);
+		doubleTrim = trimString(doubleTrim, toTrim, END);
+		return (doubleTrim);
+	}
 	return (str);
 }
 
@@ -172,4 +177,23 @@ std::size_t	findLine(std::string &header, std::string &line, std::string &delimi
 	line = header.substr(0, end_pos);
 	header = header.substr(end_pos + delimiteur.size());
 	return (end_pos);
+}
+
+std::string    uploadPrint(std::size_t current, std::size_t total)
+{
+	if (total == 0)
+		return ("");
+	double cur = current;
+	double max = total;
+	double percent = (cur / max) * 100;
+	std::string str = "<<";
+	for (double i = 10 ; i <= 100; i += 10)
+	{
+		if (i <= percent)
+			str += "=";
+		else
+			str += "-";
+	}
+	str += ">>";
+	return (str);
 }

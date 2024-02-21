@@ -30,6 +30,8 @@ class HttpRequestBody
 			ssize_t		_contentLength;
 			bool		_isChunked;
 			bool		_isABody;
+			std::size_t	_saveStringSize;
+
 };
 
 #endif

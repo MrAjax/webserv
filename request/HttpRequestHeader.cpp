@@ -23,17 +23,7 @@ bool	HttpRequestHeader::isMaxSize(std::size_t SIZE)
 void	HttpRequestHeader::setHeaderBeginBody(std::size_t pos, std::size_t delimiteurSize)
 {
 	_request.setHeaderRequest(_request.getSaveString().substr(0, pos + delimiteurSize));
-
 	_request.setSaveString(_request.getSaveString().substr(pos + delimiteurSize));
-	
-	server_log("Request fd " + _debugFd + " pos delimiteur " + int_to_str(pos), ERROR);
-
-	std::vector<unsigned char> temp = _request.getRecvLine();
-	temp.erase(temp.begin(), temp.begin() + pos + delimiteurSize);
-	server_log("Request clientFd " + _debugFd + " size temp after = " + int_to_str(temp.size()), INFO);
-	_request.setNewBody(temp);
-	_request.getRecvLine().clear();
-	_request.getRecvLine() = temp;
 }
 
 bool    HttpRequestHeader::parsingHeader(void)

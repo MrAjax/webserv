@@ -9,7 +9,8 @@ HttpRequestBody::HttpRequestBody(HttpRequest &request) : _request(request), _con
 	if (_request.getTransferEncoding() == "chunked")
 		_isChunked = true;
 	if (_contentLength > 0 || _isChunked == true)
-		_isABody= true;
+		_isABody = true;
+	_saveStringSize =_request.getSaveString().size();
 }
 
 HttpRequestBody::~HttpRequestBody() {}
@@ -76,18 +77,13 @@ bool    HttpRequestBody::parsingBody(void)
 	}
 	else
 	{
-		server_log("Request fd " + _debugFd + " head length " + int_to_str(_request.getHeaderRequest().size()), ERROR);
-		server_log("Request fd " + _debugFd + " content-length BODY " + int_to_str(_request.getNewBody().size()), ERROR);
-		server_log("Request fd " + _debugFd + " savestring length " + int_to_str(_request.getSaveString().size()), ERROR);
-		server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_request.getNumBytes()), INFO);
-		server_log("Request clientFd " + _debugFd + " recvline size = " + int_to_str(_request.getRecvLine().size()), INFO);
-		if (isMaxSize(_request.getSaveString().size()) == true) {
+		server_log("Request fd " + _debugFd + " upload progress :	" + uploadPrint(_saveStringSize, _contentLength), INFO);
+		if (isMaxSize(_saveStringSize) == true) {
 			return (false);
 		}
-		if (_request.getSaveString().size() >= static_cast< std::size_t >(_contentLength))
+		if (_saveStringSize >= static_cast< std::size_t >(_contentLength))
 		{
 			_request.setBodyRequest(_request.getSaveString().substr(0, _contentLength));
-			server_log("Request fd " + _debugFd + " YOUHOU ", ERROR);
 			_request.setSaveString("");
 			return (_request.setStatusCode(202), true);
 		}

@@ -48,11 +48,6 @@ int HttpRequestChecking::POST(void)
 		server_log("Reqest fd " + _debugFd + " method POST bad synthax transfer-encoding: " + _request.getTransferEncoding(), ERROR);
 		return (_request.setStatusCode(400), 5);
 	}
-	if (_request.getPath() == "/") //remove for accepting root POST
-	{
-		server_log("Reqest fd " + _debugFd + " method POST with path / not allow", ERROR);
-		return (_request.setStatusCode(403), 6);
-	}
 	if (findCgi() == true && setCgiPath() == false)
 	{
 		server_log("Request fd " + _debugFd + " POST cannot find any valide cgi path", ERROR);
@@ -172,21 +167,25 @@ bool HttpRequestChecking::setDownloadPath()
 {
 	if (_request.getPath() == "/" && findRootPath() == false)
 		return (false);
-
 	Server *serv = _request.getMyserver();
 	Location *loc = serv->getLocation("download");
 	std::string finalPath;
-	if (loc == NULL)
+	if (loc == NULL || loc->getRoot().empty())
+	{
+		server_log("Request fd " + _debugFd + " Download location/root NOT set", DEBUG);
 		checkPath("", *serv, finalPath, true);
+	}
 	else
 	{
 		std::string root = loc->getRoot();
 		if (checkPath(root, *serv, finalPath, false) == -1)
 		{
-			server_log("Request clientFd " + _debugFd + " no download file on location : " + finalPath, ERROR);
-			finalPath = trimString(serv->getRoot(), "/", START);
+			server_log("Request clientFd " + _debugFd + " no download file on location : " + finalPath, DEBUG);
+			finalPath = trimString(serv->getRoot(), ".", START);
+			finalPath = trimString(finalPath, "/", ALL);
 			server_log("Request clientFd " + _debugFd + " download file set on root site : " + finalPath, INFO);
 		}
+		finalPath += "/";
 	}
 	return (_request.setPath(finalPath), true);
 }
@@ -197,33 +196,25 @@ bool HttpRequestChecking::setCgiPath()
 		return (false);
 	Server *serv = _request.getMyserver();
 	std::string processPath;
-	if (checkPath(_request.getPath(), *serv, processPath, true) == true)
-		return (_request.setPath(processPath), true);
+	std::string finalPath;
+
 	Location *loc = serv->getLocation("cgi-bin");
-	if (loc == NULL || loc->getCgi_path().empty())
+	if (loc != NULL || !loc->getRoot().empty())
 	{
-		if (checkPath(_request.getPath(), *serv, processPath, true) == true)
-			return (_request.setPath(processPath), true);
-	}
-	else
-	{
+		server_log("Request fd " + _debugFd + " cgi-bin location find, searching for path", DEBUG);
 		std::string endPath;
 		std::size_t pos = _request.getPath().rfind("/");
 		if (pos == std::string::npos)
 			endPath = _request.getPath();
 		else
 			endPath = _request.getPath().substr(pos + 1);
-		std::vector<std::string> temp = loc->getCgi_path();
-		std::vector<std::string>::iterator it = temp.begin();
-		for (;it != temp.end(); it++)
-		{
-			std::string str = trimString(*it, ".", START);
-			processPath = trimString(str, "/", START) + "/" + endPath;
-			std::string finalPath;
-			if (checkPath(processPath, *serv, finalPath, true) == true)
-				return (_request.setPath(finalPath), true);
-		}
+		processPath = loc->getRoot() + "/" + endPath;
+		if (checkPath(processPath, *serv, finalPath, false) == true)
+			return (_request.setPath(finalPath), true);
 	}
+	server_log("Request fd " + _debugFd + " trying path server_root + brut_path", DEBUG);
+	if (checkPath(_request.getPath(), *serv, processPath, true) == true)
+		return (_request.setPath(processPath), true);
 	server_log("Request fd " + _debugFd + " no valid cgi-bin path has been found", ERROR);
 	return (false);
 }
@@ -242,13 +233,16 @@ bool HttpRequestChecking::findCgi()
 
 int HttpRequestChecking::checkPath(std::string const &path, Server const &serv, std::string &finalPath, bool addRoot)
 {
+	std::string pathStr = trimString(path, ".", START);
+	pathStr = trimString(pathStr, "/", ALL);
 	if (addRoot == true)
 	{
-		std::string tempStr = trimString(path, "/", START);
-		finalPath = trimString(serv.getRoot() + "/" + tempStr, "/", START);
+		std::string servRootStr = trimString(serv.getRoot(), ".", START);
+		servRootStr = trimString(servRootStr, "/", ALL);
+		finalPath = servRootStr + "/" + pathStr;
 	}
 	else
-		finalPath = trimString(path, "/", START);
+		finalPath = pathStr;
 	return (isGoodPath(finalPath));
 }
 
@@ -316,7 +310,8 @@ bool HttpRequestChecking::findOtherPath()
 
 int	HttpRequestChecking::isGoodPath(std::string &str)
 {
-	if (fileExiste(str) == false)
+	int status = access(str.c_str(), R_OK);
+	if (status == -1)
 		return (-1);
 	std::string tabMethod[3] = {"GET", "POST", "DELETE"};
 	int choice = 0;
