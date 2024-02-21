@@ -17,8 +17,8 @@ class Method {
 	std::string	_body;
 	int			_status_code;
 public:
-	Method(std::string path, std::string content, std::string connection_status);
-	Method(std::string path, std::string raw_path, std::string root, std::string content, std::string connection_status, std::string body_request);
+	Method(const std::string &path, const std::string &content, const std::string &connection_status);
+	Method(const std::string &path, const std::string &raw_path, const std::string &root, const std::string &content, const std::string &connection_status, const std::string &body_request);
 
 	virtual ~Method();
 

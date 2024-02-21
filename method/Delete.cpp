@@ -1,6 +1,6 @@
 #include "Delete.hpp"
 
-Delete::Delete(std::string path, std::string content, std::string connection_status): Method(path, content, connection_status) {}
+Delete::Delete(const std::string &path, const std::string &content, const std::string &connection_status): Method(path, content, connection_status) {}
 
 Delete::~Delete() {}
 
