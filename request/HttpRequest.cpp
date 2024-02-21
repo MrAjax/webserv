@@ -123,6 +123,7 @@ void		HttpRequest::resetRequest(void)
 
 int	HttpRequest::recvfd(int & fd)
 {
+	try{
 	char buffer[MAXDATA_RECV + 1];
 	_numbytes = recv(fd, &buffer, sizeof(buffer), 0);
 	saveString.append(buffer, _numbytes);
@@ -138,6 +139,11 @@ int	HttpRequest::recvfd(int & fd)
 	if (_numbytes == 0)
 	{
 		server_log("Request clientFd " + _debugFd + " has close the connection", ERROR);
+		_statusCode = KILL_ME;
+	}
+	} catch (std::exception &e) {
+		(void)e;
+		server_log("Request clientFd " + _debugFd + " exception error", ERROR);
 		_statusCode = KILL_ME;
 	}
 	return (_numbytes);

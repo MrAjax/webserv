@@ -1,6 +1,6 @@
 #include "Post.hpp"
 
-Post::Post(const std::string &path, const std::string &raw_path, const std::string &root, const std::string &content, const std::string &connection_status, const std::string &body_request): Method(path, raw_path, root, content, body_request, connection_status) {}
+Post::Post(const std::string &path, const std::string &raw_path, const std::string &root, const std::string &content, const std::string &connection_status, std::string &body_request): Method(path, raw_path, root, content, connection_status, body_request) {}
 
 Post::~Post() {}
 
@@ -11,6 +11,7 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	std::string	value;
 	size_t		pos = body.find(field);
 
+	server_log("BODY TO POST: " + body, INFO);
 	if (get_content_type().find("multipart/form-data") == std::string::npos || pos == std::string::npos) {
 		server_log("not a multipart", DEBUG);
 		_set_post_path(get_raw_path());
@@ -61,17 +62,6 @@ void	Post::_set_post_path(std::string path) {
 	server_log("get_root() = " + get_root(), DEBUG);
 	server_log("post_path = " + post_path, DEBUG);
 	set_path(get_root() + post_path);
-}
-
-void	Post::_set_post_path_Test()
-{
-	server_log("CCCCCCC", ERROR);
-	std::string str = trimString(get_path(), "/", END);
-	server_log("get_path() str = " + str, DEBUG);
-	int status = access(str.c_str(), F_OK);
-	if (status == -1)
-		server_log("ERROR no download file" + str, ERROR);
-	
 }
 
 static	void	post_encoded_text(std::string &query_string, std::fstream &post_file) {
