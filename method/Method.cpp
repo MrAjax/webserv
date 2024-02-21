@@ -5,7 +5,7 @@ Method::Method(const std::string &path, const std::string &content, const std::s
 		_connection_status = "keep-alive";
 }
 
-Method::Method(const std::string &path, const std::string &raw_path, const std::string &root, const std::string &content, const std::string &connection_status, const std::string &body_request): _path(path), _raw_path(raw_path), _root(root), _content_type(content), _connection_status(connection_status), _body_request(body_request), _header("HTTP/1.1"), _body(""), _status_code(0) {
+Method::Method(const std::string &path, const std::string &raw_path, const std::string &root, const std::string &content, const std::string &connection_status, std::string &body_request): _path(path), _raw_path(raw_path), _root(root), _content_type(content), _connection_status(connection_status), _body_request(body_request), _header("HTTP/1.1"), _body(""), _status_code(0) {
 	if (_connection_status.empty())
 		_connection_status = "keep-alive";
 }
