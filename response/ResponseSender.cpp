@@ -37,12 +37,17 @@ ResponseSender::ResponseSender(HttpRequest &Req, struct pollfd &mypoll) : _respo
 		HttpResponse	Rep(Req, *serv);
 
 		_response = Rep.get_response(*serv);
-		server_log(Rep.get_header(), DIALOG);
+		if (!Rep.get_header().empty())
+			server_log(Rep.get_header(), DIALOG);
+		else
+			server_log(_response, DIALOG);
 		send_first_response_to_client();
 	}
 	catch (std::string &s) {
 		_response = s;
 		server_log(Req.getHeaderRequest() + "\n\n", DIALOG);
+		server_log(Req.getBodyRequest() + "\n\n", DIALOG);
+		server_log(_response, DIALOG);
 		send_first_response_to_client();
 	}
 }
@@ -193,7 +198,7 @@ void	ResponseSender::send_first_response_to_client()
         if (catchHeader() == false)
             return (_request.setStatusCode(KILL_ME)); //TODO
         putTransfertEncoding();
-        // server_log("Client fd " + int_to_str(_mypoll.fd) + " entire response\n[" + _response + "]", DIALOG);
+        server_log("Client fd " + int_to_str(_mypoll.fd) + " entire response\n[" + _response + "]", DIALOG);
         _request.setIsChunked(true);
     }
     if (_request.getIsChunked() == true)

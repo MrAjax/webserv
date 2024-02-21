@@ -1,6 +1,6 @@
 #include "Get.hpp"
 
-Get::Get(const std::string &path, const std::string &content, const std::string &connection_status): Method(path, content, connection_status) {}
+Get::Get(std::string path, std::string content, std::string connection_status): Method(path, content, connection_status) {}
 
 Get::~Get() {}
 
