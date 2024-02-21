@@ -10,7 +10,7 @@ class Post: public Method {
 	void		_set_post_path_Test();
 	void		_fill_post_file(Server &serv, std::string body);
 public:
-	Post(std::string path, std::string raw_path, std::string root, std::string content, std::string body_request, std::string connection_status);
+	Post(const std::string &path, const std::string &raw_path, const std::string &root, const std::string &content, const std::string &connection_status, const std::string &body_request);
 	~Post();
 	void	execute_method(Server &serv);
 };

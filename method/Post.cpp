@@ -1,6 +1,6 @@
 #include "Post.hpp"
 
-Post::Post(std::string path, std::string raw_path, std::string root, std::string content, std::string body_request, std::string connection_status): Method(path, raw_path, root, content, body_request, connection_status) {}
+Post::Post(const std::string &path, const std::string &raw_path, const std::string &root, const std::string &content, const std::string &connection_status, const std::string &body_request): Method(path, raw_path, root, content, body_request, connection_status) {}
 
 Post::~Post() {}
 
