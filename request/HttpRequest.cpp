@@ -115,7 +115,6 @@ void		HttpRequest::resetRequest(void)
 	_isCgi = false;
 	_isChunked = false;
 	_numbytes = 0;
-	_recvline.clear();
 	clock_gettime(CLOCK_REALTIME, &_keepAliveTimeout);
 	clock_gettime(CLOCK_REALTIME, &_requestTimeout);
 }
@@ -124,22 +123,12 @@ void		HttpRequest::resetRequest(void)
 
 int	HttpRequest::recvfd(int & fd)
 {
-	std::vector<unsigned char>	temp(MAXDATA_RECV);
-	
-	server_log("Request clientFd " + _debugFd + " size temp before = " + int_to_str(temp.size()), INFO);
-
 	char buffer[MAXDATA_RECV + 1];
 	_numbytes = recv(fd, &buffer, sizeof(buffer), 0);
-	temp.push_back('\0');
 	saveString.append(buffer, _numbytes);
-	temp.pop_back();
-	temp.erase(temp.begin() + _numbytes, temp.end());
-	_recvline.insert(_recvline.end(), temp.begin(), temp.end());
 
-	server_log("Request clientFd " + _debugFd + " size temp after = " + int_to_str(temp.size()), INFO);
-	server_log("Request clientFd " + _debugFd + " size recvline = " + int_to_str(temp.size()), INFO);
-	server_log("Request clientFd " + _debugFd + " string = " + saveString, INFO);
-	server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_numbytes), INFO);
+	server_log("Request clientFd " + _debugFd + " size save string = " + int_to_str(saveString.size()), DEBUG);
+	server_log("Request clientFd " + _debugFd + " numbytes recv    = " + int_to_str(_numbytes), DEBUG);
 	
 	if (_numbytes < 0)
 	{
@@ -171,7 +160,7 @@ int    HttpRequest::processingRequest(void)
 	}
 	if (_statusCode == DONE_HEADER)
 	{
-		server_log("Request clientFd " + _debugFd + " header size " + int_to_str(_bodyRequest.size()), INFO);
+		server_log("Request clientFd " + _debugFd + " header size " + int_to_str(_headerRequest.size()), INFO);
 		server_log("Request clientFd " + _debugFd + " 2nd step cheking Header in process...", DEBUG);
 		HttpRequestChecking checking(*this);
 		_myServer = checking.findMyServer(_servers);
@@ -237,9 +226,6 @@ int			HttpRequest::getListenFd()			{return (this->_listenFd);}
 
 std::size_t	HttpRequest::getMaxBodySize()		{return (this->_maxBodySize);}
 
-std::vector<unsigned char>	&HttpRequest::getRecvLine()			{return (this->_recvline);}
-ssize_t		HttpRequest::getNumBytes()			{return (this->_numbytes);}
-std::vector<unsigned char>	&HttpRequest::getNewBody()	{return (this->_newBody);}
 //-------------------STETTEUR-------------------
 
 void	HttpRequest::setMethod(const std::string &value)			{_method = value;}
@@ -277,8 +263,3 @@ void	HttpRequest::setIsCgi(const bool &value)					{_isCgi = value;}
 void	HttpRequest::setIsChunked(const bool &value)				{_isChunked = value;}
 
 void	HttpRequest::setMaxBodySize(const std::size_t &value)		{_maxBodySize = value;}
-
-void	HttpRequest::setNewBody(std::vector<unsigned char>	&partBody)
-{
-	_newBody.insert(_newBody.end(), partBody.begin(), partBody.end());
-}

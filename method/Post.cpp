@@ -1,9 +1,6 @@
 #include "Post.hpp"
 
-Post::Post(std::string path, std::string raw_path, std::string root, std::string content, std::string body_request, std::string connection_status): Method(path, raw_path, root, content, body_request, connection_status)
-{
-	server_log("TEST sur POST getRaw " + raw_path + " path " + path, ERROR);
-}
+Post::Post(std::string path, std::string raw_path, std::string root, std::string content, std::string body_request, std::string connection_status): Method(path, raw_path, root, content, body_request, connection_status) {}
 
 Post::~Post() {}
 
@@ -17,7 +14,6 @@ std::string	Post::_guess_mime_type(std::string &body) {
 	if (get_content_type().find("multipart/form-data") == std::string::npos || pos == std::string::npos) {
 		server_log("not a multipart", DEBUG);
 		_set_post_path(get_raw_path());
-		//_set_post_path_Test(); //in process to fix download path
 		return "_data.csv";
 	}
 	body = body.substr(pos + field.size(), body.size() - pos - field.size());
@@ -49,10 +45,7 @@ std::string	Post::_guess_mime_type(std::string &body) {
 		server_log("\nBODY:\n" + body + "$\n", DEBUG);
 	else
 		server_log("\nFILE IS EMPTY", DEBUG); */
-	server_log("AAAAAAA" + value, ERROR);
-	server_log("value = " + value, DEBUG);
-	server_log("path = " + get_path(), DEBUG);
-
+	server_log("set_path = value [" + value + "] + path [" + get_path()+ "]", DEBUG);
 	set_path(get_path() + value);
 	return "";
 }
@@ -73,17 +66,6 @@ void	Post::_set_post_path(std::string path) {
 	server_log("get_root() = " + get_root(), DEBUG);
 	server_log("post_path = " + post_path, DEBUG);
 	set_path(get_root() + post_path);
-}
-
-void	Post::_set_post_path_Test()
-{
-	server_log("CCCCCCC", ERROR);
-	std::string str = trimString(get_path(), "/", END);
-	server_log("get_path() str = " + str, DEBUG);
-	int status = access(str.c_str(), F_OK);
-	if (status == -1)
-		server_log("ERROR no download file" + str, ERROR);
-	
 }
 
 static	void	post_encoded_text(std::string &query_string, std::fstream &post_file) {
@@ -121,10 +103,9 @@ void	Post::_fill_post_file(Server &serv, std::string body) {
 	std::string		path = get_path() + ext;
 	std::fstream	post_file;
 
-	server_log("ext = " + ext + " getRaw " + get_raw_path() + " path " + get_path(), ERROR);
-	
+	if (path.empty())
+		return;
 	server_log("Post file location: " + path, DEBUG);
-	//server_log("Post body: " + body, DEBUG);
 	if (get_content_type().find("multipart/form-data") != std::string::npos)
 		post_file.open(path.c_str(), std::ios::out | std::ios::trunc);
 	else

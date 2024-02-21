@@ -58,7 +58,6 @@ Method	*HttpResponse::_execute_method(int method_code, Server &serv) {
 		m = new Get(_path, _contentType, _connection_status);
 		break;
 	case POST:
-	server_log("TEST getRaw " + _raw_path + " path " + _path, ERROR);
 		m = new Post(_path, _raw_path, _server_path, _contentType, _connection_status, _body_request);
 		break;
 	case DELETE:

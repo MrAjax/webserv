@@ -20,7 +20,7 @@ server {
 	}
 
 	location cgi-bin {
-		root a/website_exmpl/Zzewebsite/cgi-bin/;
+		root website_exmpl/Zzewebsite/cgi-bin/;
 	}
 
 }

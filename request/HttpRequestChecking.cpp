@@ -174,18 +174,18 @@ bool HttpRequestChecking::setDownloadPath()
 	{
 		server_log("Request fd " + _debugFd + " Download location/root NOT set", DEBUG);
 		checkPath("", *serv, finalPath, true);
-		finalPath += "/";
 	}
 	else
 	{
 		std::string root = loc->getRoot();
 		if (checkPath(root, *serv, finalPath, false) == -1)
 		{
-			server_log("Request clientFd " + _debugFd + " no download file on location : " + finalPath, ERROR);
-			finalPath = trimString(serv->getRoot(), "/", START);
-			finalPath += "/";
+			server_log("Request clientFd " + _debugFd + " no download file on location : " + finalPath, DEBUG);
+			finalPath = trimString(serv->getRoot(), ".", START);
+			finalPath = trimString(finalPath, "/", ALL);
 			server_log("Request clientFd " + _debugFd + " download file set on root site : " + finalPath, INFO);
 		}
+		finalPath += "/";
 	}
 	return (_request.setPath(finalPath), true);
 }
@@ -233,12 +233,12 @@ bool HttpRequestChecking::findCgi()
 
 int HttpRequestChecking::checkPath(std::string const &path, Server const &serv, std::string &finalPath, bool addRoot)
 {
-	std::string pathStr = trimString(path, "./", START);
-	pathStr = trimString(pathStr, "/", START);
+	std::string pathStr = trimString(path, ".", START);
+	pathStr = trimString(pathStr, "/", ALL);
 	if (addRoot == true)
 	{
-		std::string servRootStr = trimString(serv.getRoot(), "./", START);
-		servRootStr = trimString(servRootStr, "/", START);
+		std::string servRootStr = trimString(serv.getRoot(), ".", START);
+		servRootStr = trimString(servRootStr, "/", ALL);
 		finalPath = servRootStr + "/" + pathStr;
 	}
 	else
