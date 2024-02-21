@@ -295,7 +295,7 @@ bool HttpRequestChecking::findOtherPath()
 			server_log("Request fd " + _debugFd + " cannot access path : " + finalPath, ERROR);
 			return (_request.setStatusCode(403), false);
 		case -1:
-			server_log("Request fd " + _debugFd + " cannot find the path : " + finalPath, ERROR);
+			server_log("Request fd " + _debugFd + " cannot find the path AAAAAAA : " + finalPath, ERROR);
 			return (_request.setStatusCode(404), false);
 		case -2:
 			server_log("Request fd " + _debugFd + " method " + _request.getMethod() + " not allowed", ERROR);
@@ -310,7 +310,7 @@ bool HttpRequestChecking::findOtherPath()
 
 int	HttpRequestChecking::isGoodPath(std::string &str)
 {
-	int status = access(str.c_str(), R_OK);
+	int status = access(str.c_str(), F_OK);
 	if (status == -1)
 		return (-1);
 	std::string tabMethod[3] = {"GET", "POST", "DELETE"};

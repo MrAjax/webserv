@@ -77,7 +77,7 @@ bool    HttpRequestBody::parsingBody(void)
 	}
 	else
 	{
-		server_log("Request fd " + _debugFd + " upload progress :	" + uploadPrint(_saveStringSize, _contentLength), INFO);
+		//server_log("Request fd " + _debugFd + " upload progress :	" + uploadPrint(_saveStringSize, _contentLength), INFO);
 		if (isMaxSize(_saveStringSize) == true) {
 			return (false);
 		}

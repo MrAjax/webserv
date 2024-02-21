@@ -20,7 +20,7 @@ static	int	check_file_permission(std::string path) {
 }
 
 int	child_process(int *fd, std::string &path) {
-	server_log(std::string(WHITEE) + "Child process", DEBUG);
+	//server_log(std::string(WHITEE) + "Child process", DEBUG);
 	char	*arg[] = {const_cast<char*>(path.c_str()), NULL};
 	close(fd[0]);
 	if (dup2(fd[1], STDOUT_FILENO) < 0) {
@@ -28,7 +28,7 @@ int	child_process(int *fd, std::string &path) {
 		return (500);
 	}
 	close(fd[1]);
-	server_log(std::string(WHITEE) + "Execution", DEBUG);
+	//server_log(std::string(WHITEE) + "Execution", DEBUG);
 	execve(path.c_str(), arg, environ);
 	return (500);
 }
