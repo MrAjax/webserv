@@ -1,0 +1,270 @@
+[36;1m[22:03:33]  SERVER STARTED[0m
+[36;1m[22:03:33]  Server 0 port is 18000[0m
+[36;1m[22:03:33]  Server 0 host is 127.0.0.1[0m
+[36;1m[22:03:33]  Server 0 server_name is Zzewebsite[0m
+[36;1m[22:03:33]  Server 0 max_body_size is 100000000[0m
+[36;1m[22:03:33]  Server 0 root is website_exmpl/Zzewebsite[0m
+[36;1m[22:03:33]  Server 0 set up and ready to listen[0m
+[36;1m[22:03:33]  Server 1 port is 18001[0m
+[36;1m[22:03:33]  Server 1 host is 127.0.0.1[0m
+[36;1m[22:03:33]  Server 1 server_name is simple[0m
+[36;1m[22:03:33]  Server 1 max_body_size is 1024[0m
+[36;1m[22:03:33]  Server 1 root is website_exmpl/Simple[0m
+[36;1m[22:03:33]  Server 1 set up and ready to listen[0m
+[36;1m[22:03:33]  Server 2 port is 18003[0m
+[36;1m[22:03:33]  Server 2 host is 127.0.0.1[0m
+[36;1m[22:03:33]  Server 2 server_name is Hellooo[0m
+[36;1m[22:03:33]  Server 2 max_body_size is 5000000[0m
+[36;1m[22:03:33]  Server 2 root is /website_exmpl/Hellooo[0m
+[36;1m[22:03:33]  Server 2 set up and ready to listen[0m
+[36;1m[22:03:33]  Server 3 port is 18005[0m
+[36;1m[22:03:33]  Server 3 host is 127.0.0.1[0m
+[36;1m[22:03:33]  Server 3 server_name is news.com[0m
+[36;1m[22:03:33]  Server 3 max_body_size is 1024[0m
+[36;1m[22:03:33]  Server 3 root is /website_exmpl/news.com[0m
+[36;1m[22:03:33]  Server 3 set up and ready to listen[0m
+[32;1m
+--------- SocketFd 4 accept new client ---------[0m
+[38;5;227;1m            New connexion on fd 3[0m
+[32;1m
+--------- Processing request clientFd 3 ---------[0m
+[38;5;227;1m            Request clientFd 3 status code 0 enter processing...[0m
+[38;5;227;1m            Request clientFd 3 size save string = 524[0m
+[38;5;227;1m            Request clientFd 3 numbytes recv    = 524[0m
+[38;5;227;1m            Request clientFd 3 1st step getting Header in process...[0m
+[36;1m[22:03:39]  Request clientFd 3 header size 524[0m
+[38;5;227;1m            Request clientFd 3 2nd step cheking Header in process...[0m
+[38;5;227;1m            Finding content type for file: /user/files/delete_me[0m
+[38;5;227;1m            [37;1mSetting up Content Type Finder...[0m
+[38;5;227;1m            [37;1mOpening server/MIME_types file[0m
+[38;5;227;1m            [37;1mserver/MIME_types file is ready[0m
+[38;5;227;1m            [37;1mReading server/MIME_types file...[0m
+[38;5;227;1m            [37;1mContent Type Finder ready to use[0m
+[38;5;227;1m            [37;1m/user/files/delete_me content type: [0m
+[31;1m[22:03:39]  Request fd 3 cannot access path : website_exmpl/Zzewebsite/user/files/delete_me[0m
+[38;5;227;1m            Request clientFd 3 GET status code 403 quitting processing...[0m
+[32;1m
+--------- Sending response to clientFd 3 ---------[0m
+[38;5;227;1m            Sending response to clientFd 3...[0m
+[38;5;227;1m            Found default page for 403 error[0m
+[38;5;227;1m            Finding content type for file: website_exmpl/Zzewebsite/errorpages/403.html[0m
+[38;5;227;1m            [37;1mSetting up Content Type Finder...[0m
+[38;5;227;1m            [37;1mOpening server/MIME_types file[0m
+[38;5;227;1m            [37;1mserver/MIME_types file is ready[0m
+[38;5;227;1m            [37;1mReading server/MIME_types file...[0m
+[38;5;227;1m            [37;1mContent Type Finder ready to use[0m
+[38;5;227;1m            [37;1mwebsite_exmpl/Zzewebsite/errorpages/403.html content type: text/html[0m
+[38;5;227;1m            Building header...[0m
+[38;5;227;1m            Header ready[0m
+[38;5;227;1m            Response status is ready[0m
+[32;1m
+GET /user/files/delete_me HTTP/1.1
+Host: localhost:18000
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Cookie: login-cookie=a3128046-5007-4432-b6a9-cfadadc990b1
+Upgrade-Insecure-Requests: 1
+Sec-Fetch-Dest: document
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: none
+Sec-Fetch-User: ?1
+
+
+
+[0m
+[32;1m
+
+
+[0m
+[32;1m
+HTTP/1.1 403 Forbidden
+Date: [22:03:39] 
+Server: Webserv
+Content-Type: text/html
+Content-Length: 828
+Connection: close
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Error 403 - Forbidden</title>
+    <link rel="stylesheet" href="/errorpages/styles.css">
+</head>
+<body>
+    <h1>Whoa! Get out of here!</h1>
+    <div class="spacer"></div>
+    <p>You're not allowed to be here, turn around and head back to where you came from!</p>
+    <img src="/errorpages/images/monster_angry.svg" alt="angry monster">
+    <p class="instructions">You're not authorized to view this content. This is NOT a credential error, you're just not allowed to be here. (error 403)</p>
+    <div class="spacer"></div>
+    <footer>
+        <a href="/index/index.html">Hello There!</a>
+    </footer>
+</body>
+</html>[0m
+[38;5;227;1m            Client fd 3 preparing 1st response...[0m
+[38;5;227;1m            Sending response...[0m
+[36;1m[22:03:39]  Response sent bytes numbers = 955[0m
+[38;5;227;1m            Set clientFd 3 to close[0m
+[38;5;227;1m            - Remove Request -[0m
+[38;5;227;1m            clientMap[pollfds[4].fd] removed : pollfds[4].fd = 3[0m
+[32;1m
+--------- SocketFd 4 accept new client ---------[0m
+[38;5;227;1m            New connexion on fd 3[0m
+[32;1m
+--------- Processing request clientFd 3 ---------[0m
+[38;5;227;1m            Request clientFd 3 status code 0 enter processing...[0m
+[38;5;227;1m            Request clientFd 3 size save string = 465[0m
+[38;5;227;1m            Request clientFd 3 numbytes recv    = 465[0m
+[38;5;227;1m            Request clientFd 3 1st step getting Header in process...[0m
+[36;1m[22:03:39]  Request clientFd 3 header size 465[0m
+[38;5;227;1m            Request clientFd 3 2nd step cheking Header in process...[0m
+[38;5;227;1m            Finding content type for file: /errorpages/styles.css[0m
+[38;5;227;1m            [37;1mSetting up Content Type Finder...[0m
+[38;5;227;1m            [37;1mOpening server/MIME_types file[0m
+[38;5;227;1m            [37;1mserver/MIME_types file is ready[0m
+[38;5;227;1m            [37;1mReading server/MIME_types file...[0m
+[38;5;227;1m            [37;1mContent Type Finder ready to use[0m
+[38;5;227;1m            [37;1m/errorpages/styles.css content type: text/css[0m
+[38;5;227;1m            Request clientFd 3 checking Header succeed[0m
+[38;5;227;1m            Request clientFd 3 server name : Zzewebsite[0m
+[38;5;227;1m            Request clientFd 3 final path : website_exmpl/Zzewebsite/errorpages/styles.css[0m
+[38;5;227;1m            Request clientFd 3 last step getting Body in process...[0m
+[36;1m[22:03:39]  Request clientFd 3 succesful status code 202[0m
+[36;1m[22:03:39]  Request clientFd 3 body size 0 vs header info [0m
+[38;5;227;1m            Request clientFd 3 GET status code 202 quitting processing...[0m
+[32;1m
+--------- SocketFd 4 accept new client ---------[0m
+[38;5;227;1m            New connexion on fd 8[0m
+[32;1m
+--------- Sending response to clientFd 3 ---------[0m
+[38;5;227;1m            Sending response to clientFd 3...[0m
+[38;5;227;1m            ClientFd 3 server name is Zzewebsite[0m
+[38;5;227;1m            Request is valid[0m
+[32;1m
+GET /errorpages/styles.css HTTP/1.1
+Host: localhost:18000
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0
+Accept: text/css,*/*;q=0.1
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Referer: http://localhost:18000/user/files/delete_me
+Cookie: login-cookie=a3128046-5007-4432-b6a9-cfadadc990b1
+Sec-Fetch-Dest: style
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Site: same-origin
+
+
+
+[0m
+[38;5;227;1m            Building Response...[0m
+[38;5;227;1m            [37;1mmethod = GET[0m
+[38;5;227;1m            [37;1mmethod code = 3[0m
+[38;5;227;1m            [37;1mpath = website_exmpl/Zzewebsite/errorpages/styles.css[0m
+[38;5;227;1m            [37;1mserv name Zzewebsite[0m
+[38;5;227;1m            Finding content type for file: website_exmpl/Zzewebsite/errorpages/styles.css[0m
+[38;5;227;1m            [37;1mSetting up Content Type Finder...[0m
+[38;5;227;1m            [37;1mOpening server/MIME_types file[0m
+[38;5;227;1m            [37;1mserver/MIME_types file is ready[0m
+[38;5;227;1m            [37;1mReading server/MIME_types file...[0m
+[38;5;227;1m            [37;1mContent Type Finder ready to use[0m
+[38;5;227;1m            [37;1mwebsite_exmpl/Zzewebsite/errorpages/styles.css content type: text/css[0m
+[38;5;227;1m            Server successfully found website_exmpl/Zzewebsite/errorpages/styles.css[0m
+[38;5;227;1m            Building header...[0m
+[38;5;227;1m            Header ready[0m
+[38;5;227;1m            Response ready to send[0m
+[32;1m
+HTTP/1.1 200 OK
+Date: [22:03:39] 
+Server: Webserv
+Content-Type: text/css
+Content-Length: 2903
+Connection: keep-alive
+
+[0m
+[38;5;227;1m            Client fd 3 preparing 1st response...[0m
+[38;5;227;1m            Sending response...[0m
+[36;1m[22:03:39]  Response sent bytes numbers = 3028[0m
+[38;5;227;1m            Reset clientFd 3 for other requests (keep-alive)[0m
+[32;1m
+--------- Processing request clientFd 8 ---------[0m
+[38;5;227;1m            Request clientFd 8 status code 0 enter processing...[0m
+[38;5;227;1m            Request clientFd 8 size save string = 486[0m
+[38;5;227;1m            Request clientFd 8 numbytes recv    = 486[0m
+[38;5;227;1m            Request clientFd 8 1st step getting Header in process...[0m
+[36;1m[22:03:39]  Request clientFd 8 header size 486[0m
+[38;5;227;1m            Request clientFd 8 2nd step cheking Header in process...[0m
+[38;5;227;1m            Finding content type for file: /errorpages/images/monster_angry.svg[0m
+[38;5;227;1m            [37;1mSetting up Content Type Finder...[0m
+[38;5;227;1m            [37;1mOpening server/MIME_types file[0m
+[38;5;227;1m            [37;1mserver/MIME_types file is ready[0m
+[38;5;227;1m            [37;1mReading server/MIME_types file...[0m
+[38;5;227;1m            [37;1mContent Type Finder ready to use[0m
+[38;5;227;1m            [37;1m/errorpages/images/monster_angry.svg content type: image/svg+xml[0m
+[38;5;227;1m            Request clientFd 8 checking Header succeed[0m
+[38;5;227;1m            Request clientFd 8 server name : Zzewebsite[0m
+[38;5;227;1m            Request clientFd 8 final path : website_exmpl/Zzewebsite/errorpages/images/monster_angry.svg[0m
+[38;5;227;1m            Request clientFd 8 last step getting Body in process...[0m
+[36;1m[22:03:39]  Request clientFd 8 succesful status code 202[0m
+[36;1m[22:03:39]  Request clientFd 8 body size 0 vs header info [0m
+[38;5;227;1m            Request clientFd 8 GET status code 202 quitting processing...[0m
+[32;1m
+--------- Sending response to clientFd 8 ---------[0m
+[38;5;227;1m            Sending response to clientFd 8...[0m
+[38;5;227;1m            ClientFd 8 server name is Zzewebsite[0m
+[38;5;227;1m            Request is valid[0m
+[32;1m
+GET /errorpages/images/monster_angry.svg HTTP/1.1
+Host: localhost:18000
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0
+Accept: image/avif,image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Referer: http://localhost:18000/user/files/delete_me
+Cookie: login-cookie=a3128046-5007-4432-b6a9-cfadadc990b1
+Sec-Fetch-Dest: image
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Site: same-origin
+
+
+
+[0m
+[38;5;227;1m            Building Response...[0m
+[38;5;227;1m            [37;1mmethod = GET[0m
+[38;5;227;1m            [37;1mmethod code = 3[0m
+[38;5;227;1m            [37;1mpath = website_exmpl/Zzewebsite/errorpages/images/monster_angry.svg[0m
+[38;5;227;1m            [37;1mserv name Zzewebsite[0m
+[38;5;227;1m            Finding content type for file: website_exmpl/Zzewebsite/errorpages/images/monster_angry.svg[0m
+[38;5;227;1m            [37;1mSetting up Content Type Finder...[0m
+[38;5;227;1m            [37;1mOpening server/MIME_types file[0m
+[38;5;227;1m            [37;1mserver/MIME_types file is ready[0m
+[38;5;227;1m            [37;1mReading server/MIME_types file...[0m
+[38;5;227;1m            [37;1mContent Type Finder ready to use[0m
+[38;5;227;1m            [37;1mwebsite_exmpl/Zzewebsite/errorpages/images/monster_angry.svg content type: image/svg+xml[0m
+[38;5;227;1m            Server successfully found website_exmpl/Zzewebsite/errorpages/images/monster_angry.svg[0m
+[38;5;227;1m            Building header...[0m
+[38;5;227;1m            Header ready[0m
+[38;5;227;1m            Response ready to send[0m
+[32;1m
+HTTP/1.1 200 OK
+Date: [22:03:39] 
+Server: Webserv
+Content-Type: image/svg+xml
+Content-Length: 58197
+Connection: keep-alive
+
+[0m
+[38;5;227;1m            Client fd 8 preparing 1st response...[0m
+[38;5;227;1m            Sending response...[0m
+[36;1m[22:03:39]  Response sent bytes numbers = 58328[0m
+[38;5;227;1m            Reset clientFd 8 for other requests (keep-alive)[0m
+[38;5;227;1m            Signal caught[0m
+[36;1m[22:03:52]  Stopping server...[0m
