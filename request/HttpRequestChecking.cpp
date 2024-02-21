@@ -181,14 +181,13 @@ bool HttpRequestChecking::setDownloadPath()
 	else
 	{
 		std::string root = loc->getRoot();
-		root = trimString(loc->getRoot(), "/", END);
+		// root = trimString(loc->getRoot(), "/", END);
 		if (checkPath(root, *serv, finalPath, false) == -1)
 		{
 			server_log("Request clientFd " + _debugFd + " no download file on location : " + finalPath, ERROR);
 			finalPath = trimString(serv->getRoot(), "/", START);
 			server_log("Request clientFd " + _debugFd + " download file set on root site : " + finalPath, INFO);
 		}
-
 	}
 	return (_request.setPath(finalPath), true);
 }
