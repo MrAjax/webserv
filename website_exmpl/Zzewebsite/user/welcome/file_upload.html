@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Upload</title>
+    <link rel="stylesheet" href="/index/styles.css">
+</head>
+<body>
+    <h2>Upload a File</h2>
+	<div class="spacer"></div>
+    <img src="/user/welcome/landscape.jpeg" alt="beautiful landscape">
+    <form action="/user/welcome/file_upload.html" method="post" enctype="multipart/form-data">
+        Select file to upload:
+        <input type="file" name="fileToUpload" id="fileToUpload">
+        <input type="submit" value="Upload File" name="submit">
+    </form>
+    <div class="spacer"></div>
+    <footer>
+        <a href="/index/index.html">Hello There!</a>
+        <p><a href="/cgi-bin/hello.sh.cgi">Hello World</a></p>
+    </footer>
+</body>
+</html>
+

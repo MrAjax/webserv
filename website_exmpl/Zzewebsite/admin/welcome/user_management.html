@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login</title>
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/admin/welcome/user_management.css">
+</head>
+<body>
+   <div><h1>User Management</h1>
+    <img src="/admin/welcome/user_management.jpg" alt="admin">
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Created</th>
+        </tr>
+        </thead>
+        <tbody>
+        {rows}
+        </tbody>
+    </table>
+    </div>
+    <div>
+        <p>Add New User</p>
+        <form action="/cgi-bin/user_create.py.cgi" method="post">
+            <div>
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="add-button">Add</button>
+        </form>
+    </div>
+    <div>
+        <p>Delete User</p>
+        <form action="/cgi-bin/delete_user.py.cgi" method="post">
+            <div>
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            <button type="submit" class="delete-button">Ciao</button>
+        </form>
+    </div>
+    <footer>
+        <p><a href="/admin/welcome/admin_welcome.html">Welcome</a></p>
+    </footer>
+    </body>
+</html>
