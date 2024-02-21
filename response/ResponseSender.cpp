@@ -37,10 +37,10 @@ ResponseSender::ResponseSender(HttpRequest &Req, struct pollfd &mypoll) : _respo
 		HttpResponse	Rep(Req, *serv);
 
 		_response = Rep.get_response(*serv);
-		if (!Rep.get_header().empty())
+/* 		if (!Rep.get_header().empty())
 			server_log(Rep.get_header(), DIALOG);
 		else
-			server_log(_response, DIALOG);
+			server_log(_response, DIALOG); */
 		send_first_response_to_client();
 	}
 	catch (std::string &s) {

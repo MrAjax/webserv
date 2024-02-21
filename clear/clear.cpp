@@ -4,9 +4,10 @@ void	exitClean(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > &cli
 {
 	for (size_t i = 0; i < pollfds.size(); i++)
 	{
-		if (pollfds[i].fd == -1)
+		if (pollfds[i].fd == -1) {
+			std::cerr << "Exit CLean ERROR\n";
 			server_log(std::string(REDD) + "ExitClean pollfds[" + int_to_str(i) + "].fd = -1", ERROR);
-		else
+		} else
 			close(pollfds[i].fd);
 	}
 	for (std::map<int, std::pair<struct sockaddr_in, HttpRequest* > >::iterator it = clientMap.begin();
@@ -90,8 +91,7 @@ void	removeRequest(std::map<int, std::pair<struct sockaddr_in, HttpRequest* > > 
         {
             if (clientMap[pollfds[index].fd].second == NULL)
             {
-                server_log("RemoveRequest Error : clientMap[pollfds[" + int_to_str(index)
-                + "].fd].request = NULL, pollfds[" + int_to_str(index) + "] shouldn't exist", ERROR);
+                server_log("RemoveRequest Error : clientMap[pollfds[" + int_to_str(index) + "].fd].request = NULL, pollfds[" + int_to_str(index) + "] shouldn't exist", ERROR);
                 close(pollfds[index].fd);
                 pollfds.erase(pollfds.begin() + index);
             }

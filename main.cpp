@@ -43,7 +43,9 @@ int main(int ac, char **av)
 			std::size_t sizePollfds = pollfds.size();
 		
 			if (poll(&pollfds[0], sizePollfds, 1000) == -1)
+			{
 				server_log("Poll error pollfds.size() = " + int_to_str(sizePollfds), ERROR); // TODO doit on renvoyer une erreur et fermer server?
+			}
 			if (n == 3)
 				n = 0;
 			std::cout << "\rWebserv is running" << dot[n++] << std::flush;
@@ -53,11 +55,11 @@ int main(int ac, char **av)
 				{
 					handlePollin(pollfds, clientMap, servers, check, i); 	
 				}
-				if (pollfds[i].revents & POLLOUT)
+				else if (pollfds[i].revents & POLLOUT)
 				{
 					handlePollout(pollfds, clientMap, i); 	
 				}
-				if (pollfds[i].events & POLLERR)
+				else if (pollfds[i].events & POLLERR)
 				{
 					handlePollerr(pollfds, clientMap, i);
 				}
@@ -70,4 +72,5 @@ int main(int ac, char **av)
 		std::cerr << e.what() << "\n";
 	}
 	exitClean(clientMap, pollfds);
+	server_log("Stopping server...", INFO);
 }

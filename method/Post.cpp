@@ -63,17 +63,6 @@ void	Post::_set_post_path(std::string path) {
 	set_path(get_root() + post_path);
 }
 
-void	Post::_set_post_path_Test()
-{
-	server_log("CCCCCCC", ERROR);
-	std::string str = trimString(get_path(), "/", END);
-	server_log("get_path() str = " + str, DEBUG);
-	int status = access(str.c_str(), F_OK);
-	if (status == -1)
-		server_log("ERROR no download file" + str, ERROR);
-	
-}
-
 static	void	post_encoded_text(std::string &query_string, std::fstream &post_file) {
 	std::istringstream			query_stream(query_string);
 	std::string					key, value, token;

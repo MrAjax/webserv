@@ -60,7 +60,7 @@ class HttpRequest
 		std::string getHeaderRequest();
 
 		int         getConnfd();
-		std::string getSaveString();
+		std::string &getSaveString();
 		std::string getStrContentLength();
 
 		std::string getBrutPath();

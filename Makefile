@@ -39,7 +39,8 @@ YELLOW=\033[0;93m
 RED=\033[0;38;5;167m
 END=\033[0m
 
-valgrind = valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes --trace-children=yes ./$(NAME) config
+#valgrind = valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes --trace-children=yes ./$(NAME) config
+valgrind = valgrind --leak-check=full ./$(NAME) config
 
 $(NAME) : $(OBJ)
 	@chmod 400 server/MIME_types

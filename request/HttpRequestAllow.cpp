@@ -36,8 +36,7 @@ bool HttpRequestAllow::allowRequest(std::vector<struct pollfd> &pollfds, HttpReq
     }
 	else
     {
-        server_log("Request clientFd " + debugFd
-        + " too many request in small periode of time", ERROR);
+        server_log("Request clientFd " + debugFd + " too many request in small periode of time", ERROR);
         Request.setStatusCode(429);
         return false;
     }

@@ -49,8 +49,7 @@ bool    HttpRequestHeader::parsingHeader(void)
 		ssize_t temp = strToSsize_t(_request.getStrContentLength());
         if (temp == -1)
 		{
-			server_log("Request fd " + _debugFd + " bad synthax content-length : "
-			+ _request.getStrContentLength(), ERROR);
+			server_log("Request fd " + _debugFd + " bad synthax content-length : " + _request.getStrContentLength(), ERROR);
 			_request.setStatusCode(400);
 			return (false);
 		}
