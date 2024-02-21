@@ -48,11 +48,6 @@ int HttpRequestChecking::POST(void)
 		server_log("Reqest fd " + _debugFd + " method POST bad synthax transfer-encoding: " + _request.getTransferEncoding(), ERROR);
 		return (_request.setStatusCode(400), 5);
 	}
-	if (_request.getPath() == "/") //remove for accepting root POST
-	{
-		server_log("Reqest fd " + _debugFd + " method POST with path / not allow", ERROR);
-		return (_request.setStatusCode(403), 6);
-	}
 	if (findCgi() == true && setCgiPath() == false)
 	{
 		server_log("Request fd " + _debugFd + " POST cannot find any valide cgi path", ERROR);
@@ -179,15 +174,16 @@ bool HttpRequestChecking::setDownloadPath()
 	{
 		server_log("Request fd " + _debugFd + " Download location/root NOT set", DEBUG);
 		checkPath("", *serv, finalPath, true);
+		finalPath += "/";
 	}
 	else
 	{
 		std::string root = loc->getRoot();
-		// root = trimString(loc->getRoot(), "/", END);
 		if (checkPath(root, *serv, finalPath, false) == -1)
 		{
 			server_log("Request clientFd " + _debugFd + " no download file on location : " + finalPath, ERROR);
 			finalPath = trimString(serv->getRoot(), "/", START);
+			finalPath += "/";
 			server_log("Request clientFd " + _debugFd + " download file set on root site : " + finalPath, INFO);
 		}
 	}
@@ -215,16 +211,6 @@ bool HttpRequestChecking::setCgiPath()
 		processPath = loc->getRoot() + "/" + endPath;
 		if (checkPath(processPath, *serv, finalPath, false) == true)
 			return (_request.setPath(finalPath), true);
-		// std::vector<std::string> temp = loc->getCgi_path();
-		// std::vector<std::string>::iterator it = temp.begin();
-		// for (;it != temp.end(); it++)
-		// {
-		// 	std::string str = trimString(*it, ".", START);
-		// 	processPath = trimString(str, "/", START) + "/" + endPath;
-		// 	std::string finalPath;
-		// 	if (checkPath(processPath, *serv, finalPath, true) == true)
-		// 		return (_request.setPath(finalPath), true);
-		// }
 	}
 	server_log("Request fd " + _debugFd + " trying path server_root + brut_path", DEBUG);
 	if (checkPath(_request.getPath(), *serv, processPath, true) == true)

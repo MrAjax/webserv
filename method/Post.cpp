@@ -120,14 +120,9 @@ void	Post::_fill_post_file(Server &serv, std::string body) {
 	std::string		ext = _guess_mime_type(body);
 	std::string		path = get_path() + ext;
 	std::fstream	post_file;
-<<<<<<< HEAD
 
 	server_log("ext = " + ext + " getRaw " + get_raw_path() + " path " + get_path(), ERROR);
 	
-=======
-	if (path.empty())
-		return;
->>>>>>> main
 	server_log("Post file location: " + path, DEBUG);
 	//server_log("Post body: " + body, DEBUG);
 	if (get_content_type().find("multipart/form-data") != std::string::npos)

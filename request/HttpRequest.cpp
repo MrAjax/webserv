@@ -138,13 +138,7 @@ int	HttpRequest::recvfd(int & fd)
 
 	server_log("Request clientFd " + _debugFd + " size temp after = " + int_to_str(temp.size()), INFO);
 	server_log("Request clientFd " + _debugFd + " size recvline = " + int_to_str(temp.size()), INFO);
-<<<<<<< HEAD
 	server_log("Request clientFd " + _debugFd + " string = " + saveString, INFO);
-=======
-
-	//server_log("Request clientFd " + _debugFd + " string = " + saveString, INFO);
-
->>>>>>> main
 	server_log("Request clientFd " + _debugFd + " numbytes = " + int_to_str(_numbytes), INFO);
 	
 	if (_numbytes < 0)

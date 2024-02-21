@@ -136,6 +136,11 @@ std::string	trimString(std::string str, std::string const &toTrim, int STARTorEN
 				return (str);
 		return (str.substr(0, (str.size() - toTrim.size())));
 	}
+	if (STARTorEND == ALL){
+		std::string doubleTrim = trimString(str, toTrim, START);
+		doubleTrim = trimString(doubleTrim, toTrim, END);
+		return (doubleTrim);
+	}
 	return (str);
 }
 

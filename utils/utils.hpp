@@ -7,6 +7,8 @@
 
 #define START  		0
 #define END 		1
+#define ALL 		2
+
 
 std::string			int_to_str(long int n);
 std::string			getTimestamp(void);
