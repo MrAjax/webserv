@@ -10,7 +10,7 @@ HttpRequestBody::HttpRequestBody(HttpRequest &request) : _request(request), _con
 		_isChunked = true;
 	if (_contentLength > 0 || _isChunked == true)
 		_isABody = true;
-	_saveStringSize =_request.getSaveString().size();
+	// _saveStringSize =_request.getSaveString().size();
 }
 
 HttpRequestBody::~HttpRequestBody() {}
@@ -77,11 +77,11 @@ bool    HttpRequestBody::parsingBody(void)
 	}
 	else
 	{
-		server_log("Request fd " + _debugFd + " upload progress :	" + uploadPrint(_saveStringSize, _contentLength), INFO);
-		if (isMaxSize(_saveStringSize) == true) {
+		// server_log("Request fd " + _debugFd + " upload progress :	" + uploadPrint(_saveStringSize, _contentLength), INFO);
+		if (isMaxSize(_request.getSaveString().size()) == true) {
 			return (false);
 		}
-		if (_saveStringSize >= static_cast< std::size_t >(_contentLength))
+		if (_request.getSaveString().size() >= static_cast< std::size_t >(_contentLength))
 		{
 			_request.setBodyRequest(_request.getSaveString().substr(0, _contentLength));
 			_request.setSaveString("");

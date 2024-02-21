@@ -310,7 +310,7 @@ bool HttpRequestChecking::findOtherPath()
 
 int	HttpRequestChecking::isGoodPath(std::string &str)
 {
-	int status = access(str.c_str(), R_OK);
+	int status = access(str.c_str(), F_OK);
 	if (status == -1)
 		return (-1);
 	std::string tabMethod[3] = {"GET", "POST", "DELETE"};

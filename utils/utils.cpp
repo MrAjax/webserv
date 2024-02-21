@@ -33,11 +33,13 @@ void	server_log(std::string content, int log_level) {
 	if (log_level > LOGLVL)
 		return ;
 
-	std::fstream	log_file(LOG_FILE, std::ios::out | std::ios::app);
-	std::string		begin;
+	static    std::fstream    log_file;
+    if (!log_file.is_open())
+	{
+        log_file.open(LOG_FILE, std::ios::out | std::ios::app);
+	}
 
-	if (!log_file.is_open())
-		error_throw("cannot open server log file", true);
+	std::string		begin;
 
 	switch (log_level)
 	{
