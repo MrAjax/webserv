@@ -16,7 +16,7 @@ server {
     }
 
 	location download {
-		root website_exmpl/Zzewebsite/Download/;
+		root website_exmpl/Zzewebsite/download/;
 	}
 
 	location cgi-bin {
