@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/21 23:44:45 by mferracc         ###   ########.fr       */
+/*   Updated: 2024/02/22 12:14:37 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,7 @@ void Server::configServer(void) {
 	int ret = getaddrinfo(_ip.c_str(), _port.c_str(), &hints, &_res);
 	if (ret != 0) {
 		std::string tempError = gai_strerror(ret);
+		freeaddrinfo(_res);
 		throw error_throw("getaddrinfo error - parsing/server.cpp: " + tempError, false);
 	}
 	openSocket();
@@ -182,11 +183,13 @@ void Server::configServer(void) {
 				break;
 			} 
 			if (current->ai_next == 0) {
+				freeaddrinfo(_res);
 				throw error_throw("bind error - parsing/Server.cpp", true);
 			}	
 		}
 		ret = listen(_socketfd, MAX_CO);
 		if (ret != 0) {
+			freeaddrinfo(_res);
 			throw error_throw("listen error - parsing/Server.cpp", true);
 		}
 	}	
@@ -207,8 +210,10 @@ void Server::setDefaultValue(void) {
 
 void Server::p_listen(std::string const& line) {
 
-	if (_port.empty() == false)
+	if (_port.empty() == false){
+		freeServer();
 		throw error_throw ("On server " + int_to_str(_i) + " port setup twice", false);
+    }
 
 	size_t pos = std::string("listen").length();
 	while (pos < line.length() && std::isspace(line[pos])) {
@@ -225,8 +230,10 @@ void Server::p_listen(std::string const& line) {
 
 void Server::p_host(std::string const& line) {
 	
-	if (_ip.empty() == false)
+	if (_ip.empty() == false) {
+		freeServer();
 		throw error_throw ("On server " + int_to_str(_i) + " host setup twice", false);
+	}	
 
 	size_t pos= std::string("host").length();
 	while (pos < line.length() && std::isspace(line[pos])) {
@@ -242,6 +249,7 @@ void Server::p_host(std::string const& line) {
 void Server::p_bodySize(std::string const& line) {
 
 	if (_max_body_size != -1) {
+		freeServer();
 		throw error_throw ("On server " + int_to_str(_i) + " max_body_size setup twice", false);
 	}	
 
@@ -259,6 +267,7 @@ void Server::p_bodySize(std::string const& line) {
 void Server::p_server_name(std::string const& line) {
 	
 	if (_server_name.empty() == false) {
+		freeServer();
 		throw error_throw ("On server " + int_to_str(_i) + " server_name setup twice", false);
 	}	
 		
@@ -273,6 +282,7 @@ void Server::p_server_name(std::string const& line) {
 void Server::p_root(std::string const& line) {
 
 	if (_root .empty() == false) {
+		freeServer();
 		throw error_throw ("On server " + int_to_str(_i) + " root setup twice", false);
 	}	
 		
@@ -287,6 +297,7 @@ void Server::p_root(std::string const& line) {
 void Server::p_errorPage(std::string const& line) {
 	
 	if (_error_pages.empty() == false) {
+		freeServer();
 		throw error_throw ("On server " + int_to_str(_i) + " error_pages setup twice", false);
 	}	
 		
@@ -320,6 +331,7 @@ void Server::p_errorPage(std::string const& line) {
 void Server::p_index(std::string const& line) {
 
 	if (_index.empty() == false) {
+		freeServer();
 		throw error_throw ("On server " + int_to_str(_i) + " index setup twice", false);
 	}	
 	size_t pos = std::string("index").length();
@@ -340,6 +352,7 @@ void Server::p_index(std::string const& line) {
 void Server::p_allow_methods(std::string const& line) {
 
 	if (_allow_methods.empty() == false) {
+		freeServer();
 		throw error_throw ("On server Location allow_methods setup twice", false);
 	}
 
