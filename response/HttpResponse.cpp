@@ -66,7 +66,13 @@ Method	*HttpResponse::_execute_method(int method_code, Server &serv) {
 	default:
 		break;
 	}
-	m->execute_method(serv);
+	try {
+		m->execute_method(serv);
+	}
+	catch (std::string &status_error) {
+		delete m;
+		throw status_error;
+	}
 	return m;
 }
 
