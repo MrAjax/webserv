@@ -44,7 +44,7 @@ int main(int ac, char **av)
 		
 			if (poll(&pollfds[0], sizePollfds, 1000) == -1)
 			{
-				server_log("Poll error pollfds.size() = " + int_to_str(sizePollfds), ERROR); // TODO doit on renvoyer une erreur et fermer server?
+				server_log("Poll error pollfds.size() = " + int_to_str(sizePollfds), ERROR);
 			}
 			if (n == 3)
 				n = 0;
