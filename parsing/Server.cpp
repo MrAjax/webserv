@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/22 12:25:36 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/22 12:56:34 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 	: _i(i), _socketfd(-1), _max_body_size(-1), _servers(servers), _socketIsSet(false),
 	_get(true), _post(true), _delete(true)
 {	
-
 	memset(&_res, 0, sizeof(_res));
 
 	void (Server::*ptr[PARAM])(std::string const&) =
@@ -75,6 +74,7 @@ Server& Server::operator = (Server const& a) {
 	_socketfd = a._socketfd;
 	_max_body_size = a._max_body_size;
 	_error_pages = a._error_pages;
+	_servers = a._servers;
 	_res = a._res;
 	_ip = a._ip;
 	_port = a._port;
@@ -102,6 +102,7 @@ Server::Server(Server const& a) {
 	_socketfd = a._socketfd;
 	_max_body_size = a._max_body_size;
 	_error_pages = a._error_pages;
+	_servers = a._servers;
 	_res = a._res;
 	_ip = a._ip;
 	_port = a._port;
