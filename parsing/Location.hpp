@@ -5,12 +5,13 @@
 
 #define PARAM_LOC 8
 typedef void (*FuncPtr)(std::string const&);
+class Server;
 
 class Location {
 
 public:
 
-	Location( std::vector<std::string> config );
+	Location( std::vector<std::string> config, Server* server);
 	Location( Location const& a);
 	Location& operator=( Location const& a);
 	~Location(void);
@@ -49,6 +50,7 @@ private:
 	bool						_delete;
 	std::vector<std::string>	_cgi_ext;
 	std::vector<std::string>	_cgi_path;
+	Server*						_server;
 };
 
 #endif

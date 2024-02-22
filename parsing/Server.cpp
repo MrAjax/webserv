@@ -6,7 +6,7 @@
 /*   By: mferracc <mferracc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 12:33:52 by bahommer          #+#    #+#             */
-/*   Updated: 2024/02/22 12:14:37 by bahommer         ###   ########.fr       */
+/*   Updated: 2024/02/22 12:25:36 by bahommer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ Server::Server(std::vector<std::string> config, std::vector<Server> const& serve
 		int j = 0;
 		
 		if (recording == true && config[i][0] == '}') {
-			Location* tempPtr = new Location(block);
+			Location* tempPtr = new Location(block, this);
 			_locations.insert(std::make_pair(tempLocation, tempPtr));
 			block.clear();
 			recording = false;

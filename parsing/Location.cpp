@@ -1,7 +1,8 @@
 #include "Location.hpp"
+#include "Server.hpp"
 #include "../utils/utils.hpp"
 
-Location::Location(std::vector<std::string> config) : _autoindex(false), _get(true), _post(true), _delete(true) 
+Location::Location(std::vector<std::string> config, Server* server) : _autoindex(false), _get(true), _post(true), _delete(true), _server(server) 
 {
 	void (Location::*ptr[PARAM_LOC])(std::string const&) =
 		{&Location::p_allow_methods, &Location::p_httpRedirection, &Location::p_root, &Location::p_autoindex,
@@ -17,8 +18,10 @@ Location::Location(std::vector<std::string> config) : _autoindex(false), _get(tr
 			}
 			j++;	
 		}	
-		if (j == PARAM_LOC && config[i][0] != '}') // no condition
+		if (j == PARAM_LOC && config[i][0] != '}') { // no condition
+			server->freeServer();
 			throw error_throw("unknown directive \"" + config[i] + "\" - config file", false);
+		}	
 	}
 }
 
@@ -60,6 +63,7 @@ Location::~Location(void) {}
 void Location::p_root(std::string const& line) {
 
 	if (_root.empty() == false) {
+		_server->freeServer();
 		throw error_throw ("On server Location root setup twice", false);
 	}
 
@@ -73,6 +77,7 @@ void Location::p_root(std::string const& line) {
 void Location::p_allow_methods(std::string const& line) {
 
 	if (_allow_methods.empty() == false) {
+		_server->freeServer();
 		throw error_throw ("On server Location allow_methods setup twice", false);
 	}
 
@@ -114,6 +119,7 @@ void Location::p_allow_methods(std::string const& line) {
 void Location::p_httpRedirection(std::string const& line) {
 
 	if (_return.empty() == false) {
+		_server->freeServer();
 		throw error_throw ("On server Location return setup twice", false);
 	}
 
@@ -127,6 +133,7 @@ void Location::p_httpRedirection(std::string const& line) {
 void Location::p_autoindex(std::string const& line ) {
 
 	if (_autoindex == true) {
+		_server->freeServer();
 		throw error_throw ("On server Location autoindex setup twice", false);
 	}
 
@@ -146,6 +153,7 @@ void Location::p_autoindex(std::string const& line ) {
 void Location::p_index(std::string const& line) {
 
 	if (_index.empty() == false) {
+		_server->freeServer();
 		throw error_throw ("On server Location index setup twice", false);
 	}
 
@@ -159,6 +167,7 @@ void Location::p_index(std::string const& line) {
 void Location::p_cgi_path(std::string const& line) {
 
 	if (_cgi_path.empty() == false) {
+		_server->freeServer();
 		throw error_throw ("On server Location cgi_path setup twice", false);
 	}
 
@@ -179,6 +188,7 @@ void Location::p_cgi_path(std::string const& line) {
 void Location::p_cgi_ext(std::string const& line) {
 
 	if (_cgi_ext.empty() == false) {
+		_server->freeServer();
 		throw error_throw ("On server Location cgi_ext setup twice", false);
 	}
 
@@ -199,6 +209,7 @@ void Location::p_cgi_ext(std::string const& line) {
 void Location::p_alias(std::string const& line) {
 
 	if (_alias.empty() == false) {
+		_server->freeServer();
 		throw error_throw ("On server Location alias setup twice", false);
 	}
 

@@ -53,7 +53,6 @@ server {
 	location cgi-bin {
       root ./;  
       cgi_path /usr/bin/python3 /bin/bash;
-	  lol;
       cgi_ext .py .sh;                   
 	}
 }
